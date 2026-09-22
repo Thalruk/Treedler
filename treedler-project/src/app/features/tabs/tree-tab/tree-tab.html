@@ -1,0 +1,74 @@
+<div class="flex flex-col gap-6">
+  <!-- CROWN -->
+  <div [class.opacity-40]="!upgradeService.hasFirstStem()">
+    <h3
+      class="text-xs font-bold text-green-600 uppercase tracking-wider border-b border-gray-700 mb-2 pb-1"
+    >
+      Crown
+    </h3>
+
+    @if (!upgradeService.hasFirstStem()) {
+      <div class="text-xs text-gray-500 italic">Break through the soil to unlock.</div>
+    } @else {
+      <div class="text-xs text-gray-500 italic">Leaf upgrades coming soon.</div>
+    }
+  </div>
+
+  <!-- BARK -->
+  <div [class.opacity-40]="!upgradeService.hasFirstRoot()">
+    <h3
+      class="text-xs font-bold text-yellow-700 uppercase tracking-wider border-b border-gray-700 mb-2 pb-1"
+    >
+      Bark
+    </h3>
+
+    @if (!upgradeService.hasFirstRoot()) {
+      <div class="text-xs text-gray-500 italic">Grow roots to begin stem growth.</div>
+    } @else if (!upgradeService.hasFirstStem()) {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+        <app-upgrade-button
+          title="Pierce the soil (Stem)"
+          [costs]="[
+            { amount: upgradeService.firstStemCost, resourceName: resourceService.water().name },
+          ]"
+          effect="Unlocks {{ resourceService.energy().name }}"
+          [canAfford]="resourceService.water().amount >= upgradeService.firstStemCost"
+          customClasses="bg-yellow-700 hover:bg-yellow-600 disabled:bg-gray-800 border-yellow-500"
+          costTextClass="text-yellow-300"
+          (buy)="upgradeService.buyFirstStem()"
+        >
+        </app-upgrade-button>
+      </div>
+    } @else {
+      <div class="text-xs text-gray-500 italic">Standard bark upgrades coming soon.</div>
+    }
+  </div>
+
+  <!-- ROOTS -->
+  <div>
+    <h3
+      class="text-xs font-bold text-gray-400 uppercase tracking-wider border-b border-gray-700 mb-2 pb-1"
+    >
+      Roots
+    </h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+      @if (!upgradeService.hasFirstRoot()) {
+        <app-upgrade-button
+          title="First Root"
+          [costs]="[
+            { amount: upgradeService.firstRootCost, resourceName: resourceService.water().name },
+          ]"
+          effect="+1 {{ resourceService.water().name }}/s"
+          [canAfford]="resourceService.water().amount >= upgradeService.firstRootCost"
+          customClasses="bg-blue-700 hover:bg-blue-600 disabled:bg-gray-800 border-blue-500"
+          costTextClass="text-blue-300"
+          (buy)="upgradeService.buyFirstRoot()"
+        >
+        </app-upgrade-button>
+      } @else {
+        <!-- Miejsce docelowe na uniwersalną siatkę ulepszeń -->
+      }
+    </div>
+  </div>
+</div>

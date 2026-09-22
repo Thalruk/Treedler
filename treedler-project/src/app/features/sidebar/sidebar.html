@@ -1,0 +1,70 @@
+<div class="w-64 bg-gray-800 p-3 rounded shadow-lg border border-gray-700 h-fit text-sm">
+  <h2 class="font-bold mb-2 border-b border-gray-600 pb-1 text-gray-300">Zasoby</h2>
+  <div class="flex flex-col gap-2 mt-2">
+    <div class="flex flex-col relative pb-1">
+      <div class="flex justify-between items-center z-10">
+        <span class="text-blue-400 font-semibold">{{ resourceService.water().name }}</span>
+        <span class="text-gray-200 font-mono text-xs">
+          {{ resourceService.water().amount | number: '1.0-0' }} /
+          {{ resourceService.water().maxAmount }}
+        </span>
+        <span class="text-green-400 text-xs w-12 text-right">
+          +{{ resourceService.water().generationPerSecond }}/s
+        </span>
+      </div>
+      <div class="absolute bottom-0 left-0 h-[2px] bg-blue-900 w-full rounded">
+        <div
+          class="h-full bg-blue-500 rounded transition-all duration-100 linear"
+          [style.width.%]="
+            (resourceService.water().amount / resourceService.water().maxAmount) * 100
+          "
+        ></div>
+      </div>
+    </div>
+    @if (resourceService.minerals().isUnlocked) {
+      <div class="flex flex-col relative pb-1 mt-3">
+        <div class="flex justify-between items-center z-10">
+          <span class="text-gray-400 font-semibold">{{ resourceService.minerals().name }}</span>
+          <span class="text-gray-200 font-mono text-xs">
+            {{ resourceService.minerals().amount | number: '1.0-0' }} /
+            {{ resourceService.minerals().maxAmount }}
+          </span>
+          <span class="text-green-400 text-xs w-12 text-right">
+            +{{ resourceService.minerals().generationPerSecond }}/s
+          </span>
+        </div>
+        <div class="absolute bottom-0 left-0 h-[2px] bg-gray-700 w-full rounded">
+          <div
+            class="h-full bg-gray-400 rounded transition-all duration-100 linear"
+            [style.width.%]="
+              (resourceService.minerals().amount / resourceService.minerals().maxAmount) * 100
+            "
+          ></div>
+        </div>
+      </div>
+    }
+
+    @if (resourceService.energy().isUnlocked) {
+      <div class="flex flex-col relative pb-1 mt-3">
+        <div class="flex justify-between items-center z-10">
+          <span class="text-gray-400 font-semibold">{{ resourceService.energy().name }}</span>
+          <span class="text-gray-200 font-mono text-xs">
+            {{ resourceService.energy().amount | number: '1.0-0' }} /
+            {{ resourceService.energy().maxAmount }}
+          </span>
+          <span class="text-green-400 text-xs w-12 text-right">
+            +{{ resourceService.energy().generationPerSecond }}/s
+          </span>
+        </div>
+        <div class="absolute bottom-0 left-0 h-[2px] bg-gray-700 w-full rounded">
+          <div
+            class="h-full bg-gray-400 rounded transition-all duration-100 linear"
+            [style.width.%]="
+              (resourceService.energy().amount / resourceService.energy().maxAmount) * 100
+            "
+          ></div>
+        </div>
+      </div>
+    }
+  </div>
+</div>
