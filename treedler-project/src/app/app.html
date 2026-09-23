@@ -1,47 +1,46 @@
 <div class="min-h-screen bg-gray-900 text-gray-100 p-8 font-sans flex gap-6">
-
-  <!-- Odseparowany komponent Sidebara -->
   <app-sidebar></app-sidebar>
 
-  <!-- Główny obszar roboczy -->
-  <div class="flex-1 bg-gray-800 p-4 rounded shadow-lg border border-gray-700 min-h-[600px]">
+  <div
+    class="flex-1 bg-gray-800 p-4 rounded shadow-lg border border-gray-700 min-h-[600px] flex flex-col"
+  >
+    <div class="flex mb-4 border-b border-gray-700 pb-1 text-sm justify-between">
+      <div class="flex gap-4">
+        <button
+          (click)="switchTab(Tab.Tree)"
+          [class.border-green-400]="activeTab() === Tab.Tree"
+          [class.text-green-400]="activeTab() === Tab.Tree"
+          [class.text-gray-500]="activeTab() !== Tab.Tree"
+          class="font-bold border-b-2 border-transparent hover:text-green-300 pb-1 px-1 transition-colors"
+        >
+          Tree
+        </button>
 
-    <!-- Pasek nawigacji zakładek -->
-    <div class="flex gap-4 mb-4 border-b border-gray-700 pb-1 text-sm">
-      <button (click)="switchTab('tree')" [class.border-green-400]="activeTab() === 'tree'"
-        [class.text-green-400]="activeTab() === 'tree'" [class.text-gray-500]="activeTab() !== 'tree'"
-        class="font-bold border-b-2 border-transparent hover:text-green-300 pb-1 px-1 transition-colors">
-        Tree
-      </button>
-
-      <button (click)="switchTab('research')" [class.border-blue-400]="activeTab() === 'research'"
-        [class.text-blue-400]="activeTab() === 'research'" [class.text-gray-500]="activeTab() !== 'research'"
-        class="font-bold border-b-2 border-transparent hover:text-blue-300 pb-1 px-1 transition-colors">
-        Research
-      </button>
-
-      <button (click)="switchTab('mana')" [class.border-purple-400]="activeTab() === 'mana'"
-        [class.text-purple-400]="activeTab() === 'mana'" [class.text-gray-500]="activeTab() !== 'mana'"
-        class="font-bold border-b-2 border-transparent hover:text-purple-300 pb-1 px-1 transition-colors">
-        Magic
-      </button>
-    </div>
-
-    <!-- Dynamiczne ładowanie komponentów zakładek -->
-    <div class="pt-2">
-      @if (activeTab() === 'tree') {
-      <app-tree-tab></app-tree-tab>
-      }
-
-      @if (activeTab() === 'research') {
-      <div class="text-gray-400 italic">Panel Badań zostanie odblokowany po osiągnięciu odpowiedniego poziomu kory.
+        <!-- Miejsce na Research i Magic w przyszłości -->
       </div>
-      }
 
-      @if (activeTab() === 'mana') {
-      <div class="text-gray-400 italic">Panel Magii jest obecnie zablokowany. Odkryj źródło many.</div>
-      }
+      <div>
+        <button
+          (click)="switchTab(Tab.Settings)"
+          [class.border-gray-400]="activeTab() === Tab.Settings"
+          [class.text-gray-100]="activeTab() === Tab.Settings"
+          [class.text-gray-500]="activeTab() !== Tab.Settings"
+          class="font-bold border-b-2 border-transparent hover:text-gray-300 pb-1 px-1 transition-colors"
+        >
+          Settings
+        </button>
+      </div>
     </div>
 
+    <!-- Wyświetlanie zawartości -->
+    <div class="pt-2 flex-1">
+      @if (activeTab() === Tab.Tree) {
+        <app-tree-tab></app-tree-tab>
+      }
+
+      @if (activeTab() === Tab.Settings) {
+        <app-settings-tab></app-settings-tab>
+      }
+    </div>
   </div>
 </div>

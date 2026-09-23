@@ -1,6 +1,6 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
 import { Resource } from '../models/resource.model';
-import { ResourceId, ResourceName } from '../models/resource.enum';
+import { ResourceId, ResourceName } from '../enums/resource.enum';
 
 @Injectable({ providedIn: 'root' })
 export class ResourceService {

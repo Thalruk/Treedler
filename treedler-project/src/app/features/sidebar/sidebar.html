@@ -14,7 +14,7 @@
       </div>
       <div class="absolute bottom-0 left-0 h-[2px] bg-blue-900 w-full rounded">
         <div
-          class="h-full bg-blue-500 rounded transition-all duration-100 linear"
+          class="h-full bg-blue-500 rounded transition-[width] duration-300 ease-out"
           [style.width.%]="
             (resourceService.water().amount / resourceService.water().maxAmount) * 100
           "
@@ -35,7 +35,7 @@
         </div>
         <div class="absolute bottom-0 left-0 h-[2px] bg-gray-700 w-full rounded">
           <div
-            class="h-full bg-gray-400 rounded transition-all duration-100 linear"
+            class="h-full bg-gray-400 rounded transition-[width] duration-300 ease-out"
             [style.width.%]="
               (resourceService.minerals().amount / resourceService.minerals().maxAmount) * 100
             "
@@ -58,7 +58,7 @@
         </div>
         <div class="absolute bottom-0 left-0 h-[2px] bg-gray-700 w-full rounded">
           <div
-            class="h-full bg-gray-400 rounded transition-all duration-100 linear"
+            class="h-full bg-gray-400 rounded transition-[width] duration-300 ease-out"
             [style.width.%]="
               (resourceService.energy().amount / resourceService.energy().maxAmount) * 100
             "

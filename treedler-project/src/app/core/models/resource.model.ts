@@ -1,4 +1,4 @@
-import { ResourceId } from './resource.enum';
+import { ResourceId } from '../enums/resource.enum';
 
 export interface Resource {
   id: ResourceId;
