@@ -1,21 +1,45 @@
-<button
-  (click)="buy.emit()"
-  [disabled]="!canAfford"
-  class="text-left p-2 rounded flex flex-col justify-between h-16 transition-all group w-full border"
-  [ngClass]="customClasses"
->
-  <div class="font-bold text-gray-100 text-sm">{{ title }}</div>
-
-  <div class="flex justify-between items-end w-full mt-1">
-    <div class="flex gap-1" [ngClass]="costTextClass">
-      <span class="text-xs font-semibold">Cost:</span>
-      @for (cost of costs; track cost.resourceName) {
-        <span class="text-xs">{{ cost.amount }} {{ cost.resourceName }}</span>
+<div class="relative w-full" (mouseenter)="onMouseEnter($event)" (mouseleave)="onMouseLeave()">
+  <button
+    (click)="buy.emit()"
+    [disabled]="!canAfford"
+    class="w-full text-left px-3 py-4 rounded transition-colors border"
+    [ngClass]="customClasses"
+  >
+    <div class="font-bold text-gray-100 text-sm flex justify-between items-center">
+      <span>{{ title }}</span>
+      @if (!canAfford) {
+        <span class="text-xs text-red-400 font-normal">Cannot afford</span>
       }
     </div>
+  </button>
 
-    <span class="text-xs text-green-400 opacity-0 group-hover:opacity-100 transition-opacity">
-      {{ effect }}
-    </span>
-  </div>
-</button>
+  <!-- Dynamic Tooltip -->
+  @if (isHovered()) {
+    <div
+      class="absolute left-1/2 -translate-x-1/2 w-64 p-3 bg-gray-900 border border-gray-600 rounded shadow-xl pointer-events-none z-50"
+      [ngClass]="{
+        'top-full mt-2': position() === 'bottom',
+        'bottom-full mb-2': position() === 'top',
+      }"
+    >
+      <div class="font-bold text-gray-200 mb-1 border-b border-gray-700 pb-1">{{ title }}</div>
+
+      @if (description) {
+        <div class="text-xs text-gray-400 mb-2 italic">{{ description }}</div>
+      }
+
+      <div class="text-xs font-semibold text-gray-300 mb-1 mt-2">Cost:</div>
+      <div class="flex flex-col gap-1 mb-2">
+        @for (cost of costs; track cost.resourceName) {
+          <div class="flex justify-between text-xs">
+            <span class="text-gray-400">{{ cost.resourceName }}</span>
+            <span class="text-gray-200">{{ cost.amount }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="text-xs font-semibold text-gray-300 mb-1">Effect:</div>
+      <div class="text-xs text-green-400">{{ effect }}</div>
+    </div>
+  }
+</div>
