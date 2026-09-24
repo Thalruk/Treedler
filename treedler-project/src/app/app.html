@@ -1,9 +1,16 @@
 <div class="min-h-screen bg-gray-900 text-gray-100 p-8 font-sans flex gap-6">
+  <!-- ========================================== -->
+  <!-- SIDE PANEL                                 -->
+  <!-- ========================================== -->
   <app-sidebar></app-sidebar>
 
+  <!-- ========================================== -->
+  <!-- MAIN WINDOW                                -->
+  <!-- ========================================== -->
   <div
     class="flex-1 bg-gray-800 p-4 rounded shadow-lg border border-gray-700 min-h-[600px] flex flex-col"
   >
+    <!-- NAVIGATION TABS -->
     <div class="flex mb-4 border-b border-gray-700 pb-1 text-sm justify-between">
       <div class="flex gap-4">
         <button
@@ -15,8 +22,17 @@
         >
           Tree
         </button>
-
-        <!-- Miejsce na Research i Magic w przyszłości -->
+        @if (storylineService.isResearchUnlocked()) {
+          <button
+            (click)="switchTab(Tab.Research)"
+            [class.border-green-400]="activeTab() === Tab.Research"
+            [class.text-green-400]="activeTab() === Tab.Research"
+            [class.text-gray-500]="activeTab() !== Tab.Research"
+            class="font-bold border-b-2 border-transparent hover:text-green-300 pb-1 px-1 transition-colors"
+          >
+            Research
+          </button>
+        }
       </div>
 
       <div>
@@ -32,13 +48,13 @@
       </div>
     </div>
 
-    <!-- Wyświetlanie zawartości -->
+    <!-- CONTENT AREA -->
     <div class="pt-2 flex-1">
       @if (activeTab() === Tab.Tree) {
         <app-tree-tab></app-tree-tab>
-      }
-
-      @if (activeTab() === Tab.Settings) {
+      } @else if (activeTab() === Tab.Research) {
+        <app-research-tab></app-research-tab>
+      } @else if (activeTab() === Tab.Settings) {
         <app-settings-tab></app-settings-tab>
       }
     </div>

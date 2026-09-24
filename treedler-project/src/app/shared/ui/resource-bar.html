@@ -1,0 +1,82 @@
+<div class="flex flex-col relative pb-1 group cursor-help mt-3 first:mt-0">
+  <!-- ========================================== -->
+  <!-- MAIN VALUES                                -->
+  <!-- ========================================== -->
+  <div class="grid grid-cols-3 items-center z-10">
+    <span class="font-semibold justify-self-start" [ngClass]="colorClass">{{ name }}</span>
+
+    <span class="text-gray-200 font-mono text-xs justify-self-center">
+      {{ amount | number: '1.0-0' }} / {{ maxAmount }}
+    </span>
+
+    <span
+      class="text-xs font-mono justify-self-end"
+      [ngClass]="netGeneration >= 0 ? 'text-green-400' : 'text-red-400'"
+    >
+      {{ netGeneration > 0 ? '+' : '' }}{{ netGeneration }}/s
+    </span>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- PROGRESS BAR                               -->
+  <!-- ========================================== -->
+  <div class="absolute bottom-0 left-0 h-[2px] bg-gray-700 w-full rounded" [ngClass]="bgDarkClass">
+    <div
+      class="h-full rounded transition-[width] duration-300 ease-out"
+      [ngClass]="bgLightClass"
+      [style.width.%]="(amount / maxAmount) * 100"
+    ></div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- HOVER TOOLTIP                              -->
+  <!-- ========================================== -->
+  <div
+    class="absolute left-full ml-4 top-0 w-80 bg-gray-900 border border-gray-600 rounded p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none flex gap-3"
+  >
+    <!-- Kolumna: Produkcja -->
+    <div class="flex-1 border-r border-gray-700 pr-3">
+      <div class="text-xs font-bold text-gray-200 mb-2 border-b border-gray-700 pb-1">
+        Production
+      </div>
+      <div class="flex flex-col gap-1">
+        @for (item of breakdown; track item.label) {
+          <div class="flex justify-between text-xs">
+            <span class="text-gray-400">{{ item.label }}:</span>
+            <span class="font-mono" [ngClass]="item.isNegative ? 'text-red-400' : 'text-green-400'">
+              {{ item.isNegative ? '' : '+' }}{{ item.amount }}
+            </span>
+          </div>
+        }
+        <div class="flex justify-between text-xs border-t border-gray-700 mt-1 pt-1 font-bold">
+          <span class="text-gray-300">Total:</span>
+          <span
+            class="font-mono"
+            [ngClass]="netGeneration >= 0 ? 'text-green-400' : 'text-red-400'"
+          >
+            {{ netGeneration > 0 ? '+' : '' }}{{ netGeneration }}/s
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Column: Magazyn -->
+    <div class="flex-1 pl-1">
+      <div class="text-xs font-bold text-gray-200 mb-2 border-b border-gray-700 pb-1">Capacity</div>
+      <div class="flex flex-col gap-1">
+        @for (item of capacityBreakdown; track item.label) {
+          <div class="flex justify-between text-xs">
+            <span class="text-gray-400">{{ item.label }}:</span>
+            <span class="font-mono text-blue-300"> +{{ item.amount }} </span>
+          </div>
+        }
+        <div class="flex justify-between text-xs border-t border-gray-700 mt-1 pt-1 font-bold">
+          <span class="text-gray-300">Total:</span>
+          <span class="font-mono text-blue-300">
+            {{ maxAmount }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

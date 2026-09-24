@@ -4,10 +4,18 @@ import { UpgradeService } from './upgrade.service';
 
 @Injectable({ providedIn: 'root' })
 export class SaveService {
+  // ==========================================
+  // 1. INJECTIONS & CONSTANTS
+  // ==========================================
+
   private resourceService = inject(ResourceService);
   private upgradeService = inject(UpgradeService);
 
   private readonly SAVE_KEY = 'treedler_save';
+
+  // ==========================================
+  // 2. ACTIONS
+  // ==========================================
 
   public saveGame(): void {
     const saveState = {
@@ -19,6 +27,10 @@ export class SaveService {
       upgrades: {
         hasFirstRoot: this.upgradeService.hasFirstRoot(),
         hasFirstStem: this.upgradeService.hasFirstStem(),
+        rootWidthLevel: this.upgradeService.rootWidthLevel(),
+        rootDepthLevel: this.upgradeService.rootDepthLevel(),
+        barkThicknessLevel: this.upgradeService.barkThicknessLevel(),
+        leafLevel: this.upgradeService.leafLevel(),
       },
     };
     localStorage.setItem(this.SAVE_KEY, JSON.stringify(saveState));
@@ -42,9 +54,17 @@ export class SaveService {
           this.upgradeService.hasFirstRoot.set(parsed.upgrades.hasFirstRoot);
         if (parsed.upgrades.hasFirstStem !== undefined)
           this.upgradeService.hasFirstStem.set(parsed.upgrades.hasFirstStem);
+        if (parsed.upgrades.rootWidthLevel !== undefined)
+          this.upgradeService.rootWidthLevel.set(parsed.upgrades.rootWidthLevel);
+        if (parsed.upgrades.rootDepthLevel !== undefined)
+          this.upgradeService.rootDepthLevel.set(parsed.upgrades.rootDepthLevel);
+        if (parsed.upgrades.barkThicknessLevel !== undefined)
+          this.upgradeService.barkThicknessLevel.set(parsed.upgrades.barkThicknessLevel);
+        if (parsed.upgrades.leafLevel !== undefined)
+          this.upgradeService.leafLevel.set(parsed.upgrades.leafLevel);
       }
     } catch (e) {
-      console.error('Błąd wczytywania zapisu gry:', e);
+      console.error('Save load error:', e);
     }
   }
 

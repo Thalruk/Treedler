@@ -1,19 +1,28 @@
 <div class="relative w-full" (mouseenter)="onMouseEnter($event)" (mouseleave)="onMouseLeave()">
+  <!-- ========================================== -->
+  <!-- ACTION BUTTON                              -->
+  <!-- ========================================== -->
   <button
     (click)="buy.emit()"
     [disabled]="!canAfford"
     class="w-full text-left px-3 py-4 rounded transition-colors border"
-    [ngClass]="customClasses"
+    [ngClass]="{
+      'bg-gray-600 hover:bg-gray-500 border-gray-500': canAfford,
+      'bg-gray-800 border-gray-700 cursor-not-allowed': !canAfford && isReachable,
+      'bg-black border-gray-900 cursor-not-allowed': !isReachable,
+    }"
   >
-    <div class="font-bold text-gray-100 text-sm flex justify-between items-center">
+    <div
+      class="font-bold text-sm flex justify-between items-center"
+      [ngClass]="canAfford ? 'text-gray-100' : isReachable ? 'text-gray-400' : 'text-gray-600'"
+    >
       <span>{{ title }}</span>
-      @if (!canAfford) {
-        <span class="text-xs text-red-400 font-normal">Cannot afford</span>
-      }
     </div>
   </button>
 
-  <!-- Dynamic Tooltip -->
+  <!-- ========================================== -->
+  <!-- HOVER TOOLTIP                              -->
+  <!-- ========================================== -->
   @if (isHovered()) {
     <div
       class="absolute left-1/2 -translate-x-1/2 w-64 p-3 bg-gray-900 border border-gray-600 rounded shadow-xl pointer-events-none z-50"

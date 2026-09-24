@@ -13,24 +13,33 @@ export interface UpgradeCost {
   templateUrl: './upgrade-button.html',
 })
 export class UpgradeButtonComponent {
+  // ==========================================
+  // 1. INPUTS & OUTPUTS
+  // ==========================================
+
   @Input({ required: true }) title!: string;
   @Input() description: string = '';
   @Input({ required: true }) costs!: UpgradeCost[];
   @Input({ required: true }) effect!: string;
   @Input({ required: true }) canAfford!: boolean;
-
-  @Input() customClasses: string =
-    'bg-gray-800 hover:bg-gray-700 disabled:bg-gray-900 border-gray-600 disabled:border-gray-800';
+  @Input() isReachable: boolean = true;
 
   @Output() buy = new EventEmitter<void>();
+
+  // ==========================================
+  // 2. STATE (SIGNALS)
+  // ==========================================
 
   public isHovered = signal<boolean>(false);
   public position = signal<'top' | 'bottom'>('bottom');
 
+  // ==========================================
+  // 3. UI EVENTS
+  // ==========================================
+
   public onMouseEnter(event: MouseEvent): void {
     const buttonElement = event.currentTarget as HTMLElement;
     const rect = buttonElement.getBoundingClientRect();
-
     const spaceBelow = window.innerHeight - rect.bottom;
 
     if (spaceBelow < 150) {

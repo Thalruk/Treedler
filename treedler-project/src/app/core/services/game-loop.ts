@@ -1,13 +1,27 @@
 import { Injectable, inject } from '@angular/core';
 import { ResourceService } from './resource';
 import { SaveService } from './save.service';
+import { UpgradeService } from './upgrade.service';
+import { ResearchService } from './research.service';
+import { StorylineService } from './storyline.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GameLoopService {
+  // ==========================================
+  // 1. INJECTIONS
+  // ==========================================
+
   private resourceService = inject(ResourceService);
   private saveService = inject(SaveService);
+  private upgradeService = inject(UpgradeService);
+  private researchService = inject(ResearchService);
+  private storylineService = inject(StorylineService);
+
+  // ==========================================
+  // 2. STATE & CONFIG
+  // ==========================================
 
   private lastTickTime: number = 0;
   private lastSaveTime: number = 0;
@@ -16,6 +30,10 @@ export class GameLoopService {
 
   private ticksPerSecond: number = 10;
   private saveIntervalSeconds: number = 30;
+
+  // ==========================================
+  // 3. LIFECYCLE
+  // ==========================================
 
   public start(): void {
     if (this.isRunning) return;
@@ -50,7 +68,21 @@ export class GameLoopService {
     this.saveService.saveGame();
   }
 
+  // ==========================================
+  // 4. CORE LOGIC
+  // ==========================================
+
   private updateGame(deltaTime: number): void {
-    this.resourceService.tick(deltaTime);
+    const dt = deltaTime;
+
+    const generations = {
+      water: this.upgradeService.waterGeneration(),
+      minerals: this.upgradeService.mineralsGeneration(),
+      energy: this.upgradeService.energyGeneration(),
+    };
+
+    this.resourceService.tick(dt, generations);
+    this.researchService.tick(dt);
+    this.storylineService.checkMilestones();
   }
 }

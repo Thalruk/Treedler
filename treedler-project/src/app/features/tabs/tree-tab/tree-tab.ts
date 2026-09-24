@@ -11,6 +11,10 @@ import { UpgradeButtonComponent } from '../../../shared/ui/upgrade-button';
   templateUrl: './tree-tab.html',
 })
 export class TreeTabComponent {
+  // ==========================================
+  // 1. INJECTIONS
+  // ==========================================
+
   public resourceService = inject(ResourceService);
   public upgradeService = inject(UpgradeService);
 }

@@ -9,7 +9,15 @@ import { SaveService } from '../../../core/services/save.service';
   templateUrl: './settings-tab.html',
 })
 export class SettingsTabComponent {
+  // ==========================================
+  // 1. INJECTIONS
+  // ==========================================
+
   private saveService = inject(SaveService);
+
+  // ==========================================
+  // 2. ACTIONS
+  // ==========================================
 
   public wipeSave(): void {
     const isConfirmed = window.confirm(
