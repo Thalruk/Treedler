@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { ResourceService } from './resource';
 import { SaveService } from './save.service';
 import { UpgradeService } from './upgrade.service';
-import { ResearchService } from './research.service';
+import { MutationService } from './mutation.service';
 import { StorylineService } from './storyline.service';
 
 @Injectable({
@@ -16,7 +16,7 @@ export class GameLoopService {
   private resourceService = inject(ResourceService);
   private saveService = inject(SaveService);
   private upgradeService = inject(UpgradeService);
-  private researchService = inject(ResearchService);
+  private mutationService = inject(MutationService);
   private storylineService = inject(StorylineService);
 
   // ==========================================
@@ -82,7 +82,7 @@ export class GameLoopService {
     };
 
     this.resourceService.tick(dt, generations);
-    this.researchService.tick(dt);
+    this.mutationService.tick(dt);
     this.storylineService.checkMilestones();
   }
 }

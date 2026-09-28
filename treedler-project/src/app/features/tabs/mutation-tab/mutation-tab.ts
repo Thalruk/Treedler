@@ -1,17 +1,17 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ResearchService } from '../../../core/services/research.service';
+import { MutationService } from '../../../core/services/mutation.service';
 
 @Component({
-  selector: 'app-research-tab',
+  selector: 'app-mutation-tab',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './research-tab.html',
+  templateUrl: './mutation-tab.html',
 })
-export class ResearchTabComponent {
+export class MutationTabComponent {
   // ==========================================
   // 1. INJECTIONS
   // ==========================================
 
-  public researchService = inject(ResearchService);
+  public mutationService = inject(MutationService);
 }

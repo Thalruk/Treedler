@@ -6,7 +6,7 @@ import { SidebarComponent } from './features/sidebar/sidebar';
 import { TreeTabComponent } from './features/tabs/tree-tab/tree-tab';
 import { TabId } from './core/enums/tab.enum';
 import { SettingsTabComponent } from './features/tabs/settings-tab/settings-tab';
-import { ResearchTabComponent } from './features/tabs/research-tab/research-tab';
+import { MutationTabComponent } from './features/tabs/mutation-tab/mutation-tab';
 
 @Component({
   selector: 'app-root',
@@ -16,28 +16,15 @@ import { ResearchTabComponent } from './features/tabs/research-tab/research-tab'
     SidebarComponent,
     TreeTabComponent,
     SettingsTabComponent,
-    ResearchTabComponent,
+    MutationTabComponent,
   ],
   templateUrl: './app.html',
 })
 export class AppComponent implements OnInit {
-  // ==========================================
-  // 1. INJECTIONS
-  // ==========================================
-
   private gameLoop = inject(GameLoopService);
   public storylineService = inject(StorylineService);
-
-  // ==========================================
-  // 2. STATE & CONSTANTS
-  // ==========================================
-
   public activeTab = signal<TabId>(TabId.Tree);
   public Tab = TabId;
-
-  // ==========================================
-  // 3. LIFECYCLE & ROUTING
-  // ==========================================
 
   ngOnInit(): void {
     this.gameLoop.start();

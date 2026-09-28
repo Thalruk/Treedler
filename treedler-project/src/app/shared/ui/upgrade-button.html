@@ -1,11 +1,12 @@
-<div class="relative w-full" (mouseenter)="onMouseEnter($event)" (mouseleave)="onMouseLeave()">
-  <!-- ========================================== -->
-  <!-- ACTION BUTTON                              -->
-  <!-- ========================================== -->
+<div
+  class="relative w-full h-full"
+  (mouseenter)="onMouseEnter($event)"
+  (mouseleave)="onMouseLeave()"
+>
   <button
     (click)="buy.emit()"
     [disabled]="!canAfford"
-    class="w-full text-left px-3 py-4 rounded transition-colors border"
+    class="w-full h-full text-left px-3 py-4 rounded transition-colors border"
     [ngClass]="{
       'bg-gray-600 hover:bg-gray-500 border-gray-500': canAfford,
       'bg-gray-800 border-gray-700 cursor-not-allowed': !canAfford && isReachable,
@@ -20,9 +21,6 @@
     </div>
   </button>
 
-  <!-- ========================================== -->
-  <!-- HOVER TOOLTIP                              -->
-  <!-- ========================================== -->
   @if (isHovered()) {
     <div
       class="absolute left-1/2 -translate-x-1/2 w-64 p-3 bg-gray-900 border border-gray-600 rounded shadow-xl pointer-events-none z-50"

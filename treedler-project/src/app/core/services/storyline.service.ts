@@ -13,20 +13,21 @@ export class StorylineService {
   // 2. STATE (SIGNALS)
   // ==========================================
 
-  public isResearchUnlocked = signal<boolean>(false);
-  public hasReachedTenLeaves = signal<boolean>(false);
+  public isMutationUnlocked = signal<boolean>(false);
+  public hasReachedLeafMilestone = signal<boolean>(false);
 
   // ==========================================
   // 3. LOGIC
   // ==========================================
 
   public checkMilestones(): void {
-    if (!this.hasReachedTenLeaves() && this.upgradeService.leafLevel() >= 10) {
-      this.hasReachedTenLeaves.set(true);
-      this.isResearchUnlocked.set(true);
+    // Zmieniony limit z 10 na 30
+    if (!this.hasReachedLeafMilestone() && this.upgradeService.leaf.level() >= 30) {
+      this.hasReachedLeafMilestone.set(true);
+      this.isMutationUnlocked.set(true);
 
       console.log(
-        'Storyline unlocked: You realized there is more to growing than just drinking water.',
+        'Storyline unlocked: The excess energy is triggering spontaneous biological adaptations.',
       );
     }
   }

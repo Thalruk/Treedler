@@ -1,6 +1,6 @@
 export enum TabId {
   Tree,
-  Research,
+  Mutation,
   Magic,
   Settings,
 }

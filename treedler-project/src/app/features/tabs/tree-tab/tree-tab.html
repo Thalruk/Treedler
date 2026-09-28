@@ -1,13 +1,11 @@
 <div class="flex flex-col gap-6">
-  <!-- ========================================== -->
-  <!-- CROWN LAYER                                -->
-  <!-- ========================================== -->
+  <!-- CROWN LAYER -->
   <div [class.opacity-40]="!upgradeService.hasFirstStem()">
     <div class="flex justify-between items-end border-b border-gray-700 mb-2 pb-1">
       <h3 class="text-xs font-bold text-green-600 uppercase tracking-wider">Crown</h3>
       @if (upgradeService.hasFirstStem()) {
         <span class="text-xs text-gray-400 font-mono">
-          Leaves: {{ upgradeService.leafLevel() }} / {{ upgradeService.maxLeaves() }}
+          Leaves: {{ upgradeService.leaf.level() }} / {{ upgradeService.maxLeaves() }}
         </span>
       }
     </div>
@@ -16,69 +14,30 @@
       <div class="text-xs text-gray-500 italic">Break through the soil to unlock.</div>
     } @else {
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-2">
-        <app-upgrade-button
-          title="Grow Branch (Lvl {{ upgradeService.branchLevel() }})"
-          description="Extends the tree structure, creating space for 1 new Leaf."
-          [costs]="[
-            {
-              amount: upgradeService.branchCost().energy,
-              resourceName: resourceService.energy().name,
-            },
-            {
-              amount: upgradeService.branchCost().water,
-              resourceName: resourceService.water().name,
-            },
-            {
-              amount: upgradeService.branchCost().minerals,
-              resourceName: resourceService.minerals().name,
-            },
-          ]"
-          effect="+1 Leaf Capacity"
-          [canAfford]="
-            resourceService.energy().amount >= upgradeService.branchCost().energy &&
-            resourceService.water().amount >= upgradeService.branchCost().water &&
-            resourceService.minerals().amount >= upgradeService.branchCost().minerals
-          "
-          [isReachable]="
-            resourceService.energy().maxAmount >= upgradeService.branchCost().energy &&
-            resourceService.water().maxAmount >= upgradeService.branchCost().water &&
-            resourceService.minerals().maxAmount >= upgradeService.branchCost().minerals
-          "
-          (buy)="upgradeService.buyBranch()"
-        ></app-upgrade-button>
-
-        <app-upgrade-button
-          title="Sprout Leaf (Lvl {{ upgradeService.leafLevel() }} / {{
-            upgradeService.maxLeaves()
-          }})"
-          description="Converts water and minerals into precious energy."
-          [costs]="[
-            {
-              amount: upgradeService.leafCost().energy,
-              resourceName: resourceService.energy().name,
-            },
-            { amount: upgradeService.leafCost().water, resourceName: resourceService.water().name },
-          ]"
-          effect="+1 Energy/s | -0.5 Water/s | -0.5 Minerals/s"
-          [canAfford]="
-            resourceService.energy().amount >= upgradeService.leafCost().energy &&
-            resourceService.water().amount >= upgradeService.leafCost().water &&
-            upgradeService.leafLevel() < upgradeService.maxLeaves()
-          "
-          [isReachable]="
-            resourceService.energy().maxAmount >= upgradeService.leafCost().energy &&
-            resourceService.water().maxAmount >= upgradeService.leafCost().water &&
-            upgradeService.leafLevel() < upgradeService.maxLeaves()
-          "
-          (buy)="upgradeService.buyLeaf()"
-        ></app-upgrade-button>
+        @for (item of crownUpgrades(); track item.model.id) {
+          @if (!item.isVisible || item.isVisible()) {
+            <app-upgrade-button
+              [title]="item.title"
+              [description]="item.description"
+              [costs]="upgradeService.getFormattedCosts(item.model)"
+              [effect]="item.effect"
+              [canAfford]="
+                upgradeService.canAfford(item.model) &&
+                (item.limit === undefined || item.model.level() < item.limit)
+              "
+              [isReachable]="
+                upgradeService.isReachable(item.model) &&
+                (item.limit === undefined || item.model.level() < item.limit)
+              "
+              (buy)="upgradeService.buyUpgrade(item.model, item.limit)"
+            ></app-upgrade-button>
+          }
+        }
       </div>
     }
   </div>
 
-  <!-- ========================================== -->
-  <!-- BARK LAYER                                 -->
-  <!-- ========================================== -->
+  <!-- BARK LAYER -->
   <div [class.opacity-40]="!upgradeService.hasFirstRoot()">
     <h3
       class="text-xs font-bold text-yellow-700 uppercase tracking-wider border-b border-gray-700 mb-2 pb-1"
@@ -103,38 +62,25 @@
             (buy)="upgradeService.buyFirstStem()"
           ></app-upgrade-button>
         } @else {
-          <app-upgrade-button
-            title="Thicken Bark (Lvl {{ upgradeService.barkThicknessLevel() }})"
-            description="Increases structural integrity, allowing you to store more resources."
-            [costs]="[
-              {
-                amount: upgradeService.barkThicknessCost().energy,
-                resourceName: resourceService.energy().name,
-              },
-              {
-                amount: upgradeService.barkThicknessCost().minerals,
-                resourceName: resourceService.minerals().name,
-              },
-            ]"
-            effect="+10 All Max Limits"
-            [canAfford]="
-              resourceService.energy().amount >= upgradeService.barkThicknessCost().energy &&
-              resourceService.minerals().amount >= upgradeService.barkThicknessCost().minerals
-            "
-            [isReachable]="
-              resourceService.energy().maxAmount >= upgradeService.barkThicknessCost().energy &&
-              resourceService.minerals().maxAmount >= upgradeService.barkThicknessCost().minerals
-            "
-            (buy)="upgradeService.buyBarkThickness()"
-          ></app-upgrade-button>
+          @for (item of barkUpgrades(); track item.model.id) {
+            @if (!item.isVisible || item.isVisible()) {
+              <app-upgrade-button
+                [title]="item.title"
+                [description]="item.description"
+                [costs]="upgradeService.getFormattedCosts(item.model)"
+                [effect]="item.effect"
+                [canAfford]="upgradeService.canAfford(item.model)"
+                [isReachable]="upgradeService.isReachable(item.model)"
+                (buy)="upgradeService.buyUpgrade(item.model)"
+              ></app-upgrade-button>
+            }
+          }
         }
       </div>
     }
   </div>
 
-  <!-- ========================================== -->
-  <!-- ROOTS LAYER                                -->
-  <!-- ========================================== -->
+  <!-- ROOTS LAYER -->
   <div>
     <h3
       class="text-xs font-bold text-gray-400 uppercase tracking-wider border-b border-gray-700 mb-2 pb-1"
@@ -156,55 +102,19 @@
           (buy)="upgradeService.buyFirstRoot()"
         ></app-upgrade-button>
       } @else {
-        <app-upgrade-button
-          title="Expand Roots (Lvl {{ upgradeService.rootWidthLevel() }})"
-          description="Spread wide to catch passing moisture."
-          [costs]="[
-            {
-              amount: upgradeService.rootWidthCost().energy,
-              resourceName: resourceService.energy().name,
-            },
-            {
-              amount: upgradeService.rootWidthCost().minerals,
-              resourceName: resourceService.minerals().name,
-            },
-          ]"
-          effect="+1 Water/s"
-          [canAfford]="
-            resourceService.energy().amount >= upgradeService.rootWidthCost().energy &&
-            resourceService.minerals().amount >= upgradeService.rootWidthCost().minerals
-          "
-          [isReachable]="
-            resourceService.energy().maxAmount >= upgradeService.rootWidthCost().energy &&
-            resourceService.minerals().maxAmount >= upgradeService.rootWidthCost().minerals
-          "
-          (buy)="upgradeService.buyRootWidth()"
-        ></app-upgrade-button>
-
-        <app-upgrade-button
-          title="Deepen Roots (Lvl {{ upgradeService.rootDepthLevel() }})"
-          description="Burrow deeper to extract rich minerals."
-          [costs]="[
-            {
-              amount: upgradeService.rootDepthCost().energy,
-              resourceName: resourceService.energy().name,
-            },
-            {
-              amount: upgradeService.rootDepthCost().water,
-              resourceName: resourceService.water().name,
-            },
-          ]"
-          effect="+1 Minerals/s"
-          [canAfford]="
-            resourceService.energy().amount >= upgradeService.rootDepthCost().energy &&
-            resourceService.water().amount >= upgradeService.rootDepthCost().water
-          "
-          [isReachable]="
-            resourceService.energy().maxAmount >= upgradeService.rootDepthCost().energy &&
-            resourceService.water().maxAmount >= upgradeService.rootDepthCost().water
-          "
-          (buy)="upgradeService.buyRootDepth()"
-        ></app-upgrade-button>
+        @for (item of rootUpgrades(); track item.model.id) {
+          @if (!item.isVisible || item.isVisible()) {
+            <app-upgrade-button
+              [title]="item.title"
+              [description]="item.description"
+              [costs]="upgradeService.getFormattedCosts(item.model)"
+              [effect]="item.effect"
+              [canAfford]="upgradeService.canAfford(item.model)"
+              [isReachable]="upgradeService.isReachable(item.model)"
+              (buy)="upgradeService.buyUpgrade(item.model)"
+            ></app-upgrade-button>
+          }
+        }
       }
     </div>
   </div>

@@ -1,120 +1,182 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { ResourceService } from './resource';
-import { ResourceId } from '../enums/resource.enum';
-import { ResearchService } from './research.service';
+import { ResourceId, ResourceName } from '../enums/resource.enum';
+import { MutationService } from './mutation.service';
+import { UpgradeBase } from '../classes/upgrade-base';
 
 @Injectable({ providedIn: 'root' })
 export class UpgradeService {
   private resourceService = inject(ResourceService);
-  private researchService = inject(ResearchService);
+  private mutationService = inject(MutationService);
 
   // ==========================================
-  // 1. STATE (SIGNALS)
+  // 1. MILESTONES & BASE COSTS
   // ==========================================
 
   public hasFirstRoot = signal<boolean>(false);
   public hasFirstStem = signal<boolean>(false);
 
-  public rootWidthLevel = signal<number>(0);
-  public rootDepthLevel = signal<number>(0);
-  public barkThicknessLevel = signal<number>(0);
-  public branchLevel = signal<number>(0);
-  public leafLevel = signal<number>(0);
-
-  // ==========================================
-  // 2. LIMITS & CONSTRAINTS (COMPUTED)
-  // ==========================================
-
-  public maxLeaves = computed(() => {
-    const leavesPerBranch = this.researchService.branchExpansionCompleted() ? 2 : 1;
-    return this.branchLevel() * leavesPerBranch;
-  });
-
-  // ==========================================
-  // 3. COSTS (COMPUTED & CONSTANTS)
-  // ==========================================
-
   public readonly firstRootCost = 5;
   public readonly firstStemCost = 5;
 
-  public rootWidthCost = computed(() => ({
-    energy: Math.floor(5 * Math.pow(1.15, this.rootWidthLevel())),
-    minerals: Math.floor(4 * Math.pow(1.15, this.rootWidthLevel())),
-  }));
-
-  public rootDepthCost = computed(() => ({
-    energy: Math.floor(5 * Math.pow(1.15, this.rootDepthLevel())),
-    water: Math.floor(4 * Math.pow(1.15, this.rootDepthLevel())),
-  }));
-
-  public barkThicknessCost = computed(() => ({
-    energy: Math.floor(6 * Math.pow(1.15, this.barkThicknessLevel())),
-    minerals: Math.floor(8 * Math.pow(1.15, this.barkThicknessLevel())),
-  }));
-
-  public branchCost = computed(() => ({
-    energy: Math.floor(8 * Math.pow(1.25, this.branchLevel())),
-    water: Math.floor(6 * Math.pow(1.25, this.branchLevel())),
-    minerals: Math.floor(6 * Math.pow(1.25, this.branchLevel())),
-  }));
-
-  public leafCost = computed(() => ({
-    energy: Math.floor(5 * Math.pow(1.3, this.leafLevel())),
-    water: Math.floor(5 * Math.pow(1.3, this.leafLevel())),
-  }));
-
   // ==========================================
-  // 4. RESOURCE GENERATION & BREAKDOWNS (COMPUTED)
+  // 2. UPGRADES REGISTRY (OBJECT-ORIENTED)
   // ==========================================
 
-  // Water
+  public rootWidth = new UpgradeBase('rootWidth', [
+    { resourceId: ResourceId.Energy, baseCost: 5, multiplier: 1.15 },
+    { resourceId: ResourceId.Minerals, baseCost: 4, multiplier: 1.15 },
+  ]);
+
+  public rootDepth = new UpgradeBase('rootDepth', [
+    { resourceId: ResourceId.Energy, baseCost: 5, multiplier: 1.15 },
+    { resourceId: ResourceId.Water, baseCost: 4, multiplier: 1.15 },
+  ]);
+
+  public barkThickness = new UpgradeBase('barkThickness', [
+    { resourceId: ResourceId.Energy, baseCost: 6, multiplier: 1.15 },
+    { resourceId: ResourceId.Minerals, baseCost: 8, multiplier: 1.15 },
+  ]);
+
+  public branch = new UpgradeBase('branch', [
+    { resourceId: ResourceId.Energy, baseCost: 8, multiplier: 1.25 },
+    { resourceId: ResourceId.Water, baseCost: 6, multiplier: 1.25 },
+    { resourceId: ResourceId.Minerals, baseCost: 6, multiplier: 1.25 },
+  ]);
+
+  public leaf = new UpgradeBase('leaf', [
+    { resourceId: ResourceId.Energy, baseCost: 5, multiplier: 1.3 },
+    { resourceId: ResourceId.Water, baseCost: 5, multiplier: 1.3 },
+  ]);
+
+  // Nowe ulepszenia
+  public sunwardReach = new UpgradeBase('sunwardReach', [
+    { resourceId: ResourceId.Energy, baseCost: 60, multiplier: 1.4 },
+  ]);
+
+  public vascularTissues = new UpgradeBase('vascularTissues', [
+    { resourceId: ResourceId.Energy, baseCost: 45, multiplier: 1.3 },
+    { resourceId: ResourceId.Water, baseCost: 35, multiplier: 1.3 },
+  ]);
+
+  public rootHairs = new UpgradeBase('rootHairs', [
+    { resourceId: ResourceId.Energy, baseCost: 35, multiplier: 1.2 },
+    { resourceId: ResourceId.Minerals, baseCost: 50, multiplier: 1.2 },
+  ]);
+
+  public canopySpread = new UpgradeBase('canopySpread', [
+    { resourceId: ResourceId.Energy, baseCost: 100, multiplier: 1.3 },
+    { resourceId: ResourceId.Water, baseCost: 80, multiplier: 1.3 },
+  ]);
+
+  public resinSecretion = new UpgradeBase('resinSecretion', [
+    { resourceId: ResourceId.Water, baseCost: 100, multiplier: 1.3 },
+    { resourceId: ResourceId.Minerals, baseCost: 100, multiplier: 1.3 },
+  ]);
+
+  public mycorrhizalNetwork = new UpgradeBase('mycorrhizalNetwork', [
+    { resourceId: ResourceId.Energy, baseCost: 150, multiplier: 1.3 },
+  ]);
+  // ==========================================
+  // 3. LIMITS & CONSTRAINTS
+  // ==========================================
+
+  public maxLeaves = computed(() => {
+    const leavesPerBranch = this.mutationService.denseBranchingCompleted() ? 2 : 1;
+    return this.branch.level() * leavesPerBranch;
+  });
+
+  // ==========================================
+  // 4. RESOURCE GENERATION & BREAKDOWNS
+  // ==========================================
+
   public waterGeneration = computed(() => {
     let base = this.hasFirstRoot() ? 1 : 0;
-    let fromRoots = this.rootWidthLevel() * 1;
-    let leafUpkeep = this.leafLevel() * 0.5;
-    return base + fromRoots - leafUpkeep;
+    let fromRoots = this.rootWidth.level() * 1;
+    let fromRootHairs = this.rootHairs.level() * 2;
+    let leafUpkeep = this.leaf.level() * 0.5;
+    return base + fromRoots + fromRootHairs - leafUpkeep;
   });
 
   public waterBreakdown = computed(() => ({
     base: this.hasFirstRoot() ? 1 : 0,
-    roots: this.rootWidthLevel() * 1,
-    leaves: -(this.leafLevel() * 0.5),
+    roots: this.rootWidth.level() * 1,
+    rootHairs: this.rootHairs.level() * 2,
+    leaves: -(this.leaf.level() * 0.5),
   }));
 
-  // Minerals
   public mineralsGeneration = computed(() => {
     let base = this.hasFirstRoot() ? 1 : 0;
-    let fromRoots = this.rootDepthLevel() * 1;
-    let leafUpkeep = this.leafLevel() * 0.5;
-    return base + fromRoots - leafUpkeep;
+    let fromRoots = this.rootDepth.level() * 1;
+    let fromFungi = this.mycorrhizalNetwork.level() * 3;
+    let leafUpkeep = this.leaf.level() * 0.5;
+    return base + fromRoots + fromFungi - leafUpkeep;
   });
 
   public mineralsBreakdown = computed(() => ({
     base: this.hasFirstRoot() ? 1 : 0,
-    roots: this.rootDepthLevel() * 1,
-    leaves: -(this.leafLevel() * 0.5),
+    roots: this.rootDepth.level() * 1,
+    mycorrhizalNetwork: this.mycorrhizalNetwork.level() * 3,
+    leaves: -(this.leaf.level() * 0.5),
   }));
 
-  // Energy
   public energyGeneration = computed(() => {
     let base = this.hasFirstStem() ? 1 : 0;
-    let fromLeaves = this.leafLevel() * 1;
-    return base + fromLeaves;
+    let leafMultiplier = 1 + this.sunwardReach.level() * 0.2;
+    let fromLeaves = this.leaf.level() * leafMultiplier;
+    let fromVascular = this.vascularTissues.level() * 1;
+    return base + fromLeaves + fromVascular;
   });
 
   public energyBreakdown = computed(() => ({
     base: this.hasFirstStem() ? 1 : 0,
-    leaves: this.leafLevel() * 1,
+    leaves: this.leaf.level() * (1 + this.sunwardReach.level() * 0.2),
+    vascularTissues: this.vascularTissues.level() * 1,
   }));
 
-  public capacityBreakdown = computed(() => {
-    return {
-      base: 10,
-      bark: this.barkThicknessLevel() * 10,
-    };
-  });
+  public capacityBreakdown = computed(() => ({
+    base: 10,
+    bark: this.barkThickness.level() * 10,
+    vascularTissues: this.vascularTissues.level() * 5,
+    canopySpread: this.canopySpread.level() * 15,
+    resinSecretion: this.resinSecretion.level() * 20,
+  }));
+
   // ==========================================
-  // 5. ACTIONS (METHODS)
+  // 5. HELPER METHODS FOR UI
+  // ==========================================
+
+  private getResourceAmount(id: ResourceId): number {
+    if (id === ResourceId.Water) return this.resourceService.water().amount;
+    if (id === ResourceId.Minerals) return this.resourceService.minerals().amount;
+    if (id === ResourceId.Energy) return this.resourceService.energy().amount;
+    return 0;
+  }
+
+  private getResourceMaxAmount(id: ResourceId): number {
+    if (id === ResourceId.Water) return this.resourceService.water().maxAmount;
+    if (id === ResourceId.Minerals) return this.resourceService.minerals().maxAmount;
+    if (id === ResourceId.Energy) return this.resourceService.energy().maxAmount;
+    return 0;
+  }
+
+  public canAfford(upgrade: UpgradeBase): boolean {
+    return upgrade.costs().every((c) => this.getResourceAmount(c.resourceId) >= c.amount);
+  }
+
+  public isReachable(upgrade: UpgradeBase): boolean {
+    return upgrade.costs().every((c) => this.getResourceMaxAmount(c.resourceId) >= c.amount);
+  }
+
+  public getFormattedCosts(upgrade: UpgradeBase): { amount: number; resourceName: string }[] {
+    return upgrade.costs().map((c) => ({
+      amount: c.amount,
+      resourceName: ResourceName[c.resourceId],
+    }));
+  }
+
+  // ==========================================
+  // 6. ACTIONS (METHODS)
   // ==========================================
 
   public buyFirstRoot(): void {
@@ -134,66 +196,20 @@ export class UpgradeService {
     }
   }
 
-  public buyRootWidth(): void {
-    const cost = this.rootWidthCost();
-    const energy = this.resourceService.energy().amount;
-    const minerals = this.resourceService.minerals().amount;
+  public buyUpgrade(upgrade: UpgradeBase, maxLevelLimit?: number): void {
+    if (maxLevelLimit !== undefined && upgrade.level() >= maxLevelLimit) return;
 
-    if (energy >= cost.energy && minerals >= cost.minerals) {
-      this.resourceService.consume(ResourceId.Energy, cost.energy);
-      this.resourceService.consume(ResourceId.Minerals, cost.minerals);
-      this.rootWidthLevel.update((l) => l + 1);
-    }
-  }
+    if (this.canAfford(upgrade)) {
+      upgrade.costs().forEach((cost) => {
+        this.resourceService.consume(cost.resourceId, cost.amount);
+      });
 
-  public buyRootDepth(): void {
-    const cost = this.rootDepthCost();
-    const energy = this.resourceService.energy().amount;
-    const water = this.resourceService.water().amount;
+      if (upgrade.id === 'barkThickness') this.resourceService.increaseMaxAmount(10);
+      if (upgrade.id === 'vascularTissues') this.resourceService.increaseMaxAmount(5);
+      if (upgrade.id === 'canopySpread') this.resourceService.increaseMaxAmount(15);
+      if (upgrade.id === 'resinSecretion') this.resourceService.increaseMaxAmount(20);
 
-    if (energy >= cost.energy && water >= cost.water) {
-      this.resourceService.consume(ResourceId.Energy, cost.energy);
-      this.resourceService.consume(ResourceId.Water, cost.water);
-      this.rootDepthLevel.update((l) => l + 1);
-    }
-  }
-
-  public buyBarkThickness(): void {
-    const cost = this.barkThicknessCost();
-    const energy = this.resourceService.energy().amount;
-    const minerals = this.resourceService.minerals().amount;
-
-    if (energy >= cost.energy && minerals >= cost.minerals) {
-      this.resourceService.consume(ResourceId.Energy, cost.energy);
-      this.resourceService.consume(ResourceId.Minerals, cost.minerals);
-      this.resourceService.increaseMaxAmount(10);
-      this.barkThicknessLevel.update((l) => l + 1);
-    }
-  }
-
-  public buyBranch(): void {
-    const cost = this.branchCost();
-    const energy = this.resourceService.energy().amount;
-    const water = this.resourceService.water().amount;
-    const minerals = this.resourceService.minerals().amount;
-
-    if (energy >= cost.energy && water >= cost.water && minerals >= cost.minerals) {
-      this.resourceService.consume(ResourceId.Energy, cost.energy);
-      this.resourceService.consume(ResourceId.Water, cost.water);
-      this.resourceService.consume(ResourceId.Minerals, cost.minerals);
-      this.branchLevel.update((l) => l + 1);
-    }
-  }
-
-  public buyLeaf(): void {
-    const cost = this.leafCost();
-    const energy = this.resourceService.energy().amount;
-    const water = this.resourceService.water().amount;
-
-    if (energy >= cost.energy && water >= cost.water && this.leafLevel() < this.maxLeaves()) {
-      this.resourceService.consume(ResourceId.Energy, cost.energy);
-      this.resourceService.consume(ResourceId.Water, cost.water);
-      this.leafLevel.update((l) => l + 1);
+      upgrade.level.update((l) => l + 1);
     }
   }
 }

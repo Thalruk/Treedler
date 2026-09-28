@@ -22,12 +22,12 @@
         >
           Tree
         </button>
-        @if (storylineService.isResearchUnlocked()) {
+        @if (storylineService.isMutationUnlocked()) {
           <button
-            (click)="switchTab(Tab.Research)"
-            [class.border-green-400]="activeTab() === Tab.Research"
-            [class.text-green-400]="activeTab() === Tab.Research"
-            [class.text-gray-500]="activeTab() !== Tab.Research"
+            (click)="switchTab(Tab.Mutation)"
+            [class.border-green-400]="activeTab() === Tab.Mutation"
+            [class.text-green-400]="activeTab() === Tab.Mutation"
+            [class.text-gray-500]="activeTab() !== Tab.Mutation"
             class="font-bold border-b-2 border-transparent hover:text-green-300 pb-1 px-1 transition-colors"
           >
             Research
@@ -52,8 +52,8 @@
     <div class="pt-2 flex-1">
       @if (activeTab() === Tab.Tree) {
         <app-tree-tab></app-tree-tab>
-      } @else if (activeTab() === Tab.Research) {
-        <app-research-tab></app-research-tab>
+      } @else if (activeTab() === Tab.Mutation) {
+        <app-mutation-tab></app-mutation-tab>
       } @else if (activeTab() === Tab.Settings) {
         <app-settings-tab></app-settings-tab>
       }
