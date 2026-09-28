@@ -169,10 +169,13 @@ export class UpgradeService {
   }
 
   public getFormattedCosts(upgrade: UpgradeBase): { amount: number; resourceName: string }[] {
-    return upgrade.costs().map((c) => ({
-      amount: c.amount,
-      resourceName: ResourceName[c.resourceId],
-    }));
+    return upgrade
+      .costs()
+      .sort((a, b) => a.resourceId - b.resourceId)
+      .map((c) => ({
+        amount: c.amount,
+        resourceName: ResourceName[c.resourceId],
+      }));
   }
 
   // ==========================================

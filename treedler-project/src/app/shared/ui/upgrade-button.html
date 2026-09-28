@@ -14,10 +14,10 @@
     }"
   >
     <div
-      class="font-bold text-sm flex justify-between items-center"
+      class="font-bold text-sm flex justify-between items-center overflow-hidden"
       [ngClass]="canAfford ? 'text-gray-100' : isReachable ? 'text-gray-400' : 'text-gray-600'"
     >
-      <span>{{ title }}</span>
+      <span class="truncate">{{ title }}</span>
     </div>
   </button>
 

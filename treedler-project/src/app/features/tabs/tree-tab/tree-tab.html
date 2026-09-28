@@ -15,23 +15,22 @@
     } @else {
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-2">
         @for (item of crownUpgrades(); track item.model.id) {
-          @if (!item.isVisible || item.isVisible()) {
-            <app-upgrade-button
-              [title]="item.title"
-              [description]="item.description"
-              [costs]="upgradeService.getFormattedCosts(item.model)"
-              [effect]="item.effect"
-              [canAfford]="
-                upgradeService.canAfford(item.model) &&
-                (item.limit === undefined || item.model.level() < item.limit)
-              "
-              [isReachable]="
-                upgradeService.isReachable(item.model) &&
-                (item.limit === undefined || item.model.level() < item.limit)
-              "
-              (buy)="upgradeService.buyUpgrade(item.model, item.limit)"
-            ></app-upgrade-button>
-          }
+          <app-upgrade-button
+            [style.display]="!item.isVisible || item.isVisible() ? 'block' : 'none'"
+            [title]="item.title"
+            [description]="item.description"
+            [costs]="upgradeService.getFormattedCosts(item.model)"
+            [effect]="item.effect"
+            [canAfford]="
+              upgradeService.canAfford(item.model) &&
+              (item.limit === undefined || item.model.level() < item.limit)
+            "
+            [isReachable]="
+              upgradeService.isReachable(item.model) &&
+              (item.limit === undefined || item.model.level() < item.limit)
+            "
+            (buy)="upgradeService.buyUpgrade(item.model, item.limit)"
+          ></app-upgrade-button>
         }
       </div>
     }
@@ -63,17 +62,16 @@
           ></app-upgrade-button>
         } @else {
           @for (item of barkUpgrades(); track item.model.id) {
-            @if (!item.isVisible || item.isVisible()) {
-              <app-upgrade-button
-                [title]="item.title"
-                [description]="item.description"
-                [costs]="upgradeService.getFormattedCosts(item.model)"
-                [effect]="item.effect"
-                [canAfford]="upgradeService.canAfford(item.model)"
-                [isReachable]="upgradeService.isReachable(item.model)"
-                (buy)="upgradeService.buyUpgrade(item.model)"
-              ></app-upgrade-button>
-            }
+            <app-upgrade-button
+              [style.display]="!item.isVisible || item.isVisible() ? 'block' : 'none'"
+              [title]="item.title"
+              [description]="item.description"
+              [costs]="upgradeService.getFormattedCosts(item.model)"
+              [effect]="item.effect"
+              [canAfford]="upgradeService.canAfford(item.model)"
+              [isReachable]="upgradeService.isReachable(item.model)"
+              (buy)="upgradeService.buyUpgrade(item.model)"
+            ></app-upgrade-button>
           }
         }
       </div>
@@ -103,17 +101,16 @@
         ></app-upgrade-button>
       } @else {
         @for (item of rootUpgrades(); track item.model.id) {
-          @if (!item.isVisible || item.isVisible()) {
-            <app-upgrade-button
-              [title]="item.title"
-              [description]="item.description"
-              [costs]="upgradeService.getFormattedCosts(item.model)"
-              [effect]="item.effect"
-              [canAfford]="upgradeService.canAfford(item.model)"
-              [isReachable]="upgradeService.isReachable(item.model)"
-              (buy)="upgradeService.buyUpgrade(item.model)"
-            ></app-upgrade-button>
-          }
+          <app-upgrade-button
+            [style.display]="!item.isVisible || item.isVisible() ? 'block' : 'none'"
+            [title]="item.title"
+            [description]="item.description"
+            [costs]="upgradeService.getFormattedCosts(item.model)"
+            [effect]="item.effect"
+            [canAfford]="upgradeService.canAfford(item.model)"
+            [isReachable]="upgradeService.isReachable(item.model)"
+            (buy)="upgradeService.buyUpgrade(item.model)"
+          ></app-upgrade-button>
         }
       }
     </div>

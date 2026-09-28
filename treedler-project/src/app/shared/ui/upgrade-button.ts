@@ -11,6 +11,9 @@ export interface UpgradeCost {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './upgrade-button.html',
+  host: {
+    class: 'block h-full',
+  },
 })
 export class UpgradeButtonComponent {
   // ==========================================
