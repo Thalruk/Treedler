@@ -3,6 +3,7 @@ import { ResourceService } from './resource';
 import { UpgradeService } from './upgrade.service';
 import { StorylineService } from './storyline.service';
 import { MutationService } from './mutation.service';
+import { LogService } from './log.service';
 
 @Injectable({ providedIn: 'root' })
 export class SaveService {
@@ -14,7 +15,7 @@ export class SaveService {
   private upgradeService = inject(UpgradeService);
   private storylineService = inject(StorylineService);
   private mutationService = inject(MutationService);
-
+  private logService = inject(LogService);
   private readonly SAVE_KEY = 'treedler_save';
 
   // ==========================================
@@ -51,6 +52,7 @@ export class SaveService {
         denseBranchingProgress: this.mutationService.denseBranchingProgress(),
         denseBranchingCompleted: this.mutationService.denseBranchingCompleted(),
       },
+      logs: this.logService.logs(),
     };
     localStorage.setItem(this.SAVE_KEY, JSON.stringify(saveState));
   }
@@ -112,6 +114,9 @@ export class SaveService {
           this.mutationService.denseBranchingCompleted.set(
             parsed.mutations.denseBranchingCompleted,
           );
+      }
+      if (parsed.logs) {
+        this.logService.logs.set(parsed.logs);
       }
     } catch (e) {
       console.error('Save load error:', e);

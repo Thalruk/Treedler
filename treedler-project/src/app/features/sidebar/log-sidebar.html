@@ -1,0 +1,69 @@
+<div
+  class="w-72 bg-gray-800 p-4 rounded shadow-lg border border-gray-700 flex flex-col h-[calc(100vh-2rem)] text-sm"
+>
+  <!-- ZABLOKOWANA WYSOKOŚĆ NAGŁÓWKA -->
+  <div class="h-10 flex items-center mb-4 border-b border-gray-700">
+    <h2 class="font-bold text-gray-300">Event Log</h2>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="flex gap-1 mb-3 bg-gray-900 p-1 rounded border border-gray-700">
+    <button
+      (click)="setFilter('All')"
+      class="flex-1 py-1 px-2 text-xs font-bold rounded transition-colors"
+      [ngClass]="
+        activeFilter() === 'All' ? 'bg-gray-700 text-gray-100' : 'text-gray-500 hover:text-gray-300'
+      "
+    >
+      All
+    </button>
+    <button
+      (click)="setFilter(LogCategory.Story)"
+      class="flex-1 py-1 px-2 text-xs font-bold rounded transition-colors"
+      [ngClass]="
+        activeFilter() === LogCategory.Story
+          ? 'bg-gray-700 text-amber-400'
+          : 'text-gray-500 hover:text-amber-400'
+      "
+    >
+      Story
+    </button>
+    <button
+      (click)="setFilter(LogCategory.Progress)"
+      class="flex-1 py-1 px-2 text-xs font-bold rounded transition-colors"
+      [ngClass]="
+        activeFilter() === LogCategory.Progress
+          ? 'bg-gray-700 text-green-400'
+          : 'text-gray-500 hover:text-green-400'
+      "
+    >
+      Prog
+    </button>
+    <button
+      (click)="setFilter(LogCategory.Random)"
+      class="flex-1 py-1 px-2 text-xs font-bold rounded transition-colors"
+      [ngClass]="
+        activeFilter() === LogCategory.Random
+          ? 'bg-gray-700 text-purple-400'
+          : 'text-gray-500 hover:text-purple-400'
+      "
+    >
+      Rand
+    </button>
+  </div>
+
+  <!-- LOG LIST -->
+  <div class="flex-1 overflow-y-auto flex flex-col gap-2 pr-1 custom-scrollbar">
+    @if (filteredLogs().length === 0) {
+      <div class="text-xs text-gray-600 italic text-center mt-4">No events recorded yet.</div>
+    }
+
+    @for (log of filteredLogs(); track log.id) {
+      <div class="text-xs bg-gray-900/50 p-2 rounded border border-gray-700/50">
+        <span [ngClass]="getCategoryColor(log.category)" class="font-semibold block mb-0.5">
+          {{ log.text }}
+        </span>
+      </div>
+    }
+  </div>
+</div>

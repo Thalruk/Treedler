@@ -21,7 +21,7 @@ export class SettingsTabComponent {
 
   public wipeSave(): void {
     const isConfirmed = window.confirm(
-      'Czy na pewno chcesz usunąć cały postęp? Tej operacji nie można cofnąć.',
+      'Are you sure you want to wipe all progress? This action cannot be undone.',
     );
 
     if (isConfirmed) {

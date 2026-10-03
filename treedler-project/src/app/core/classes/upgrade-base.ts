@@ -1,6 +1,10 @@
 import { signal, computed, WritableSignal, Signal } from '@angular/core';
 import { ResourceId } from '../enums/resource.enum';
 
+// ==========================================
+// 1. CONFIGURATION INTERFACES
+// ==========================================
+
 export interface CostConfig {
   resourceId: ResourceId;
   baseCost: number;
@@ -11,6 +15,10 @@ export interface CalculatedCost {
   resourceId: ResourceId;
   amount: number;
 }
+
+// ==========================================
+// 2. BASE CLASS DEFINITION
+// ==========================================
 
 export class UpgradeBase {
   public level: WritableSignal<number> = signal(0);

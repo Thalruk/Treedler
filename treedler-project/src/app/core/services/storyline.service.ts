@@ -1,5 +1,7 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { UpgradeService } from './upgrade.service';
+import { LogService } from './log.service';
+import { LogCategory } from '../enums/log.enum';
 
 @Injectable({ providedIn: 'root' })
 export class StorylineService {
@@ -8,7 +10,7 @@ export class StorylineService {
   // ==========================================
 
   private upgradeService = inject(UpgradeService);
-
+  private logService = inject(LogService);
   // ==========================================
   // 2. STATE (SIGNALS)
   // ==========================================
@@ -21,13 +23,13 @@ export class StorylineService {
   // ==========================================
 
   public checkMilestones(): void {
-    // Zmieniony limit z 10 na 30
     if (!this.hasReachedLeafMilestone() && this.upgradeService.leaf.level() >= 30) {
       this.hasReachedLeafMilestone.set(true);
       this.isMutationUnlocked.set(true);
 
-      console.log(
-        'Storyline unlocked: The excess energy is triggering spontaneous biological adaptations.',
+      this.logService.addLog(
+        'The excess energy is triggering spontaneous biological adaptations. A new path unfolds.',
+        LogCategory.Story,
       );
     }
   }

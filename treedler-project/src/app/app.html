@@ -1,55 +1,52 @@
 <div class="min-h-screen bg-gray-900 text-gray-100 p-8 font-sans flex gap-6">
-  <!-- ========================================== -->
-  <!-- SIDE PANEL                                 -->
-  <!-- ========================================== -->
+  <!-- SIDE PANEL -->
   <app-sidebar></app-sidebar>
 
-  <!-- ========================================== -->
-  <!-- MAIN WINDOW                                -->
-  <!-- ========================================== -->
+  <!-- MAIN WINDOW -->
   <div
     class="flex-1 bg-gray-800 p-4 rounded shadow-lg border border-gray-700 min-h-[600px] flex flex-col"
   >
     <!-- NAVIGATION TABS -->
-    <div class="flex mb-4 border-b border-gray-700 pb-1 text-sm justify-between">
-      <div class="flex gap-4">
+    <div class="h-10 flex items-center justify-between mb-4 border-b border-gray-700 text-sm">
+      <div class="flex gap-2">
         <button
           (click)="switchTab(Tab.Tree)"
-          [class.border-green-400]="activeTab() === Tab.Tree"
+          [class.bg-gray-700]="activeTab() === Tab.Tree"
           [class.text-green-400]="activeTab() === Tab.Tree"
-          [class.text-gray-500]="activeTab() !== Tab.Tree"
-          class="font-bold border-b-2 border-transparent hover:text-green-300 pb-1 px-1 transition-colors"
+          [class.text-gray-400]="activeTab() !== Tab.Tree"
+          class="font-bold px-4 py-1.5 rounded-md transition-colors hover:bg-gray-700 hover:text-green-300"
         >
           Tree
         </button>
         @if (storylineService.isMutationUnlocked()) {
           <button
             (click)="switchTab(Tab.Mutation)"
-            [class.border-green-400]="activeTab() === Tab.Mutation"
+            [class.bg-gray-700]="activeTab() === Tab.Mutation"
             [class.text-green-400]="activeTab() === Tab.Mutation"
-            [class.text-gray-500]="activeTab() !== Tab.Mutation"
-            class="font-bold border-b-2 border-transparent hover:text-green-300 pb-1 px-1 transition-colors"
+            [class.text-gray-400]="activeTab() !== Tab.Mutation"
+            class="font-bold px-4 py-1.5 rounded-md transition-colors hover:bg-gray-700 hover:text-green-300"
           >
             Research
           </button>
         }
       </div>
 
-      <div>
-        <button
-          (click)="switchTab(Tab.Settings)"
-          [class.border-gray-400]="activeTab() === Tab.Settings"
-          [class.text-gray-100]="activeTab() === Tab.Settings"
-          [class.text-gray-500]="activeTab() !== Tab.Settings"
-          class="font-bold border-b-2 border-transparent hover:text-gray-300 pb-1 px-1 transition-colors"
-        >
-          Settings
-        </button>
-      </div>
+      <!-- SETTINGS BUTTON -->
+      <button
+        (click)="switchTab(Tab.Settings)"
+        [ngClass]="
+          activeTab() === Tab.Settings
+            ? 'bg-gray-600 text-white border-gray-500'
+            : 'bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700'
+        "
+        class="font-bold px-4 py-1.5 rounded-md text-xs border transition-colors shadow-sm"
+      >
+        Settings
+      </button>
     </div>
 
     <!-- CONTENT AREA -->
-    <div class="pt-2 flex-1">
+    <div class="flex-1">
       @if (activeTab() === Tab.Tree) {
         <app-tree-tab></app-tree-tab>
       } @else if (activeTab() === Tab.Mutation) {
@@ -59,4 +56,6 @@
       }
     </div>
   </div>
+
+  <app-log-sidebar></app-log-sidebar>
 </div>

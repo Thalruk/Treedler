@@ -20,24 +20,10 @@ export class UpgradeService {
   public readonly firstStemCost = 5;
 
   // ==========================================
-  // 2. UPGRADES REGISTRY (OBJECT-ORIENTED)
+  // 2. UPGRADES REGISTRY
   // ==========================================
 
-  public rootWidth = new UpgradeBase('rootWidth', [
-    { resourceId: ResourceId.Energy, baseCost: 5, multiplier: 1.15 },
-    { resourceId: ResourceId.Minerals, baseCost: 4, multiplier: 1.15 },
-  ]);
-
-  public rootDepth = new UpgradeBase('rootDepth', [
-    { resourceId: ResourceId.Energy, baseCost: 5, multiplier: 1.15 },
-    { resourceId: ResourceId.Water, baseCost: 4, multiplier: 1.15 },
-  ]);
-
-  public barkThickness = new UpgradeBase('barkThickness', [
-    { resourceId: ResourceId.Energy, baseCost: 6, multiplier: 1.15 },
-    { resourceId: ResourceId.Minerals, baseCost: 8, multiplier: 1.15 },
-  ]);
-
+  // --- CROWN ---
   public branch = new UpgradeBase('branch', [
     { resourceId: ResourceId.Energy, baseCost: 8, multiplier: 1.25 },
     { resourceId: ResourceId.Water, baseCost: 6, multiplier: 1.25 },
@@ -49,19 +35,8 @@ export class UpgradeService {
     { resourceId: ResourceId.Water, baseCost: 5, multiplier: 1.3 },
   ]);
 
-  // Nowe ulepszenia
   public sunwardReach = new UpgradeBase('sunwardReach', [
     { resourceId: ResourceId.Energy, baseCost: 60, multiplier: 1.4 },
-  ]);
-
-  public vascularTissues = new UpgradeBase('vascularTissues', [
-    { resourceId: ResourceId.Energy, baseCost: 45, multiplier: 1.3 },
-    { resourceId: ResourceId.Water, baseCost: 35, multiplier: 1.3 },
-  ]);
-
-  public rootHairs = new UpgradeBase('rootHairs', [
-    { resourceId: ResourceId.Energy, baseCost: 35, multiplier: 1.2 },
-    { resourceId: ResourceId.Minerals, baseCost: 50, multiplier: 1.2 },
   ]);
 
   public canopySpread = new UpgradeBase('canopySpread', [
@@ -69,14 +44,42 @@ export class UpgradeService {
     { resourceId: ResourceId.Water, baseCost: 80, multiplier: 1.3 },
   ]);
 
+  // --- BARK ---
+  public barkThickness = new UpgradeBase('barkThickness', [
+    { resourceId: ResourceId.Energy, baseCost: 6, multiplier: 1.15 },
+    { resourceId: ResourceId.Minerals, baseCost: 8, multiplier: 1.15 },
+  ]);
+
+  public vascularTissues = new UpgradeBase('vascularTissues', [
+    { resourceId: ResourceId.Energy, baseCost: 45, multiplier: 1.3 },
+    { resourceId: ResourceId.Water, baseCost: 35, multiplier: 1.3 },
+  ]);
+
   public resinSecretion = new UpgradeBase('resinSecretion', [
     { resourceId: ResourceId.Water, baseCost: 100, multiplier: 1.3 },
     { resourceId: ResourceId.Minerals, baseCost: 100, multiplier: 1.3 },
   ]);
 
+  // --- ROOTS ---
+  public rootWidth = new UpgradeBase('rootWidth', [
+    { resourceId: ResourceId.Energy, baseCost: 5, multiplier: 1.15 },
+    { resourceId: ResourceId.Minerals, baseCost: 4, multiplier: 1.15 },
+  ]);
+
+  public rootDepth = new UpgradeBase('rootDepth', [
+    { resourceId: ResourceId.Energy, baseCost: 5, multiplier: 1.15 },
+    { resourceId: ResourceId.Water, baseCost: 4, multiplier: 1.15 },
+  ]);
+
+  public rootHairs = new UpgradeBase('rootHairs', [
+    { resourceId: ResourceId.Energy, baseCost: 35, multiplier: 1.2 },
+    { resourceId: ResourceId.Minerals, baseCost: 50, multiplier: 1.2 },
+  ]);
+
   public mycorrhizalNetwork = new UpgradeBase('mycorrhizalNetwork', [
     { resourceId: ResourceId.Energy, baseCost: 150, multiplier: 1.3 },
   ]);
+
   // ==========================================
   // 3. LIMITS & CONSTRAINTS
   // ==========================================
@@ -171,6 +174,7 @@ export class UpgradeService {
   public getFormattedCosts(upgrade: UpgradeBase): { amount: number; resourceName: string }[] {
     return upgrade
       .costs()
+      .slice()
       .sort((a, b) => a.resourceId - b.resourceId)
       .map((c) => ({
         amount: c.amount,

@@ -7,6 +7,7 @@ import { TreeTabComponent } from './features/tabs/tree-tab/tree-tab';
 import { TabId } from './core/enums/tab.enum';
 import { SettingsTabComponent } from './features/tabs/settings-tab/settings-tab';
 import { MutationTabComponent } from './features/tabs/mutation-tab/mutation-tab';
+import { LogSidebarComponent } from './features/sidebar/log-sidebar';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +18,7 @@ import { MutationTabComponent } from './features/tabs/mutation-tab/mutation-tab'
     TreeTabComponent,
     SettingsTabComponent,
     MutationTabComponent,
+    LogSidebarComponent,
   ],
   templateUrl: './app.html',
 })
