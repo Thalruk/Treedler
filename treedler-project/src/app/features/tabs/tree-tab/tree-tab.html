@@ -3,6 +3,11 @@
   <div [class.opacity-40]="!upgradeService.hasFirstStem()">
     <div class="flex justify-between items-end border-b border-gray-700 mb-2 pb-1">
       <h3 class="text-xs font-bold text-green-600 uppercase tracking-wider">Crown</h3>
+      @if (upgradeService.hasFirstStem()) {
+        <span class="text-xs text-gray-400 font-mono">
+          Leaves: {{ upgradeService.leaf.level() }} / {{ upgradeService.maxLeaves() }}
+        </span>
+      }
     </div>
 
     @if (!upgradeService.hasFirstStem()) {
@@ -14,14 +19,14 @@
             [style.display]="!item.isVisible || item.isVisible() ? 'block' : 'none'"
             [title]="item.title"
             [description]="item.description"
-            [costs]="upgradeService.getFormattedCosts(item.model)"
+            [costs]="upgradeService.getFormattedCosts(item.model, item.limit)"
             [effect]="item.effect"
             [canAfford]="
-              upgradeService.canAfford(item.model) &&
+              upgradeService.canAfford(item.model, item.limit) &&
               (item.limit === undefined || item.model.level() < item.limit)
             "
             [isReachable]="
-              upgradeService.isReachable(item.model) &&
+              upgradeService.isReachable(item.model, item.limit) &&
               (item.limit === undefined || item.model.level() < item.limit)
             "
             (buy)="upgradeService.buyUpgrade(item.model, item.limit)"
@@ -61,11 +66,17 @@
               [style.display]="!item.isVisible || item.isVisible() ? 'block' : 'none'"
               [title]="item.title"
               [description]="item.description"
-              [costs]="upgradeService.getFormattedCosts(item.model)"
+              [costs]="upgradeService.getFormattedCosts(item.model, item.limit)"
               [effect]="item.effect"
-              [canAfford]="upgradeService.canAfford(item.model)"
-              [isReachable]="upgradeService.isReachable(item.model)"
-              (buy)="upgradeService.buyUpgrade(item.model)"
+              [canAfford]="
+                upgradeService.canAfford(item.model, item.limit) &&
+                (item.limit === undefined || item.model.level() < item.limit)
+              "
+              [isReachable]="
+                upgradeService.isReachable(item.model, item.limit) &&
+                (item.limit === undefined || item.model.level() < item.limit)
+              "
+              (buy)="upgradeService.buyUpgrade(item.model, item.limit)"
             ></app-upgrade-button>
           }
         }
@@ -100,11 +111,17 @@
             [style.display]="!item.isVisible || item.isVisible() ? 'block' : 'none'"
             [title]="item.title"
             [description]="item.description"
-            [costs]="upgradeService.getFormattedCosts(item.model)"
+            [costs]="upgradeService.getFormattedCosts(item.model, item.limit)"
             [effect]="item.effect"
-            [canAfford]="upgradeService.canAfford(item.model)"
-            [isReachable]="upgradeService.isReachable(item.model)"
-            (buy)="upgradeService.buyUpgrade(item.model)"
+            [canAfford]="
+              upgradeService.canAfford(item.model, item.limit) &&
+              (item.limit === undefined || item.model.level() < item.limit)
+            "
+            [isReachable]="
+              upgradeService.isReachable(item.model, item.limit) &&
+              (item.limit === undefined || item.model.level() < item.limit)
+            "
+            (buy)="upgradeService.buyUpgrade(item.model, item.limit)"
           ></app-upgrade-button>
         }
       }

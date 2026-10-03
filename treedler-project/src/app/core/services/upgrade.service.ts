@@ -3,11 +3,13 @@ import { ResourceService } from './resource';
 import { ResourceId, ResourceName } from '../enums/resource.enum';
 import { MutationService } from './mutation.service';
 import { UpgradeBase } from '../classes/upgrade-base';
+import { ShortcutService } from './shortcut.service';
 
 @Injectable({ providedIn: 'root' })
 export class UpgradeService {
   private resourceService = inject(ResourceService);
   private mutationService = inject(MutationService);
+  private shortcutService = inject(ShortcutService);
 
   // ==========================================
   // 1. MILESTONES & BASE COSTS
@@ -147,7 +149,7 @@ export class UpgradeService {
   }));
 
   // ==========================================
-  // 5. HELPER METHODS FOR UI
+  // 5. HELPER METHODS FOR UI & MULTIPLIERS
   // ==========================================
 
   private getResourceAmount(id: ResourceId): number {
@@ -164,23 +166,52 @@ export class UpgradeService {
     return 0;
   }
 
-  public canAfford(upgrade: UpgradeBase): boolean {
-    return upgrade.costs().every((c) => this.getResourceAmount(c.resourceId) >= c.amount);
+  public getTargetQuantity(
+    upgrade: UpgradeBase,
+    requestedQuantity: number,
+    limit?: number,
+  ): number {
+    let maxAllowed = limit !== undefined ? limit - upgrade.level() : Infinity;
+    if (maxAllowed <= 0) return 1; // Zabezpieczenie wizualne dla osiągniętych limitów
+    return Math.min(requestedQuantity, maxAllowed);
   }
 
-  public isReachable(upgrade: UpgradeBase): boolean {
-    return upgrade.costs().every((c) => this.getResourceMaxAmount(c.resourceId) >= c.amount);
+  private getCostsForQuantity(
+    upgrade: UpgradeBase,
+    quantity: number,
+  ): { resourceId: ResourceId; amount: number }[] {
+    return upgrade.costConfigs.map((config) => {
+      let total = 0;
+      for (let i = 0; i < quantity; i++) {
+        total += Math.floor(config.baseCost * Math.pow(config.multiplier, upgrade.level() + i));
+      }
+      return { resourceId: config.resourceId, amount: total };
+    });
   }
 
-  public getFormattedCosts(upgrade: UpgradeBase): { amount: number; resourceName: string }[] {
-    return upgrade
-      .costs()
-      .slice()
+  public getFormattedCosts(
+    upgrade: UpgradeBase,
+    limit?: number,
+  ): { amount: number; resourceName: string }[] {
+    const qty = this.getTargetQuantity(upgrade, this.shortcutService.multiplier(), limit);
+    return this.getCostsForQuantity(upgrade, qty)
       .sort((a, b) => a.resourceId - b.resourceId)
       .map((c) => ({
         amount: c.amount,
         resourceName: ResourceName[c.resourceId],
       }));
+  }
+
+  public canAfford(upgrade: UpgradeBase, limit?: number): boolean {
+    const qty = this.getTargetQuantity(upgrade, this.shortcutService.multiplier(), limit);
+    const costs = this.getCostsForQuantity(upgrade, qty);
+    return costs.every((c) => this.getResourceAmount(c.resourceId) >= c.amount);
+  }
+
+  public isReachable(upgrade: UpgradeBase, limit?: number): boolean {
+    const qty = this.getTargetQuantity(upgrade, this.shortcutService.multiplier(), limit);
+    const costs = this.getCostsForQuantity(upgrade, qty);
+    return costs.every((c) => this.getResourceMaxAmount(c.resourceId) >= c.amount);
   }
 
   // ==========================================
@@ -205,20 +236,22 @@ export class UpgradeService {
     }
   }
 
-  public buyUpgrade(upgrade: UpgradeBase, maxLevelLimit?: number): void {
-    if (maxLevelLimit !== undefined && upgrade.level() >= maxLevelLimit) return;
+  public buyUpgrade(upgrade: UpgradeBase, limit?: number): void {
+    const qty = this.getTargetQuantity(upgrade, this.shortcutService.multiplier(), limit);
+    if (limit !== undefined && upgrade.level() + qty > limit) return;
 
-    if (this.canAfford(upgrade)) {
-      upgrade.costs().forEach((cost) => {
+    if (this.canAfford(upgrade, limit)) {
+      const costs = this.getCostsForQuantity(upgrade, qty);
+      costs.forEach((cost) => {
         this.resourceService.consume(cost.resourceId, cost.amount);
       });
 
-      if (upgrade.id === 'barkThickness') this.resourceService.increaseMaxAmount(10);
-      if (upgrade.id === 'vascularTissues') this.resourceService.increaseMaxAmount(5);
-      if (upgrade.id === 'canopySpread') this.resourceService.increaseMaxAmount(15);
-      if (upgrade.id === 'resinSecretion') this.resourceService.increaseMaxAmount(20);
+      if (upgrade.id === 'barkThickness') this.resourceService.increaseMaxAmount(10 * qty);
+      if (upgrade.id === 'vascularTissues') this.resourceService.increaseMaxAmount(5 * qty);
+      if (upgrade.id === 'canopySpread') this.resourceService.increaseMaxAmount(15 * qty);
+      if (upgrade.id === 'resinSecretion') this.resourceService.increaseMaxAmount(20 * qty);
 
-      upgrade.level.update((l) => l + 1);
+      upgrade.level.update((l) => l + qty);
     }
   }
 }

@@ -2,6 +2,7 @@ import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ResourceService } from '../../../core/services/resource';
 import { UpgradeService } from '../../../core/services/upgrade.service';
+import { ShortcutService } from '../../../core/services/shortcut.service';
 import { UpgradeButtonComponent } from '../../../shared/ui/upgrade-button';
 import { UpgradeBase } from '../../../core/classes/upgrade-base';
 
@@ -23,17 +24,34 @@ export interface UpgradeView {
 export class TreeTabComponent {
   public resourceService = inject(ResourceService);
   public upgradeService = inject(UpgradeService);
+  public shortcutService = inject(ShortcutService);
+
+  public getTitle(upgrade: UpgradeBase, baseTitle: string, limit?: number): string {
+    const qty = this.upgradeService.getTargetQuantity(
+      upgrade,
+      this.shortcutService.multiplier(),
+      limit,
+    );
+    return qty > 1 ? `${baseTitle} [+${qty}]` : baseTitle;
+  }
 
   public crownUpgrades = computed<UpgradeView[]>(() => [
     {
       model: this.upgradeService.branch,
-      title: `Grow Branch (Lvl ${this.upgradeService.branch.level()})`,
+      title: this.getTitle(
+        this.upgradeService.branch,
+        `Grow Branch (Lvl ${this.upgradeService.branch.level()})`,
+      ),
       description: 'Extends the tree structure, creating space for 50 new Leaves.',
       effect: ['+50 Leaf Capacity'],
     },
     {
       model: this.upgradeService.leaf,
-      title: `Sprout Leaf (Lvl ${this.upgradeService.leaf.level()} / ${this.upgradeService.maxLeaves()})`,
+      title: this.getTitle(
+        this.upgradeService.leaf,
+        `Sprout Leaf (Lvl ${this.upgradeService.leaf.level()} / ${this.upgradeService.maxLeaves()})`,
+        this.upgradeService.maxLeaves(),
+      ),
       description: 'Converts water and minerals into precious energy in small amounts.',
       effect: [
         '-0.02 Water/s',
@@ -44,14 +62,20 @@ export class TreeTabComponent {
     },
     {
       model: this.upgradeService.sunwardReach,
-      title: `Sunward Reach (Lvl ${this.upgradeService.sunwardReach.level()})`,
+      title: this.getTitle(
+        this.upgradeService.sunwardReach,
+        `Sunward Reach (Lvl ${this.upgradeService.sunwardReach.level()})`,
+      ),
       description: 'Bend your branches towards the sun, optimizing light absorption.',
       effect: ['+20% Energy per Leaf'],
       isVisible: () => this.upgradeService.branch.level() >= 5,
     },
     {
       model: this.upgradeService.canopySpread,
-      title: `Canopy Spread (Lvl ${this.upgradeService.canopySpread.level()})`,
+      title: this.getTitle(
+        this.upgradeService.canopySpread,
+        `Canopy Spread (Lvl ${this.upgradeService.canopySpread.level()})`,
+      ),
       description:
         'Broaden the leafy canopy to capture more rain and dew, increasing global storage.',
       effect: ['+15 All Max Limits'],
@@ -62,20 +86,29 @@ export class TreeTabComponent {
   public barkUpgrades = computed<UpgradeView[]>(() => [
     {
       model: this.upgradeService.barkThickness,
-      title: `Thicken Bark (Lvl ${this.upgradeService.barkThickness.level()})`,
+      title: this.getTitle(
+        this.upgradeService.barkThickness,
+        `Thicken Bark (Lvl ${this.upgradeService.barkThickness.level()})`,
+      ),
       description: 'Increases structural integrity, allowing you to store more resources.',
       effect: ['+10 All Max Limits'],
     },
     {
       model: this.upgradeService.vascularTissues,
-      title: `Vascular Tissues (Lvl ${this.upgradeService.vascularTissues.level()})`,
+      title: this.getTitle(
+        this.upgradeService.vascularTissues,
+        `Vascular Tissues (Lvl ${this.upgradeService.vascularTissues.level()})`,
+      ),
       description: 'Develop internal channels to better distribute and store resources.',
       effect: ['+5 All Max Limits', '+1 Energy/s'],
       isVisible: () => this.upgradeService.barkThickness.level() >= 3,
     },
     {
       model: this.upgradeService.resinSecretion,
-      title: `Resin Secretion (Lvl ${this.upgradeService.resinSecretion.level()})`,
+      title: this.getTitle(
+        this.upgradeService.resinSecretion,
+        `Resin Secretion (Lvl ${this.upgradeService.resinSecretion.level()})`,
+      ),
       description: 'Seal the outer bark with hardened resin to vastly expand resource containment.',
       effect: ['+20 All Max Limits'],
       isVisible: () => this.upgradeService.vascularTissues.level() >= 5,
@@ -85,19 +118,28 @@ export class TreeTabComponent {
   public rootUpgrades = computed<UpgradeView[]>(() => [
     {
       model: this.upgradeService.rootWidth,
-      title: `Expand Roots (Lvl ${this.upgradeService.rootWidth.level()})`,
+      title: this.getTitle(
+        this.upgradeService.rootWidth,
+        `Expand Roots (Lvl ${this.upgradeService.rootWidth.level()})`,
+      ),
       description: 'Spread wide to catch passing moisture.',
       effect: ['+1 Water/s'],
     },
     {
       model: this.upgradeService.rootDepth,
-      title: `Deepen Roots (Lvl ${this.upgradeService.rootDepth.level()})`,
+      title: this.getTitle(
+        this.upgradeService.rootDepth,
+        `Deepen Roots (Lvl ${this.upgradeService.rootDepth.level()})`,
+      ),
       description: 'Burrow deeper to extract rich minerals.',
       effect: ['+1 Minerals/s'],
     },
     {
       model: this.upgradeService.rootHairs,
-      title: `Root Hairs (Lvl ${this.upgradeService.rootHairs.level()})`,
+      title: this.getTitle(
+        this.upgradeService.rootHairs,
+        `Root Hairs (Lvl ${this.upgradeService.rootHairs.level()})`,
+      ),
       description: 'Grow microscopic hairs on root tips, drastically increasing absorption area.',
       effect: ['+2 Water/s'],
       isVisible: () =>
@@ -105,7 +147,10 @@ export class TreeTabComponent {
     },
     {
       model: this.upgradeService.mycorrhizalNetwork,
-      title: `Mycorrhizal Network (Lvl ${this.upgradeService.mycorrhizalNetwork.level()})`,
+      title: this.getTitle(
+        this.upgradeService.mycorrhizalNetwork,
+        `Mycorrhizal Network (Lvl ${this.upgradeService.mycorrhizalNetwork.level()})`,
+      ),
       description: 'Trade energy with underground fungi for a massive influx of minerals.',
       effect: ['+3 Minerals/s'],
       isVisible: () => this.upgradeService.rootHairs.level() >= 5,

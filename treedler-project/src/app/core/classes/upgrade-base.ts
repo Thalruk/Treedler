@@ -1,9 +1,5 @@
-import { signal, computed, WritableSignal, Signal } from '@angular/core';
+import { signal, WritableSignal } from '@angular/core';
 import { ResourceId } from '../enums/resource.enum';
-
-// ==========================================
-// 1. CONFIGURATION INTERFACES
-// ==========================================
 
 export interface CostConfig {
   resourceId: ResourceId;
@@ -11,27 +7,11 @@ export interface CostConfig {
   multiplier: number;
 }
 
-export interface CalculatedCost {
-  resourceId: ResourceId;
-  amount: number;
-}
-
-// ==========================================
-// 2. BASE CLASS DEFINITION
-// ==========================================
-
 export class UpgradeBase {
   public level: WritableSignal<number> = signal(0);
 
-  public costs: Signal<CalculatedCost[]> = computed(() => {
-    return this.costConfigs.map((config) => ({
-      resourceId: config.resourceId,
-      amount: Math.floor(config.baseCost * Math.pow(config.multiplier, this.level())),
-    }));
-  });
-
   constructor(
     public id: string,
-    private costConfigs: CostConfig[],
+    public costConfigs: CostConfig[],
   ) {}
 }
