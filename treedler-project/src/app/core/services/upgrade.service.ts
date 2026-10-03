@@ -25,9 +25,9 @@ export class UpgradeService {
 
   // --- CROWN ---
   public branch = new UpgradeBase('branch', [
-    { resourceId: ResourceId.Energy, baseCost: 8, multiplier: 1.25 },
-    { resourceId: ResourceId.Water, baseCost: 6, multiplier: 1.25 },
-    { resourceId: ResourceId.Minerals, baseCost: 6, multiplier: 1.25 },
+    { resourceId: ResourceId.Energy, baseCost: 25, multiplier: 1.3 },
+    { resourceId: ResourceId.Water, baseCost: 20, multiplier: 1.3 },
+    { resourceId: ResourceId.Minerals, baseCost: 20, multiplier: 1.3 },
   ]);
 
   public leaf = new UpgradeBase('leaf', [
@@ -47,8 +47,8 @@ export class UpgradeService {
 
   // --- BARK ---
   public barkThickness = new UpgradeBase('barkThickness', [
-    { resourceId: ResourceId.Energy, baseCost: 6, multiplier: 1.15 },
-    { resourceId: ResourceId.Minerals, baseCost: 8, multiplier: 1.15 },
+    { resourceId: ResourceId.Energy, baseCost: 15, multiplier: 1.25 },
+    { resourceId: ResourceId.Minerals, baseCost: 15, multiplier: 1.25 },
   ]);
 
   public vascularTissues = new UpgradeBase('vascularTissues', [
@@ -63,13 +63,13 @@ export class UpgradeService {
 
   // --- ROOTS ---
   public rootWidth = new UpgradeBase('rootWidth', [
-    { resourceId: ResourceId.Energy, baseCost: 5, multiplier: 1.15 },
-    { resourceId: ResourceId.Minerals, baseCost: 4, multiplier: 1.15 },
+    { resourceId: ResourceId.Energy, baseCost: 20, multiplier: 1.3 },
+    { resourceId: ResourceId.Minerals, baseCost: 15, multiplier: 1.3 },
   ]);
 
   public rootDepth = new UpgradeBase('rootDepth', [
-    { resourceId: ResourceId.Energy, baseCost: 5, multiplier: 1.15 },
-    { resourceId: ResourceId.Water, baseCost: 4, multiplier: 1.15 },
+    { resourceId: ResourceId.Energy, baseCost: 20, multiplier: 1.3 },
+    { resourceId: ResourceId.Water, baseCost: 15, multiplier: 1.3 },
   ]);
 
   public rootHairs = new UpgradeBase('rootHairs', [
@@ -139,7 +139,7 @@ export class UpgradeService {
   }));
 
   public capacityBreakdown = computed(() => ({
-    base: 10,
+    base: this.hasFirstStem() ? 30 : 10,
     bark: this.barkThickness.level() * 10,
     vascularTissues: this.vascularTissues.level() * 5,
     canopySpread: this.canopySpread.level() * 15,
@@ -200,6 +200,7 @@ export class UpgradeService {
     if (!this.hasFirstStem() && this.resourceService.water().amount >= this.firstStemCost) {
       this.resourceService.consume(ResourceId.Water, this.firstStemCost);
       this.resourceService.unlock(ResourceId.Energy);
+      this.resourceService.increaseMaxAmount(20);
       this.hasFirstStem.set(true);
     }
   }
