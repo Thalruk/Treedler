@@ -31,8 +31,9 @@ export class UpgradeService {
   ]);
 
   public leaf = new UpgradeBase('leaf', [
-    { resourceId: ResourceId.Energy, baseCost: 5, multiplier: 1.3 },
-    { resourceId: ResourceId.Water, baseCost: 5, multiplier: 1.3 },
+    { resourceId: ResourceId.Energy, baseCost: 1, multiplier: 1.08 },
+    { resourceId: ResourceId.Water, baseCost: 1, multiplier: 1.08 },
+    { resourceId: ResourceId.Minerals, baseCost: 1, multiplier: 1.08 },
   ]);
 
   public sunwardReach = new UpgradeBase('sunwardReach', [
@@ -85,7 +86,7 @@ export class UpgradeService {
   // ==========================================
 
   public maxLeaves = computed(() => {
-    const leavesPerBranch = this.mutationService.denseBranchingCompleted() ? 2 : 1;
+    const leavesPerBranch = this.mutationService.denseBranchingCompleted() ? 100 : 50;
     return this.branch.level() * leavesPerBranch;
   });
 
@@ -97,7 +98,7 @@ export class UpgradeService {
     let base = this.hasFirstRoot() ? 1 : 0;
     let fromRoots = this.rootWidth.level() * 1;
     let fromRootHairs = this.rootHairs.level() * 2;
-    let leafUpkeep = this.leaf.level() * 0.5;
+    let leafUpkeep = this.leaf.level() * 0.02;
     return base + fromRoots + fromRootHairs - leafUpkeep;
   });
 
@@ -105,14 +106,14 @@ export class UpgradeService {
     base: this.hasFirstRoot() ? 1 : 0,
     roots: this.rootWidth.level() * 1,
     rootHairs: this.rootHairs.level() * 2,
-    leaves: -(this.leaf.level() * 0.5),
+    leaves: -(this.leaf.level() * 0.02),
   }));
 
   public mineralsGeneration = computed(() => {
     let base = this.hasFirstRoot() ? 1 : 0;
     let fromRoots = this.rootDepth.level() * 1;
     let fromFungi = this.mycorrhizalNetwork.level() * 3;
-    let leafUpkeep = this.leaf.level() * 0.5;
+    let leafUpkeep = this.leaf.level() * 0.02;
     return base + fromRoots + fromFungi - leafUpkeep;
   });
 
@@ -120,12 +121,12 @@ export class UpgradeService {
     base: this.hasFirstRoot() ? 1 : 0,
     roots: this.rootDepth.level() * 1,
     mycorrhizalNetwork: this.mycorrhizalNetwork.level() * 3,
-    leaves: -(this.leaf.level() * 0.5),
+    leaves: -(this.leaf.level() * 0.02),
   }));
 
   public energyGeneration = computed(() => {
     let base = this.hasFirstStem() ? 1 : 0;
-    let leafMultiplier = 1 + this.sunwardReach.level() * 0.2;
+    let leafMultiplier = 0.1 + this.sunwardReach.level() * 0.02;
     let fromLeaves = this.leaf.level() * leafMultiplier;
     let fromVascular = this.vascularTissues.level() * 1;
     return base + fromLeaves + fromVascular;
@@ -133,7 +134,7 @@ export class UpgradeService {
 
   public energyBreakdown = computed(() => ({
     base: this.hasFirstStem() ? 1 : 0,
-    leaves: this.leaf.level() * (1 + this.sunwardReach.level() * 0.2),
+    leaves: this.leaf.level() * (0.1 + this.sunwardReach.level() * 0.02),
     vascularTissues: this.vascularTissues.level() * 1,
   }));
 

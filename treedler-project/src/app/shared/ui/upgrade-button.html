@@ -46,7 +46,16 @@
       </div>
 
       <div class="text-xs font-semibold text-gray-300 mb-1">Effect:</div>
-      <div class="text-xs text-green-400">{{ effect }}</div>
+      <div class="flex flex-col gap-0.5">
+        @for (eff of effect; track eff) {
+          <div
+            class="text-xs font-mono"
+            [ngClass]="eff.trim().startsWith('-') ? 'text-red-400' : 'text-green-400'"
+          >
+            {{ eff }}
+          </div>
+        }
+      </div>
     </div>
   }
 </div>

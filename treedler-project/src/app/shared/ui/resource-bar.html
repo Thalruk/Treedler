@@ -13,7 +13,7 @@
       class="text-xs font-mono justify-self-end"
       [ngClass]="netGeneration >= 0 ? 'text-green-400' : 'text-red-400'"
     >
-      {{ netGeneration > 0 ? '+' : '' }}{{ netGeneration }}/s
+      {{ netGeneration > 0 ? '+' : '' }}{{ netGeneration | number: '1.0-2' }}/s
     </span>
   </div>
 
@@ -44,7 +44,7 @@
           <div class="flex justify-between text-xs">
             <span class="text-gray-400">{{ item.label }}:</span>
             <span class="font-mono" [ngClass]="item.isNegative ? 'text-red-400' : 'text-green-400'">
-              {{ item.isNegative ? '' : '+' }}{{ item.amount }}
+              {{ item.isNegative ? '' : '+' }}{{ item.amount | number: '1.0-2' }}
             </span>
           </div>
         }
@@ -54,7 +54,7 @@
             class="font-mono"
             [ngClass]="netGeneration >= 0 ? 'text-green-400' : 'text-red-400'"
           >
-            {{ netGeneration > 0 ? '+' : '' }}{{ netGeneration }}/s
+            {{ netGeneration > 0 ? '+' : '' }}{{ netGeneration | number: '1.0-2' }}/s
           </span>
         </div>
       </div>

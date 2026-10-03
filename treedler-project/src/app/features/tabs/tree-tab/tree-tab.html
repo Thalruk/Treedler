@@ -55,7 +55,7 @@
             [costs]="[
               { amount: upgradeService.firstStemCost, resourceName: resourceService.water().name },
             ]"
-            effect="Unlocks Energy"
+            [effect]="['Unlocks Energy']"
             [canAfford]="resourceService.water().amount >= upgradeService.firstStemCost"
             [isReachable]="resourceService.water().maxAmount >= upgradeService.firstStemCost"
             (buy)="upgradeService.buyFirstStem()"
@@ -94,7 +94,7 @@
           [costs]="[
             { amount: upgradeService.firstRootCost, resourceName: resourceService.water().name },
           ]"
-          effect="+1 Water/s & Minerals Unlocked"
+          [effect]="['+1 Water/s', '+1 Minerals/s']"
           [canAfford]="resourceService.water().amount >= upgradeService.firstRootCost"
           [isReachable]="resourceService.water().maxAmount >= upgradeService.firstRootCost"
           (buy)="upgradeService.buyFirstRoot()"
