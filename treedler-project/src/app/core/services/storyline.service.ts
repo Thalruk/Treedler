@@ -23,7 +23,7 @@ export class StorylineService {
   // ==========================================
 
   public checkMilestones(): void {
-    if (!this.hasReachedLeafMilestone() && this.upgradeService.leaf.level() >= 30) {
+    if (!this.hasReachedLeafMilestone() && this.upgradeService.leaf.level() >= 100) {
       this.hasReachedLeafMilestone.set(true);
       this.isMutationUnlocked.set(true);
 

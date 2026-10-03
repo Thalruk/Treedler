@@ -9,9 +9,5 @@ import { MutationService } from '../../../core/services/mutation.service';
   templateUrl: './mutation-tab.html',
 })
 export class MutationTabComponent {
-  // ==========================================
-  // 1. INJECTIONS
-  // ==========================================
-
   public mutationService = inject(MutationService);
 }

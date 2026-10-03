@@ -5,6 +5,7 @@ export interface ResourceBreakdownItem {
   label: string;
   amount: number;
   isNegative?: boolean;
+  subItems?: { label: string; amountText: string }[];
 }
 
 @Component({

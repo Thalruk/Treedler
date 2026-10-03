@@ -46,8 +46,26 @@ export class SidebarComponent {
     const breakdown = this.upgradeService.waterBreakdown();
 
     if (breakdown.base > 0) items.push({ label: 'Base', amount: breakdown.base });
-    if (breakdown.roots > 0) items.push({ label: 'Roots', amount: breakdown.roots });
-    if (breakdown.rootHairs > 0) items.push({ label: 'Root Hairs', amount: breakdown.rootHairs });
+
+    const rootSubs = [];
+    if (breakdown.rootWidth > 0)
+      rootSubs.push({ label: 'Expand Roots', amountText: `+${breakdown.rootWidth}` });
+    if (breakdown.rootHairs > 0)
+      rootSubs.push({ label: 'Root Hairs', amountText: `+${breakdown.rootHairs}` });
+
+    if (breakdown.rootVigorPercent > 0) {
+      const multiplier = 1 + breakdown.rootVigorPercent / 100;
+      rootSubs.push({ label: 'Root Vigor', amountText: `x${multiplier.toFixed(1)}` });
+    }
+
+    if (breakdown.subtotalRoots > 0) {
+      items.push({
+        label: 'Roots',
+        amount: breakdown.subtotalRoots,
+        subItems: rootSubs.length > 0 ? rootSubs : undefined,
+      });
+    }
+
     if (breakdown.leaves < 0)
       items.push({ label: 'Leaves Upkeep', amount: breakdown.leaves, isNegative: true });
 
@@ -71,14 +89,36 @@ export class SidebarComponent {
 
     return items;
   });
+
   public mineralsBreakdown = computed(() => {
     const items: ResourceBreakdownItem[] = [];
     const breakdown = this.upgradeService.mineralsBreakdown();
 
     if (breakdown.base > 0) items.push({ label: 'Base', amount: breakdown.base });
-    if (breakdown.roots > 0) items.push({ label: 'Roots', amount: breakdown.roots });
+
+    const mineralSubs = [];
+    if (breakdown.rootDepth > 0)
+      mineralSubs.push({ label: 'Deepen Roots', amountText: `+${breakdown.rootDepth}` });
+
     if (breakdown.mycorrhizalNetwork > 0)
-      items.push({ label: 'Mycorrhizal Network', amount: breakdown.mycorrhizalNetwork });
+      mineralSubs.push({
+        label: 'Mycorrhizal Network',
+        amountText: `+${breakdown.mycorrhizalNetwork}`,
+      });
+
+    if (breakdown.rootVigorPercent > 0) {
+      const multiplier = 1 + breakdown.rootVigorPercent / 100;
+      mineralSubs.push({ label: 'Root Vigor', amountText: `x${multiplier.toFixed(1)}` });
+    }
+
+    if (breakdown.subtotalRoots > 0) {
+      items.push({
+        label: 'Roots',
+        amount: breakdown.subtotalRoots,
+        subItems: mineralSubs.length > 0 ? mineralSubs : undefined,
+      });
+    }
+
     if (breakdown.leaves < 0)
       items.push({ label: 'Leaves Upkeep', amount: breakdown.leaves, isNegative: true });
 

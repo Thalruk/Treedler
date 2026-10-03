@@ -1,96 +1,69 @@
 <div class="flex flex-col gap-6">
-  <div>
-    <!-- HEADER -->
-    <h3
-      class="text-sm font-bold text-amber-500 uppercase tracking-wider border-b border-gray-700 mb-4 pb-1"
-    >
-      Biological Mutations
-    </h3>
-    <p class="text-xs text-gray-400 mb-6 italic">
-      Channel excess energy into forcing spontaneous adaptations within your cells.
-    </p>
-
-    <!-- MUTATIONS GRID -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <!-- MUTATION: DENSE BRANCHING -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    @for (mut of mutationService.availableMutations; track mut.id) {
       <div
-        class="border rounded p-4 relative overflow-hidden transition-colors duration-300"
-        [ngClass]="{
-          'bg-gray-800 border-gray-600':
-            !mutationService.denseBranchingCompleted() &&
-            mutationService.activeMutationId() !== 'dense_branching',
-          'bg-green-900/30 border-green-500':
-            mutationService.activeMutationId() === 'dense_branching',
-          'bg-gray-900 border-gray-800 opacity-60': mutationService.denseBranchingCompleted(),
-        }"
+        class="bg-gray-800 border border-gray-700 p-4 rounded-lg shadow flex flex-col relative overflow-hidden"
+        [ngClass]="mutationService.isCompleted(mut.id) ? 'border-green-600/50 bg-green-900/10' : ''"
       >
-        @if (!mutationService.denseBranchingCompleted()) {
-          <div
-            class="absolute top-0 left-0 h-full bg-green-900/20 z-0 transition-[width] duration-300 ease-out"
-            [style.width.%]="
-              (mutationService.denseBranchingProgress() / mutationService.denseBranchingTotal) * 100
-            "
-          ></div>
+        <!-- Progress Bar Background -->
+        @if (!mutationService.isCompleted(mut.id)) {
+          <div class="absolute bottom-0 left-0 h-1 bg-gray-700 w-full">
+            <div
+              class="h-full bg-purple-500 transition-[width] duration-200"
+              [style.width.%]="(mutationService.getProgress(mut.id) / mut.totalEnergyCost) * 100"
+            ></div>
+          </div>
         }
 
-        <div class="relative z-10 flex flex-col h-full justify-between">
-          <div>
-            <div class="flex justify-between items-start mb-2">
-              <h4
-                class="font-bold text-gray-200"
-                [class.text-green-400]="mutationService.activeMutationId() === 'dense_branching'"
-              >
-                Dense Branching
-              </h4>
-              <span
-                class="text-xs font-mono"
-                [ngClass]="
-                  mutationService.denseBranchingCompleted() ? 'text-green-500' : 'text-gray-400'
-                "
-              >
-                @if (mutationService.denseBranchingCompleted()) {
-                  MUTATED
-                } @else {
-                  {{ mutationService.denseBranchingProgress() | number: '1.0-0' }} /
-                  {{ mutationService.denseBranchingTotal }}
-                }
-              </span>
-            </div>
-
-            <p class="text-xs text-gray-400 mb-3">
-              Alter the structural integrity of your wood to support denser foliage.
-            </p>
-
-            <div class="text-xs font-semibold text-gray-300 mb-1">Effect:</div>
-            <div class="text-xs text-green-400 mb-4">
-              Each branch can hold 100 Leaves instead of 50.
-            </div>
-          </div>
-
-          <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-700/50">
-            <span class="text-xs text-yellow-400 font-mono">
-              @if (!mutationService.denseBranchingCompleted()) {
-                Cost: -{{ mutationService.denseBranchingDrain }} Energy/s
-              }
+        <div class="flex justify-between items-start mb-2">
+          <h3
+            class="font-bold text-sm"
+            [ngClass]="mutationService.isCompleted(mut.id) ? 'text-green-400' : 'text-purple-400'"
+          >
+            {{ mut.title }}
+          </h3>
+          @if (mutationService.isCompleted(mut.id)) {
+            <span
+              class="text-xs font-bold text-green-500 bg-green-900/30 px-2 py-0.5 rounded border border-green-700/50"
+              >Mutated</span
+            >
+          } @else {
+            <span class="text-xs text-gray-400 font-mono">
+              {{
+                (mutationService.getProgress(mut.id) / mut.totalEnergyCost) * 100 | number: '1.0-0'
+              }}%
             </span>
-
-            @if (!mutationService.denseBranchingCompleted()) {
-              <button
-                class="px-4 py-1.5 text-xs font-bold rounded transition-colors"
-                [ngClass]="{
-                  'bg-gray-700 text-gray-300 hover:bg-gray-600':
-                    mutationService.activeMutationId() !== 'dense_branching',
-                  'bg-green-700 text-white hover:bg-green-600':
-                    mutationService.activeMutationId() === 'dense_branching',
-                }"
-                (click)="mutationService.toggleMutation('dense_branching')"
-              >
-                {{ mutationService.activeMutationId() === 'dense_branching' ? 'HALT' : 'MUTATE' }}
-              </button>
-            }
-          </div>
+          }
         </div>
+
+        <p class="text-xs text-gray-400 mb-4 flex-1 italic">{{ mut.description }}</p>
+
+        <div class="text-xs font-semibold text-gray-300 mb-1">Cost:</div>
+        <div class="text-xs text-gray-200 mb-2 font-mono">
+          {{ mut.totalEnergyCost }} Energy ({{ mut.drainPerSecond }}/s)
+        </div>
+
+        <div class="text-xs font-semibold text-gray-300 mb-1">Effect:</div>
+        <div class="flex flex-col gap-0.5 mb-4">
+          @for (eff of mut.effect; track eff) {
+            <div class="text-xs font-mono text-green-400">{{ eff }}</div>
+          }
+        </div>
+
+        @if (!mutationService.isCompleted(mut.id)) {
+          <button
+            (click)="mutationService.toggleMutation(mut.id)"
+            class="w-full py-2 rounded text-xs font-bold transition-colors border"
+            [ngClass]="
+              mutationService.activeMutationId() === mut.id
+                ? 'bg-purple-600 hover:bg-purple-500 border-purple-500 text-white'
+                : 'bg-gray-700 hover:bg-gray-600 border-gray-600 text-gray-200'
+            "
+          >
+            {{ mutationService.activeMutationId() === mut.id ? 'Halt Mutation' : 'Mutate' }}
+          </button>
+        }
       </div>
-    </div>
+    }
   </div>
 </div>

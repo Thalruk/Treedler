@@ -43,14 +43,15 @@ export class SaveService {
         canopySpreadLevel: this.upgradeService.canopySpread.level(),
         resinSecretionLevel: this.upgradeService.resinSecretion.level(),
         mycorrhizalNetworkLevel: this.upgradeService.mycorrhizalNetwork.level(),
+        rootVigorLevel: this.upgradeService.rootVigor.level(),
       },
       storyline: {
         hasReachedLeafMilestone: this.storylineService.hasReachedLeafMilestone(),
         isMutationUnlocked: this.storylineService.isMutationUnlocked(),
       },
       mutations: {
-        denseBranchingProgress: this.mutationService.denseBranchingProgress(),
-        denseBranchingCompleted: this.mutationService.denseBranchingCompleted(),
+        progresses: this.mutationService.progresses(),
+        completed: this.mutationService.completed(),
       },
       logs: this.logService.logs(),
     };
@@ -96,6 +97,8 @@ export class SaveService {
           this.upgradeService.resinSecretion.level.set(parsed.upgrades.resinSecretionLevel);
         if (parsed.upgrades.mycorrhizalNetworkLevel !== undefined)
           this.upgradeService.mycorrhizalNetwork.level.set(parsed.upgrades.mycorrhizalNetworkLevel);
+        if (parsed.upgrades.rootVigorLevel !== undefined)
+          this.upgradeService.rootVigor.level.set(parsed.upgrades.rootVigorLevel);
       }
 
       if (parsed.storyline) {
@@ -108,12 +111,10 @@ export class SaveService {
       }
 
       if (parsed.mutations) {
-        if (parsed.mutations.denseBranchingProgress !== undefined)
-          this.mutationService.denseBranchingProgress.set(parsed.mutations.denseBranchingProgress);
-        if (parsed.mutations.denseBranchingCompleted !== undefined)
-          this.mutationService.denseBranchingCompleted.set(
-            parsed.mutations.denseBranchingCompleted,
-          );
+        if (parsed.mutations.progresses)
+          this.mutationService.progresses.set(parsed.mutations.progresses);
+        if (parsed.mutations.completed)
+          this.mutationService.completed.set(parsed.mutations.completed);
       }
       if (parsed.logs) {
         this.logService.logs.set(parsed.logs);

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ResourceService } from '../../../core/services/resource';
 import { UpgradeService } from '../../../core/services/upgrade.service';
 import { ShortcutService } from '../../../core/services/shortcut.service';
+import { MutationService } from '../../../core/services/mutation.service';
 import { UpgradeButtonComponent } from '../../../shared/ui/upgrade-button';
 import { UpgradeBase } from '../../../core/classes/upgrade-base';
 
@@ -25,6 +26,7 @@ export class TreeTabComponent {
   public resourceService = inject(ResourceService);
   public upgradeService = inject(UpgradeService);
   public shortcutService = inject(ShortcutService);
+  public mutationService = inject(MutationService);
 
   public getTitle(upgrade: UpgradeBase, baseTitle: string, limit?: number): string {
     const qty = this.upgradeService.getTargetQuantity(
@@ -42,8 +44,8 @@ export class TreeTabComponent {
         this.upgradeService.branch,
         `Grow Branch (Lvl ${this.upgradeService.branch.level()})`,
       ),
-      description: 'Extends the tree structure, creating space for 50 new Leaves.',
-      effect: ['+50 Leaf Capacity'],
+      description: 'Extends the tree structure, creating space for new Leaves.',
+      effect: [`+${this.mutationService.isCompleted('dense_branching') ? 55 : 50} Leaf Capacity`],
     },
     {
       model: this.upgradeService.leaf,
@@ -54,9 +56,9 @@ export class TreeTabComponent {
       ),
       description: 'Converts water and minerals into precious energy in small amounts.',
       effect: [
-        '-0.02 Water/s',
+        `-${this.upgradeService.leafWaterUpkeep()} Water/s`,
         '-0.02 Minerals/s',
-        `+${(0.1 + this.upgradeService.sunwardReach.level() * 0.02).toFixed(2)} Energy/s`,
+        `+${(this.upgradeService.leafEnergyBase() + this.upgradeService.sunwardReach.level() * 0.02).toFixed(2)} Energy/s`,
       ],
       limit: this.upgradeService.maxLeaves(),
     },
@@ -154,6 +156,20 @@ export class TreeTabComponent {
       description: 'Trade energy with underground fungi for a massive influx of minerals.',
       effect: ['+3 Minerals/s'],
       isVisible: () => this.upgradeService.rootHairs.level() >= 5,
+    },
+    {
+      model: this.upgradeService.rootVigor,
+      title: this.getTitle(
+        this.upgradeService.rootVigor,
+        `Root Vigor (Lvl ${this.upgradeService.rootVigor.level()})`,
+      ),
+      description:
+        'Strengthen the root system structure, boosting all water and mineral extraction by 10% per level.',
+      effect: ['+10% Root Production'],
+      isVisible: () =>
+        this.upgradeService.rootWidth.level() >= 8 &&
+        this.upgradeService.rootDepth.level() >= 8 &&
+        this.upgradeService.mycorrhizalNetwork.level() >= 3,
     },
   ]);
 }
