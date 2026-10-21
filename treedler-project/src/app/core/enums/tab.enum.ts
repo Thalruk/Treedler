@@ -3,4 +3,5 @@ export enum TabId {
   Mutation,
   Magic,
   Settings,
+  Log,
 }

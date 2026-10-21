@@ -1,51 +1,42 @@
-<div class="w-64 bg-gray-800 p-4 rounded shadow-lg border border-gray-700 h-fit text-sm">
-  <!-- ZABLOKOWANA WYSOKOŚĆ NAGŁÓWKA -->
-  <div class="h-10 flex items-center mb-4 border-b border-gray-700">
-    <h2 class="font-bold text-gray-300">Resources</h2>
-  </div>
+<div class="flex flex-col gap-1 md:gap-3 p-2 md:p-0">
+  <!-- Nagłówek widoczny tylko na komputerze/tablecie -->
+  <h2 class="hidden md:block text-sm font-bold text-gray-200 border-b border-gray-700 pb-2 mb-2">
+    Resources
+  </h2>
 
-  <div class="flex flex-col mt-2">
-    <!-- WATER -->
-    <app-resource-bar
-      [name]="resourceService.water().name"
-      [amount]="resourceService.water().amount"
-      [maxAmount]="resourceService.water().maxAmount"
-      [netGeneration]="netWaterGeneration()"
-      [breakdown]="waterBreakdown()"
-      [capacityBreakdown]="globalCapacityBreakdown()"
-      colorClass="text-blue-400"
-      bgDarkClass="bg-blue-900"
-      bgLightClass="bg-blue-500"
-    ></app-resource-bar>
+  <app-resource-bar
+    name="Water"
+    [amount]="resourceService.water().amount"
+    [maxAmount]="resourceService.water().maxAmount"
+    [netGeneration]="netWaterGeneration()"
+    [breakdown]="waterBreakdown()"
+    [capacityBreakdown]="globalCapacityBreakdown()"
+    colorClass="text-blue-400"
+    bgDarkClass="bg-blue-900/30"
+    bgLightClass="bg-blue-500"
+  ></app-resource-bar>
 
-    <!-- MINERALS -->
-    @if (resourceService.minerals().isUnlocked) {
-      <app-resource-bar
-        [name]="resourceService.minerals().name"
-        [amount]="resourceService.minerals().amount"
-        [maxAmount]="resourceService.minerals().maxAmount"
-        [netGeneration]="netMineralsGeneration()"
-        [breakdown]="mineralsBreakdown()"
-        [capacityBreakdown]="globalCapacityBreakdown()"
-        colorClass="text-gray-400"
-        bgDarkClass="bg-gray-700"
-        bgLightClass="bg-gray-400"
-      ></app-resource-bar>
-    }
+  <app-resource-bar
+    name="Minerals"
+    [amount]="resourceService.minerals().amount"
+    [maxAmount]="resourceService.minerals().maxAmount"
+    [netGeneration]="netMineralsGeneration()"
+    [breakdown]="mineralsBreakdown()"
+    [capacityBreakdown]="globalCapacityBreakdown()"
+    colorClass="text-gray-400"
+    bgDarkClass="bg-gray-700"
+    bgLightClass="bg-gray-400"
+  ></app-resource-bar>
 
-    <!-- ENERGY -->
-    @if (resourceService.energy().isUnlocked) {
-      <app-resource-bar
-        [name]="resourceService.energy().name"
-        [amount]="resourceService.energy().amount"
-        [maxAmount]="resourceService.energy().maxAmount"
-        [netGeneration]="netEnergyGeneration()"
-        [breakdown]="energyBreakdown()"
-        [capacityBreakdown]="globalCapacityBreakdown()"
-        colorClass="text-yellow-400"
-        bgDarkClass="bg-yellow-900"
-        bgLightClass="bg-yellow-500"
-      ></app-resource-bar>
-    }
-  </div>
+  <app-resource-bar
+    name="Energy"
+    [amount]="resourceService.energy().amount"
+    [maxAmount]="resourceService.energy().maxAmount"
+    [netGeneration]="netEnergyGeneration()"
+    [breakdown]="energyBreakdown()"
+    [capacityBreakdown]="globalCapacityBreakdown()"
+    colorClass="text-yellow-500"
+    bgDarkClass="bg-yellow-900/30"
+    bgLightClass="bg-yellow-500"
+  ></app-resource-bar>
 </div>

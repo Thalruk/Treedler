@@ -23,7 +23,7 @@ export class UpgradeButtonComponent {
   @Input({ required: true }) title!: string;
   @Input() description: string = '';
   @Input({ required: true }) costs!: UpgradeCost[];
-  @Input({ required: true }) effect!: string;
+  @Input({ required: true }) effect!: string[];
   @Input({ required: true }) canAfford!: boolean;
   @Input() isReachable: boolean = true;
 

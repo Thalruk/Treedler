@@ -1,7 +1,6 @@
 <div
-  class="w-72 bg-gray-800 p-4 rounded shadow-lg border border-gray-700 flex flex-col h-[calc(100vh-2rem)] text-sm"
+  class="w-full h-full bg-gray-800 p-4 rounded shadow-lg border border-gray-700 flex flex-col text-sm"
 >
-  <!-- ZABLOKOWANA WYSOKOŚĆ NAGŁÓWKA -->
   <div class="h-10 flex items-center mb-4 border-b border-gray-700">
     <h2 class="font-bold text-gray-300">Event Log</h2>
   </div>
@@ -23,7 +22,7 @@
       [ngClass]="
         activeFilter() === LogCategory.Story
           ? 'bg-gray-700 text-amber-400'
-          : 'text-gray-500 hover:text-amber-400'
+          : 'text-amber-600/80 hover:text-amber-400'
       "
     >
       Story
@@ -34,7 +33,7 @@
       [ngClass]="
         activeFilter() === LogCategory.Progress
           ? 'bg-gray-700 text-green-400'
-          : 'text-gray-500 hover:text-green-400'
+          : 'text-green-600/80 hover:text-green-400'
       "
     >
       Prog
@@ -45,7 +44,7 @@
       [ngClass]="
         activeFilter() === LogCategory.Random
           ? 'bg-gray-700 text-purple-400'
-          : 'text-gray-500 hover:text-purple-400'
+          : 'text-purple-600/80 hover:text-purple-400'
       "
     >
       Rand

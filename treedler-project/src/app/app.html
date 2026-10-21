@@ -1,13 +1,32 @@
-<div class="min-h-screen bg-gray-900 text-gray-100 p-8 font-sans flex gap-6">
-  <!-- SIDE PANEL -->
-  <app-sidebar></app-sidebar>
-
-  <!-- MAIN WINDOW -->
+<div
+  class="h-screen w-full bg-gray-900 text-gray-100 font-sans flex flex-col md:flex-row overflow-hidden"
+>
+  <!-- ========================================== -->
+  <!-- 1. MOBILE TOP BAR (Pasek zasobów)          -->
+  <!-- ========================================== -->
   <div
-    class="flex-1 bg-gray-800 p-4 rounded shadow-lg border border-gray-700 min-h-[600px] flex flex-col"
+    class="md:hidden flex-none bg-gray-800 border-b border-gray-700 z-40 max-h-40 overflow-y-auto shadow-md"
   >
-    <!-- NAVIGATION TABS -->
-    <div class="h-10 flex items-center justify-between mb-4 border-b border-gray-700 text-sm">
+    <app-sidebar></app-sidebar>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 2. DESKTOP LEFT PANEL (Sidebar zasobów)    -->
+  <!-- ========================================== -->
+  <div class="hidden md:block w-72 shrink-0 p-6 pr-3 overflow-y-auto">
+    <app-sidebar></app-sidebar>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 3. MAIN CONTENT WINDOW                     -->
+  <!-- ========================================== -->
+  <div
+    class="flex-1 flex flex-col min-w-0 bg-gray-800 md:my-6 md:rounded-lg shadow-lg md:border border-gray-700 relative overflow-hidden"
+  >
+    <!-- DESKTOP NAVIGATION TABS -->
+    <div
+      class="hidden md:flex h-12 items-center justify-between px-4 border-b border-gray-700 text-sm bg-gray-900/30"
+    >
       <div class="flex gap-2">
         <button
           (click)="switchTab(Tab.Tree)"
@@ -31,7 +50,6 @@
         }
       </div>
 
-      <!-- SETTINGS BUTTON -->
       <button
         (click)="switchTab(Tab.Settings)"
         [ngClass]="
@@ -46,16 +64,71 @@
     </div>
 
     <!-- CONTENT AREA -->
-    <div class="flex-1">
+    <!-- pb-20 zapewnia, że dolne kafelki na telefonie nie schowają się za menu -->
+    <div class="flex-1 overflow-y-auto p-4 pb-20 md:pb-4 relative">
       @if (activeTab() === Tab.Tree) {
         <app-tree-tab></app-tree-tab>
       } @else if (activeTab() === Tab.Mutation) {
         <app-mutation-tab></app-mutation-tab>
       } @else if (activeTab() === Tab.Settings) {
         <app-settings-tab></app-settings-tab>
+      } @else if (activeTab() === Tab.Log) {
+        <app-log-sidebar></app-log-sidebar>
       }
+    </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <div
+      class="md:hidden absolute bottom-0 left-0 w-full bg-gray-800 border-t border-gray-700 flex justify-around items-center h-16 z-50"
+    >
+      <button
+        (click)="switchTab(Tab.Tree)"
+        class="flex flex-col items-center p-2 transition-colors w-1/4"
+        [class.text-green-400]="activeTab() === Tab.Tree"
+        [class.text-gray-500]="activeTab() !== Tab.Tree"
+      >
+        <span class="text-xl leading-none">🌳</span>
+        <span class="text-[10px] uppercase font-bold mt-1">Tree</span>
+      </button>
+
+      @if (storylineService.isMutationUnlocked()) {
+        <button
+          (click)="switchTab(Tab.Mutation)"
+          class="flex flex-col items-center p-2 transition-colors w-1/4"
+          [class.text-purple-400]="activeTab() === Tab.Mutation"
+          [class.text-gray-500]="activeTab() !== Tab.Mutation"
+        >
+          <span class="text-xl leading-none">🧬</span>
+          <span class="text-[10px] uppercase font-bold mt-1">Mutate</span>
+        </button>
+      }
+
+      <button
+        (click)="switchTab(Tab.Log)"
+        class="flex flex-col items-center p-2 transition-colors w-1/4"
+        [class.text-blue-400]="activeTab() === Tab.Log"
+        [class.text-gray-500]="activeTab() !== Tab.Log"
+      >
+        <span class="text-xl leading-none">📜</span>
+        <span class="text-[10px] uppercase font-bold mt-1">Log</span>
+      </button>
+
+      <button
+        (click)="switchTab(Tab.Settings)"
+        class="flex flex-col items-center p-2 transition-colors w-1/4"
+        [class.text-gray-200]="activeTab() === Tab.Settings"
+        [class.text-gray-500]="activeTab() !== Tab.Settings"
+      >
+        <span class="text-xl leading-none">⚙️</span>
+        <span class="text-[10px] uppercase font-bold mt-1">Setup</span>
+      </button>
     </div>
   </div>
 
-  <app-log-sidebar></app-log-sidebar>
+  <!-- ========================================== -->
+  <!-- 4. DESKTOP RIGHT PANEL (Log Sidebar)       -->
+  <!-- ========================================== -->
+  <div class="hidden md:block w-80 shrink-0 p-6 pl-3 overflow-y-auto">
+    <app-log-sidebar></app-log-sidebar>
+  </div>
 </div>
