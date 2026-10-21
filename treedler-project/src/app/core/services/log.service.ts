@@ -39,7 +39,7 @@ export class LogService {
       this.loggedFirstGrowth.set(true);
       this.addLog(
         'The foundation is set. The sapling must now grow branches and sprout leaves to gather energy.',
-        LogCategory.Story,
+        LogCategory.Progress,
       );
     }
 
@@ -47,7 +47,7 @@ export class LogService {
       this.logged10Leaves.set(true);
       this.addLog(
         "A small canopy begins to form. More leaves are required to harness the sun's full potential.",
-        LogCategory.Story,
+        LogCategory.Progress,
       );
     }
 
@@ -55,7 +55,7 @@ export class LogService {
       this.logged25Leaves.set(true);
       this.addLog(
         "The tree's demand for energy grows. You must multiply the leaves to prepare for the first mutation.",
-        LogCategory.Story,
+        LogCategory.Progress,
       );
     }
 
@@ -63,7 +63,7 @@ export class LogService {
       this.logged10Branches.set(true);
       this.addLog(
         'The framework strengthens. The tree reaches higher, demanding an even thicker canopy.',
-        LogCategory.Story,
+        LogCategory.Progress,
       );
     }
 

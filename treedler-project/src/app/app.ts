@@ -8,6 +8,7 @@ import { TabId } from './core/enums/tab.enum';
 import { SettingsTabComponent } from './features/tabs/settings-tab/settings-tab';
 import { MutationTabComponent } from './features/tabs/mutation-tab/mutation-tab';
 import { LogSidebarComponent } from './features/sidebar/log-sidebar';
+import { StorylineTabComponent } from './features/tabs/storyline-tab/storyline-tab';
 
 @Component({
   selector: 'app-root',
@@ -19,6 +20,7 @@ import { LogSidebarComponent } from './features/sidebar/log-sidebar';
     SettingsTabComponent,
     MutationTabComponent,
     LogSidebarComponent,
+    StorylineTabComponent,
   ],
   templateUrl: './app.html',
 })

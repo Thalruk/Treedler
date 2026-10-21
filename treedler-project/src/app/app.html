@@ -13,7 +13,7 @@
   <!-- ========================================== -->
   <!-- 2. DESKTOP LEFT PANEL (Sidebar zasobów)    -->
   <!-- ========================================== -->
-  <div class="hidden md:block w-72 shrink-0 p-6 pr-3 overflow-y-auto">
+  <div class="hidden md:block w-72 shrink-0 p-6 pr-3 z-50">
     <app-sidebar></app-sidebar>
   </div>
 
@@ -48,6 +48,15 @@
             Mutations
           </button>
         }
+        <button
+          (click)="switchTab(Tab.Storyline)"
+          [class.bg-gray-700]="activeTab() === Tab.Storyline"
+          [class.text-amber-400]="activeTab() === Tab.Storyline"
+          [class.text-gray-400]="activeTab() !== Tab.Storyline"
+          class="font-bold px-4 py-1.5 rounded-md transition-colors hover:bg-gray-700 hover:text-amber-300"
+        >
+          Story
+        </button>
       </div>
 
       <button
@@ -74,6 +83,8 @@
         <app-settings-tab></app-settings-tab>
       } @else if (activeTab() === Tab.Log) {
         <app-log-sidebar></app-log-sidebar>
+      } @else if (activeTab() === Tab.Storyline) {
+        <app-storyline-tab></app-storyline-tab>
       }
     </div>
 
@@ -112,7 +123,15 @@
         <span class="text-xl leading-none">📜</span>
         <span class="text-[10px] uppercase font-bold mt-1">Log</span>
       </button>
-
+      <button
+        (click)="switchTab(Tab.Storyline)"
+        class="flex flex-col items-center p-2 transition-colors w-1/4"
+        [class.text-amber-400]="activeTab() === Tab.Storyline"
+        [class.text-gray-500]="activeTab() !== Tab.Storyline"
+      >
+        <span class="text-xl leading-none">📖</span>
+        <span class="text-[10px] uppercase font-bold mt-1">Story</span>
+      </button>
       <button
         (click)="switchTab(Tab.Settings)"
         class="flex flex-col items-center p-2 transition-colors w-1/4"

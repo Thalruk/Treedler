@@ -4,4 +4,5 @@ export enum TabId {
   Magic,
   Settings,
   Log,
+  Storyline,
 }

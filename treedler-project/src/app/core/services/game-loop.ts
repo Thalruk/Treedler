@@ -32,6 +32,7 @@ export class GameLoopService {
 
   private ticksPerSecond: number = 10;
   private saveIntervalSeconds: number = 30;
+  private timeSinceLastSlowTick: number = 0;
 
   // ==========================================
   // 3. LIFECYCLE
@@ -45,6 +46,7 @@ export class GameLoopService {
     this.isRunning = true;
     this.lastTickTime = Date.now();
     this.lastSaveTime = this.lastTickTime;
+    this.timeSinceLastSlowTick = 0;
 
     const intervalMs = 1000 / this.ticksPerSecond;
 
@@ -77,6 +79,9 @@ export class GameLoopService {
   private updateGame(deltaTime: number): void {
     const dt = deltaTime;
 
+    // ----------------------------------------
+    // FAST TICK (10x per second)
+    // ----------------------------------------
     const generations = {
       water: this.upgradeService.waterGeneration(),
       minerals: this.upgradeService.mineralsGeneration(),
@@ -85,7 +90,17 @@ export class GameLoopService {
 
     this.resourceService.tick(dt, generations);
     this.mutationService.tick(dt);
-    this.storylineService.checkMilestones();
-    this.logService.checkStoryLogs();
+
+    // ----------------------------------------
+    // SLOW TICK (1x per second)
+    // ----------------------------------------
+    this.timeSinceLastSlowTick += dt;
+
+    if (this.timeSinceLastSlowTick >= 1.0) {
+      this.storylineService.checkMilestones();
+      this.logService.checkStoryLogs();
+
+      this.timeSinceLastSlowTick -= 1.0;
+    }
   }
 }
