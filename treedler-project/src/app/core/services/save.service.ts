@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { ResourceService } from './resource';
+import { ResourceService } from './resource'; // Zaktualizuj ścieżki, jeśli potrzebne
 import { UpgradeService } from './upgrade.service';
 import { StorylineService } from './storyline.service';
 import { MutationService } from './mutation.service';
@@ -16,6 +16,7 @@ export class SaveService {
   private storylineService = inject(StorylineService);
   private mutationService = inject(MutationService);
   private logService = inject(LogService);
+
   private readonly SAVE_KEY = 'treedler_save';
 
   // ==========================================
@@ -33,6 +34,7 @@ export class SaveService {
         hasPermanentLeafDiscount: this.upgradeService.hasPermanentLeafDiscount(),
         hasFirstRoot: this.upgradeService.hasFirstRoot(),
         hasFirstStem: this.upgradeService.hasFirstStem(),
+
         rootWidthLevel: this.upgradeService.rootWidth.level(),
         rootDepthLevel: this.upgradeService.rootDepth.level(),
         barkThicknessLevel: this.upgradeService.barkThickness.level(),
@@ -47,7 +49,6 @@ export class SaveService {
         rootVigorLevel: this.upgradeService.rootVigor.level(),
       },
       storyline: {
-        // Zapisujemy tylko flagi, które niosą ze sobą bonusy mechaniczne
         hasReachedLeafMilestone: this.storylineService.hasReachedLeafMilestone(),
         isMutationUnlocked: this.storylineService.isMutationUnlocked(),
         hasReached10Branches: this.storylineService.hasReached10Branches(),
@@ -60,7 +61,6 @@ export class SaveService {
       },
       logsData: {
         logs: this.logService.logs(),
-        // Zapisujemy flagi dla "flavor text", żeby nie spamować nimi ponownie
         loggedFirstGrowth: this.logService.loggedFirstGrowth(),
         logged10Leaves: this.logService.logged10Leaves(),
         logged25Leaves: this.logService.logged25Leaves(),
@@ -68,12 +68,14 @@ export class SaveService {
         loggedMutation: this.logService.loggedMutation(),
       },
     };
+
     localStorage.setItem(this.SAVE_KEY, JSON.stringify(saveState));
   }
 
   public loadGame(): void {
     const savedData = localStorage.getItem(this.SAVE_KEY);
     if (!savedData) return;
+
     try {
       const parsed = JSON.parse(savedData);
 
@@ -83,54 +85,12 @@ export class SaveService {
         if (parsed.resources.energy) this.resourceService.energy.set(parsed.resources.energy);
       }
 
-      if (parsed.upgrades) {
-        if (parsed.upgrades.hasPermanentLeafDiscount !== undefined)
-          this.upgradeService.hasPermanentLeafDiscount.set(
-            parsed.upgrades.hasPermanentLeafDiscount,
-          );
-        if (parsed.upgrades.hasFirstRoot !== undefined)
-          this.upgradeService.hasFirstRoot.set(parsed.upgrades.hasFirstRoot);
-        if (parsed.upgrades.hasFirstStem !== undefined)
-          this.upgradeService.hasFirstStem.set(parsed.upgrades.hasFirstStem);
-        if (parsed.upgrades.rootWidthLevel !== undefined)
-          this.upgradeService.rootWidth.level.set(parsed.upgrades.rootWidthLevel);
-        if (parsed.upgrades.rootDepthLevel !== undefined)
-          this.upgradeService.rootDepth.level.set(parsed.upgrades.rootDepthLevel);
-        if (parsed.upgrades.barkThicknessLevel !== undefined)
-          this.upgradeService.barkThickness.level.set(parsed.upgrades.barkThicknessLevel);
-        if (parsed.upgrades.branchLevel !== undefined)
-          this.upgradeService.branch.level.set(parsed.upgrades.branchLevel);
-        if (parsed.upgrades.leafLevel !== undefined)
-          this.upgradeService.leaf.level.set(parsed.upgrades.leafLevel);
-        if (parsed.upgrades.sunwardReachLevel !== undefined)
-          this.upgradeService.sunwardReach.level.set(parsed.upgrades.sunwardReachLevel);
-        if (parsed.upgrades.vascularTissuesLevel !== undefined)
-          this.upgradeService.vascularTissues.level.set(parsed.upgrades.vascularTissuesLevel);
-        if (parsed.upgrades.rootHairsLevel !== undefined)
-          this.upgradeService.rootHairs.level.set(parsed.upgrades.rootHairsLevel);
-        if (parsed.upgrades.canopySpreadLevel !== undefined)
-          this.upgradeService.canopySpread.level.set(parsed.upgrades.canopySpreadLevel);
-        if (parsed.upgrades.resinSecretionLevel !== undefined)
-          this.upgradeService.resinSecretion.level.set(parsed.upgrades.resinSecretionLevel);
-        if (parsed.upgrades.mycorrhizalNetworkLevel !== undefined)
-          this.upgradeService.mycorrhizalNetwork.level.set(parsed.upgrades.mycorrhizalNetworkLevel);
-        if (parsed.upgrades.rootVigorLevel !== undefined)
-          this.upgradeService.rootVigor.level.set(parsed.upgrades.rootVigorLevel);
-      }
+      if (parsed.upgrades) this.loadSignals(parsed.upgrades, this.upgradeService);
+      if (parsed.storyline) this.loadSignals(parsed.storyline, this.storylineService);
+      if (parsed.logsData) this.loadSignals(parsed.logsData, this.logService);
 
-      if (parsed.storyline) {
-        if (parsed.storyline.hasReachedLeafMilestone !== undefined)
-          this.storylineService.hasReachedLeafMilestone.set(
-            parsed.storyline.hasReachedLeafMilestone,
-          );
-        if (parsed.storyline.isMutationUnlocked !== undefined)
-          this.storylineService.isMutationUnlocked.set(parsed.storyline.isMutationUnlocked);
-        if (parsed.storyline.hasReached10Branches !== undefined)
-          this.storylineService.hasReached10Branches.set(parsed.storyline.hasReached10Branches);
-        if (parsed.storyline.hasReachedFirstGrowth !== undefined)
-          this.storylineService.hasReachedFirstGrowth.set(parsed.storyline.hasReachedFirstGrowth);
-        if (parsed.storyline.hasReached10Leaves !== undefined)
-          this.storylineService.hasReached10Leaves.set(parsed.storyline.hasReached10Leaves);
+      if (parsed.logs && !parsed.logsData) {
+        this.logService.logs.set(parsed.logs);
       }
 
       if (parsed.mutations) {
@@ -138,23 +98,6 @@ export class SaveService {
           this.mutationService.progresses.set(parsed.mutations.progresses);
         if (parsed.mutations.completed)
           this.mutationService.completed.set(parsed.mutations.completed);
-      }
-
-      if (parsed.logsData) {
-        if (parsed.logsData.logs) this.logService.logs.set(parsed.logsData.logs);
-
-        if (parsed.logsData.loggedFirstGrowth !== undefined)
-          this.logService.loggedFirstGrowth.set(parsed.logsData.loggedFirstGrowth);
-        if (parsed.logsData.logged10Leaves !== undefined)
-          this.logService.logged10Leaves.set(parsed.logsData.logged10Leaves);
-        if (parsed.logsData.logged25Leaves !== undefined)
-          this.logService.logged25Leaves.set(parsed.logsData.logged25Leaves);
-        if (parsed.logsData.logged10Branches !== undefined)
-          this.logService.logged10Branches.set(parsed.logsData.logged10Branches);
-        if (parsed.logsData.loggedMutation !== undefined)
-          this.logService.loggedMutation.set(parsed.logsData.loggedMutation);
-      } else if (parsed.logs) {
-        this.logService.logs.set(parsed.logs);
       }
     } catch (e) {
       console.error('Save load error:', e);
@@ -164,5 +107,26 @@ export class SaveService {
   public hardReset(): void {
     localStorage.removeItem(this.SAVE_KEY);
     window.location.reload();
+  }
+
+  // ==========================================
+  // 3. HELPER METHODS
+  // ==========================================
+  private loadSignals(savedSection: any, targetService: any): void {
+    for (const key of Object.keys(savedSection)) {
+      if (savedSection[key] !== undefined && targetService[key]) {
+        if (key.endsWith('Level')) {
+          const upgradeKey = key.replace('Level', '');
+          if (
+            targetService[upgradeKey] &&
+            typeof targetService[upgradeKey].level?.set === 'function'
+          ) {
+            targetService[upgradeKey].level.set(savedSection[key]);
+          }
+        } else if (typeof targetService[key].set === 'function') {
+          targetService[key].set(savedSection[key]);
+        }
+      }
+    }
   }
 }
