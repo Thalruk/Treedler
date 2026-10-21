@@ -1,15 +1,15 @@
 import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ResourceService } from '../../core/services/resource';
-import { UpgradeService } from '../../core/services/upgrade.service';
-import { MutationService } from '../../core/services/mutation.service';
-import { ResourceBarComponent, ResourceBreakdownItem } from '../../shared/ui/resource-bar';
+import { ResourceService } from '../../../core/services/resource';
+import { UpgradeService } from '../../../core/services/upgrade.service';
+import { MutationService } from '../../../core/services/mutation.service';
+import { ResourceBarComponent, ResourceBreakdownItem } from '../../../shared/ui/resource-bar';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
   imports: [CommonModule, ResourceBarComponent],
-  templateUrl: './sidebar.html',
+  templateUrl: './resource-sidebar.html',
 })
 export class SidebarComponent {
   // ==========================================

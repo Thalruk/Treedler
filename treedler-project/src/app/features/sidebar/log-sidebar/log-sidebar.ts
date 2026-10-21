@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LogService } from '../../core/services/log.service';
-import { LogCategory } from '../../core/enums/log.enum';
+import { LogService } from '../../../core/services/log.service';
+import { LogCategory } from '../../../core/enums/log.enum';
 
 @Component({
   selector: 'app-log-sidebar',
