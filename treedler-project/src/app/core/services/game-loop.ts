@@ -4,6 +4,7 @@ import { SaveService } from './save.service';
 import { UpgradeService } from './upgrade.service';
 import { MutationService } from './mutation.service';
 import { StorylineService } from './storyline.service';
+import { LogService } from './log.service';
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +19,7 @@ export class GameLoopService {
   private upgradeService = inject(UpgradeService);
   private mutationService = inject(MutationService);
   private storylineService = inject(StorylineService);
+  private logService = inject(LogService);
 
   // ==========================================
   // 2. STATE & CONFIG
@@ -84,5 +86,6 @@ export class GameLoopService {
     this.resourceService.tick(dt, generations);
     this.mutationService.tick(dt);
     this.storylineService.checkMilestones();
+    this.logService.checkStoryLogs();
   }
 }

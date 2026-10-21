@@ -16,27 +16,31 @@
     bgLightClass="bg-blue-500"
   ></app-resource-bar>
 
-  <app-resource-bar
-    name="Minerals"
-    [amount]="resourceService.minerals().amount"
-    [maxAmount]="resourceService.minerals().maxAmount"
-    [netGeneration]="netMineralsGeneration()"
-    [breakdown]="mineralsBreakdown()"
-    [capacityBreakdown]="globalCapacityBreakdown()"
-    colorClass="text-gray-400"
-    bgDarkClass="bg-gray-700"
-    bgLightClass="bg-gray-400"
-  ></app-resource-bar>
+  @if (upgradeService.hasFirstRoot()) {
+    <app-resource-bar
+      name="Minerals"
+      [amount]="resourceService.minerals().amount"
+      [maxAmount]="resourceService.minerals().maxAmount"
+      [netGeneration]="netMineralsGeneration()"
+      [breakdown]="mineralsBreakdown()"
+      [capacityBreakdown]="globalCapacityBreakdown()"
+      colorClass="text-gray-400"
+      bgDarkClass="bg-gray-700"
+      bgLightClass="bg-gray-400"
+    ></app-resource-bar>
+  }
 
-  <app-resource-bar
-    name="Energy"
-    [amount]="resourceService.energy().amount"
-    [maxAmount]="resourceService.energy().maxAmount"
-    [netGeneration]="netEnergyGeneration()"
-    [breakdown]="energyBreakdown()"
-    [capacityBreakdown]="globalCapacityBreakdown()"
-    colorClass="text-yellow-500"
-    bgDarkClass="bg-yellow-900/30"
-    bgLightClass="bg-yellow-500"
-  ></app-resource-bar>
+  @if (upgradeService.hasFirstStem()) {
+    <app-resource-bar
+      name="Energy"
+      [amount]="resourceService.energy().amount"
+      [maxAmount]="resourceService.energy().maxAmount"
+      [netGeneration]="netEnergyGeneration()"
+      [breakdown]="energyBreakdown()"
+      [capacityBreakdown]="globalCapacityBreakdown()"
+      colorClass="text-yellow-500"
+      bgDarkClass="bg-yellow-900/30"
+      bgLightClass="bg-yellow-500"
+    ></app-resource-bar>
+  }
 </div>

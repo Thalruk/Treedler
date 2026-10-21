@@ -18,6 +18,9 @@ export class UpgradeService {
   public hasFirstRoot = signal<boolean>(false);
   public hasFirstStem = signal<boolean>(false);
 
+  // STORYLINE PERMANENT REWARDS
+  public hasPermanentLeafDiscount = signal<boolean>(false);
+
   public readonly firstRootCost = 5;
   public readonly firstStemCost = 5;
 
@@ -91,7 +94,6 @@ export class UpgradeService {
   // ==========================================
 
   public maxLeaves = computed(() => {
-    // Nerf: Dense Branching daje teraz stałe +5 liści zamiast x2
     const bonusLeaves = this.mutationService.isCompleted('dense_branching') ? 5 : 0;
     return this.branch.level() * (50 + bonusLeaves);
   });
@@ -191,7 +193,7 @@ export class UpgradeService {
     limit?: number,
   ): number {
     let maxAllowed = limit !== undefined ? limit - upgrade.level() : Infinity;
-    if (maxAllowed <= 0) return 1; // Zabezpieczenie wizualne dla osiągniętych limitów
+    if (maxAllowed <= 0) return 1;
     return Math.min(requestedQuantity, maxAllowed);
   }
 
@@ -201,8 +203,19 @@ export class UpgradeService {
   ): { resourceId: ResourceId; amount: number }[] {
     return upgrade.costConfigs.map((config) => {
       let total = 0;
+      let discount = 1.0;
+
+      // ==========================================
+      // STORYLINE MILESTONES DISCOUNTS
+      // ==========================================
+      if (upgrade.id === 'leaf' && this.hasPermanentLeafDiscount()) {
+        discount = 0.9;
+      }
+
       for (let i = 0; i < quantity; i++) {
-        total += Math.floor(config.baseCost * Math.pow(config.multiplier, upgrade.level() + i));
+        total += Math.floor(
+          config.baseCost * Math.pow(config.multiplier, upgrade.level() + i) * discount,
+        );
       }
       return { resourceId: config.resourceId, amount: total };
     });

@@ -30,6 +30,7 @@ export class SaveService {
         energy: this.resourceService.energy(),
       },
       upgrades: {
+        hasPermanentLeafDiscount: this.upgradeService.hasPermanentLeafDiscount(),
         hasFirstRoot: this.upgradeService.hasFirstRoot(),
         hasFirstStem: this.upgradeService.hasFirstStem(),
         rootWidthLevel: this.upgradeService.rootWidth.level(),
@@ -46,14 +47,26 @@ export class SaveService {
         rootVigorLevel: this.upgradeService.rootVigor.level(),
       },
       storyline: {
+        // Zapisujemy tylko flagi, które niosą ze sobą bonusy mechaniczne
         hasReachedLeafMilestone: this.storylineService.hasReachedLeafMilestone(),
         isMutationUnlocked: this.storylineService.isMutationUnlocked(),
+        hasReached10Branches: this.storylineService.hasReached10Branches(),
+        hasReachedFirstGrowth: this.storylineService.hasReachedFirstGrowth(),
+        hasReached10Leaves: this.storylineService.hasReached10Leaves(),
       },
       mutations: {
         progresses: this.mutationService.progresses(),
         completed: this.mutationService.completed(),
       },
-      logs: this.logService.logs(),
+      logsData: {
+        logs: this.logService.logs(),
+        // Zapisujemy flagi dla "flavor text", żeby nie spamować nimi ponownie
+        loggedFirstGrowth: this.logService.loggedFirstGrowth(),
+        logged10Leaves: this.logService.logged10Leaves(),
+        logged25Leaves: this.logService.logged25Leaves(),
+        logged10Branches: this.logService.logged10Branches(),
+        loggedMutation: this.logService.loggedMutation(),
+      },
     };
     localStorage.setItem(this.SAVE_KEY, JSON.stringify(saveState));
   }
@@ -71,6 +84,10 @@ export class SaveService {
       }
 
       if (parsed.upgrades) {
+        if (parsed.upgrades.hasPermanentLeafDiscount !== undefined)
+          this.upgradeService.hasPermanentLeafDiscount.set(
+            parsed.upgrades.hasPermanentLeafDiscount,
+          );
         if (parsed.upgrades.hasFirstRoot !== undefined)
           this.upgradeService.hasFirstRoot.set(parsed.upgrades.hasFirstRoot);
         if (parsed.upgrades.hasFirstStem !== undefined)
@@ -108,6 +125,12 @@ export class SaveService {
           );
         if (parsed.storyline.isMutationUnlocked !== undefined)
           this.storylineService.isMutationUnlocked.set(parsed.storyline.isMutationUnlocked);
+        if (parsed.storyline.hasReached10Branches !== undefined)
+          this.storylineService.hasReached10Branches.set(parsed.storyline.hasReached10Branches);
+        if (parsed.storyline.hasReachedFirstGrowth !== undefined)
+          this.storylineService.hasReachedFirstGrowth.set(parsed.storyline.hasReachedFirstGrowth);
+        if (parsed.storyline.hasReached10Leaves !== undefined)
+          this.storylineService.hasReached10Leaves.set(parsed.storyline.hasReached10Leaves);
       }
 
       if (parsed.mutations) {
@@ -116,7 +139,21 @@ export class SaveService {
         if (parsed.mutations.completed)
           this.mutationService.completed.set(parsed.mutations.completed);
       }
-      if (parsed.logs) {
+
+      if (parsed.logsData) {
+        if (parsed.logsData.logs) this.logService.logs.set(parsed.logsData.logs);
+
+        if (parsed.logsData.loggedFirstGrowth !== undefined)
+          this.logService.loggedFirstGrowth.set(parsed.logsData.loggedFirstGrowth);
+        if (parsed.logsData.logged10Leaves !== undefined)
+          this.logService.logged10Leaves.set(parsed.logsData.logged10Leaves);
+        if (parsed.logsData.logged25Leaves !== undefined)
+          this.logService.logged25Leaves.set(parsed.logsData.logged25Leaves);
+        if (parsed.logsData.logged10Branches !== undefined)
+          this.logService.logged10Branches.set(parsed.logsData.logged10Branches);
+        if (parsed.logsData.loggedMutation !== undefined)
+          this.logService.loggedMutation.set(parsed.logsData.loggedMutation);
+      } else if (parsed.logs) {
         this.logService.logs.set(parsed.logs);
       }
     } catch (e) {
