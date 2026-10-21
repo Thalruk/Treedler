@@ -154,9 +154,24 @@ export class UpgradeService {
   ): number {
     let maxAllowed = limit !== undefined ? limit - upgrade.level() : Infinity;
     if (maxAllowed <= 0) return 1;
-    return Math.min(requestedQuantity, maxAllowed);
-  }
 
+    const cap = Math.min(requestedQuantity, maxAllowed);
+    if (cap === 1) return 1;
+
+    let affordableQty = 0;
+
+    for (let i = 1; i <= cap; i++) {
+      const costs = this.getCostsForQuantity(upgrade, i);
+      const canAfford = costs.every((c) => this.getResourceAmount(c.resourceId) >= c.amount);
+
+      if (canAfford) {
+        affordableQty = i;
+      } else {
+        break;
+      }
+    }
+    return Math.max(1, affordableQty);
+  }
   private getCostsForQuantity(
     upgrade: UpgradeBase,
     quantity: number,

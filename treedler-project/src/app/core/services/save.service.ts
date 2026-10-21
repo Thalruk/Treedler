@@ -114,7 +114,7 @@ export class SaveService {
   // ==========================================
   private loadSignals(savedSection: any, targetService: any): void {
     for (const key of Object.keys(savedSection)) {
-      if (savedSection[key] !== undefined && targetService[key]) {
+      if (savedSection[key] !== undefined) {
         if (key.endsWith('Level')) {
           const upgradeKey = key.replace('Level', '');
           if (
@@ -123,7 +123,7 @@ export class SaveService {
           ) {
             targetService[upgradeKey].level.set(savedSection[key]);
           }
-        } else if (typeof targetService[key].set === 'function') {
+        } else if (targetService[key] && typeof targetService[key].set === 'function') {
           targetService[key].set(savedSection[key]);
         }
       }
