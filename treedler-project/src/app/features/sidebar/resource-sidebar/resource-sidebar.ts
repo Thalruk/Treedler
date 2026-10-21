@@ -3,7 +3,10 @@ import { CommonModule } from '@angular/common';
 import { ResourceService } from '../../../core/services/resource';
 import { UpgradeService } from '../../../core/services/upgrade.service';
 import { MutationService } from '../../../core/services/mutation.service';
-import { ResourceBarComponent, ResourceBreakdownItem } from '../../../shared/ui/resource-bar';
+import {
+  ResourceBarComponent,
+  ResourceBreakdownItem,
+} from '../../../shared/ui/resource-bar/resource-bar';
 
 @Component({
   selector: 'app-sidebar',

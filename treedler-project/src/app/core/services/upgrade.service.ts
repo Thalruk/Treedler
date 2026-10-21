@@ -4,6 +4,7 @@ import { ResourceId, ResourceName } from '../enums/resource.enum';
 import { MutationService } from './mutation.service';
 import { UpgradeBase } from '../classes/upgrade-base';
 import { ShortcutService } from './shortcut.service';
+import { UPGRADES_CONFIG } from '../config/upgrades.config';
 
 @Injectable({ providedIn: 'root' })
 export class UpgradeService {
@@ -29,66 +30,25 @@ export class UpgradeService {
   // ==========================================
 
   // --- CROWN ---
-  public branch = new UpgradeBase('branch', [
-    { resourceId: ResourceId.Energy, baseCost: 25, multiplier: 1.3 },
-    { resourceId: ResourceId.Water, baseCost: 20, multiplier: 1.3 },
-    { resourceId: ResourceId.Minerals, baseCost: 20, multiplier: 1.3 },
-  ]);
-
-  public leaf = new UpgradeBase('leaf', [
-    { resourceId: ResourceId.Energy, baseCost: 1, multiplier: 1.06 },
-    { resourceId: ResourceId.Water, baseCost: 1, multiplier: 1.06 },
-    { resourceId: ResourceId.Minerals, baseCost: 1, multiplier: 1.06 },
-  ]);
-
-  public sunwardReach = new UpgradeBase('sunwardReach', [
-    { resourceId: ResourceId.Energy, baseCost: 60, multiplier: 1.4 },
-  ]);
-
-  public canopySpread = new UpgradeBase('canopySpread', [
-    { resourceId: ResourceId.Energy, baseCost: 100, multiplier: 1.3 },
-    { resourceId: ResourceId.Water, baseCost: 80, multiplier: 1.3 },
-  ]);
+  public branch = new UpgradeBase('branch', UPGRADES_CONFIG['branch']);
+  public leaf = new UpgradeBase('leaf', UPGRADES_CONFIG['leaf']);
+  public sunwardReach = new UpgradeBase('sunwardReach', UPGRADES_CONFIG['sunwardReach']);
+  public canopySpread = new UpgradeBase('canopySpread', UPGRADES_CONFIG['canopySpread']);
 
   // --- BARK ---
-  public barkThickness = new UpgradeBase('barkThickness', [
-    { resourceId: ResourceId.Energy, baseCost: 15, multiplier: 1.25 },
-    { resourceId: ResourceId.Minerals, baseCost: 15, multiplier: 1.25 },
-  ]);
-
-  public vascularTissues = new UpgradeBase('vascularTissues', [
-    { resourceId: ResourceId.Energy, baseCost: 45, multiplier: 1.3 },
-    { resourceId: ResourceId.Water, baseCost: 35, multiplier: 1.3 },
-  ]);
-
-  public resinSecretion = new UpgradeBase('resinSecretion', [
-    { resourceId: ResourceId.Water, baseCost: 100, multiplier: 1.3 },
-    { resourceId: ResourceId.Minerals, baseCost: 100, multiplier: 1.3 },
-  ]);
+  public barkThickness = new UpgradeBase('barkThickness', UPGRADES_CONFIG['barkThickness']);
+  public vascularTissues = new UpgradeBase('vascularTissues', UPGRADES_CONFIG['vascularTissues']);
+  public resinSecretion = new UpgradeBase('resinSecretion', UPGRADES_CONFIG['resinSecretion']);
 
   // --- ROOTS ---
-  public rootWidth = new UpgradeBase('rootWidth', [
-    { resourceId: ResourceId.Energy, baseCost: 20, multiplier: 1.3 },
-    { resourceId: ResourceId.Minerals, baseCost: 15, multiplier: 1.3 },
-  ]);
-
-  public rootDepth = new UpgradeBase('rootDepth', [
-    { resourceId: ResourceId.Energy, baseCost: 20, multiplier: 1.3 },
-    { resourceId: ResourceId.Water, baseCost: 15, multiplier: 1.3 },
-  ]);
-
-  public rootHairs = new UpgradeBase('rootHairs', [
-    { resourceId: ResourceId.Energy, baseCost: 35, multiplier: 1.2 },
-    { resourceId: ResourceId.Minerals, baseCost: 50, multiplier: 1.2 },
-  ]);
-
-  public mycorrhizalNetwork = new UpgradeBase('mycorrhizalNetwork', [
-    { resourceId: ResourceId.Energy, baseCost: 150, multiplier: 1.3 },
-  ]);
-  public rootVigor = new UpgradeBase('rootVigor', [
-    { resourceId: ResourceId.Energy, baseCost: 120, multiplier: 1.35 },
-    { resourceId: ResourceId.Minerals, baseCost: 100, multiplier: 1.35 },
-  ]);
+  public rootWidth = new UpgradeBase('rootWidth', UPGRADES_CONFIG['rootWidth']);
+  public rootDepth = new UpgradeBase('rootDepth', UPGRADES_CONFIG['rootDepth']);
+  public rootHairs = new UpgradeBase('rootHairs', UPGRADES_CONFIG['rootHairs']);
+  public mycorrhizalNetwork = new UpgradeBase(
+    'mycorrhizalNetwork',
+    UPGRADES_CONFIG['mycorrhizalNetwork'],
+  );
+  public rootVigor = new UpgradeBase('rootVigor', UPGRADES_CONFIG['rootVigor']);
   // ==========================================
   // 3. LIMITS & CONSTRAINTS
   // ==========================================

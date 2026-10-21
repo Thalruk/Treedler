@@ -94,7 +94,7 @@
     >
       <button
         (click)="switchTab(Tab.Tree)"
-        class="flex flex-col items-center p-2 transition-colors w-1/4"
+        class="flex flex-col items-center p-2 transition-colors flex-1"
         [class.text-green-400]="activeTab() === Tab.Tree"
         [class.text-gray-500]="activeTab() !== Tab.Tree"
       >
@@ -105,7 +105,7 @@
       @if (storylineService.isMutationUnlocked()) {
         <button
           (click)="switchTab(Tab.Mutation)"
-          class="flex flex-col items-center p-2 transition-colors w-1/4"
+          class="flex flex-col items-center p-2 transition-colors flex-1"
           [class.text-purple-400]="activeTab() === Tab.Mutation"
           [class.text-gray-500]="activeTab() !== Tab.Mutation"
         >
@@ -116,7 +116,7 @@
 
       <button
         (click)="switchTab(Tab.Log)"
-        class="flex flex-col items-center p-2 transition-colors w-1/4"
+        class="flex flex-col items-center p-2 transition-colors flex-1"
         [class.text-blue-400]="activeTab() === Tab.Log"
         [class.text-gray-500]="activeTab() !== Tab.Log"
       >
@@ -125,7 +125,7 @@
       </button>
       <button
         (click)="switchTab(Tab.Storyline)"
-        class="flex flex-col items-center p-2 transition-colors w-1/4"
+        class="flex flex-col items-center p-2 transition-colors flex-1"
         [class.text-amber-400]="activeTab() === Tab.Storyline"
         [class.text-gray-500]="activeTab() !== Tab.Storyline"
       >
@@ -134,7 +134,7 @@
       </button>
       <button
         (click)="switchTab(Tab.Settings)"
-        class="flex flex-col items-center p-2 transition-colors w-1/4"
+        class="flex flex-col items-center p-2 transition-colors flex-1"
         [class.text-gray-200]="activeTab() === Tab.Settings"
         [class.text-gray-500]="activeTab() !== Tab.Settings"
       >

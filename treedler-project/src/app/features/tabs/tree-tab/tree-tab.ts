@@ -4,7 +4,7 @@ import { ResourceService } from '../../../core/services/resource';
 import { UpgradeService } from '../../../core/services/upgrade.service';
 import { ShortcutService } from '../../../core/services/shortcut.service';
 import { MutationService } from '../../../core/services/mutation.service';
-import { UpgradeButtonComponent } from '../../../shared/ui/upgrade-button';
+import { UpgradeButtonComponent } from '../../../shared/ui/upgrade-button/upgrade-button';
 import { UpgradeBase } from '../../../core/classes/upgrade-base';
 
 export interface UpgradeView {
