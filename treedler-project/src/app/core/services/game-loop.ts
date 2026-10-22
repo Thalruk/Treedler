@@ -96,9 +96,16 @@ export class GameLoopService {
     // ----------------------------------------
     this.timeSinceLastSlowTick += dt;
 
+    this.timeSinceLastSlowTick += dt;
+
     if (this.timeSinceLastSlowTick >= 1.0) {
       this.storylineService.checkMilestones();
       this.logService.checkStoryLogs();
+
+      // Szansa 1.5% na każdą sekundę (średnio jedno wydarzenie na ~66 sekund)
+      if (Math.random() < 0.005) {
+        this.logService.triggerRandomFlavorEvent();
+      }
 
       this.timeSinceLastSlowTick -= 1.0;
     }

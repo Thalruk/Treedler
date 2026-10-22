@@ -1,6 +1,7 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { UpgradeService } from './upgrade.service';
 import { LogCategory } from '../enums/log.enum';
+import { RANDOM_FLAVOR_EVENTS } from '../config/random-events.config';
 
 export interface LogEntry {
   id: string;
@@ -33,6 +34,22 @@ export class LogService {
     if (this.hasUnreadLogs()) {
       this.hasUnreadLogs.set(false);
     }
+  }
+
+  private lastRandomEventIndex: number = -1;
+
+  public triggerRandomFlavorEvent(): void {
+    const events = RANDOM_FLAVOR_EVENTS;
+    if (events.length === 0) return;
+
+    let randomIndex = Math.floor(Math.random() * events.length);
+
+    if (randomIndex === this.lastRandomEventIndex && events.length > 1) {
+      randomIndex = (randomIndex + 1) % events.length;
+    }
+
+    this.lastRandomEventIndex = randomIndex;
+    this.addLog(events[randomIndex], LogCategory.Random);
   }
 
   public checkStoryLogs(): void {
