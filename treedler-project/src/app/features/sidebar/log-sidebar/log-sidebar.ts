@@ -19,10 +19,12 @@ export class LogSidebarComponent {
     const logs = this.logService.logs();
     const filter = this.activeFilter();
 
-    if (filter === 'All') {
-      return logs;
+    let filtered = logs;
+    if (filter !== 'All') {
+      filtered = logs.filter((log) => log.category === filter);
     }
-    return logs.filter((log) => log.category === filter);
+
+    return [...filtered].reverse();
   });
 
   public setFilter(filter: LogCategory | 'All'): void {

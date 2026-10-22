@@ -13,6 +13,7 @@ export class LogService {
   private upgradeService = inject(UpgradeService);
 
   public logs = signal<LogEntry[]>([]);
+  public hasUnreadLogs = signal<boolean>(false);
 
   public loggedFirstGrowth = signal<boolean>(false);
   public logged10Leaves = signal<boolean>(false);
@@ -25,6 +26,13 @@ export class LogService {
       ...currentLogs,
       { id: Math.random().toString(36).substring(2, 9), text, category },
     ]);
+    this.hasUnreadLogs.set(true);
+  }
+
+  public markAsRead(): void {
+    if (this.hasUnreadLogs()) {
+      this.hasUnreadLogs.set(false);
+    }
   }
 
   public checkStoryLogs(): void {
