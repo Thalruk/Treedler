@@ -168,7 +168,7 @@ export const RANDOM_FLAVOR_EVENTS: string[] = [
   'A distant waterfall echoes through the valley, a reminder that water always finds its way.',
 
   // ==========================================================================
-  // 2. BOOKS & LITERATURE REFERENCES
+  // 2. BOOKS & LITERATURE
   // ==========================================================================
 
   // --- THE COSMERE (STORMLIGHT ARCHIVE & MISTBORN) ---
@@ -187,20 +187,24 @@ export const RANDOM_FLAVOR_EVENTS: string[] = [
   'A curly-haired herbalist sits by your roots knitting a hat, arguing about philosophy with a large cat that intermittently turns into a shaggy boy.',
   'Someone tries to command your branches to bend using the Ancient Language, but they do not know your True Name, so you simply ignore them.',
 
-  // --- FABLEHAVEN (BAŚNIOBÓR) ---
+  // --- FABLEHAVEN  ---
   'A seemingly ordinary butterfly flutters past. Had you absorbed fresh milk today instead of water, you might have seen the tiny, radiant woman riding it.',
   'Two children run past in terror, pursued by an old woman blowing on a knotted rope to untie ancient, dark magic.',
   'You feel a strange peace, knowing you grow inside the boundaries of a secret sanctuary, though something ancient and hungry paces inside an underground prison nearby.',
   'A tiny, glowing fairy lands on your branch, catches her own reflection in a drop of dew, and turns into a grumpy, bulbous imp out of sheer vanity.',
   'A gargantuan cow the size of a barn lumbers past in the distance, grazing on entire bushes at once.',
+  'A massive golem made entirely of dirt, rocks, and clay lumbers past, obediently carrying a load of firewood without a single thought in its head.',
+  'Two satyrs trot by your roots, arguing fiercely over a stolen portable television and a stack of batteries.',
+  'You are careful not to grow too close to the dark pond nearby; the shimmering women in the water love to pull careless observers beneath the surface.',
+  'A young girl rests her hand against your bark to catch her breath. For a brief moment, your energy reserves surge past their maximum capacity.',
 
-  // --- THE GRISHA TRILOGY (TRYLOGIA GRISZY) ---
+  // --- THE GRISHA TRILOGY ---
   'A wall of impenetrable, unnatural darkness rolls across the distant horizon, echoing with the screech of winged predators. You are glad you stay in the sun.',
   'A magnificent white stag with antlers that seem to glow with inner light steps quietly past your roots, listening for hunters.',
   'A woman in a blue embroidered coat walks by, and for a second, the atmospheric pressure drops and the wind bends entirely to her hands.',
   'A tired girl sits in your shade, rubbing a scar on her palm and trying to summon a single spark of pure sunlight.',
 
-  // --- THE KING IN YELLOW (KRÓL W ŻÓŁCI) ---
+  // --- THE KING IN YELLOW ---
   'A tattered, yellow-bound pamphlet blows against your trunk. You cannot read the second act, which is probably for the best.',
   'The mist today parts to reveal the dark, silent waters of a strange lake and twin suns setting behind black towers.',
   'A pale, featureless mask lies discarded in the dirt. Wait—that is no mask.',
@@ -217,13 +221,13 @@ export const RANDOM_FLAVOR_EVENTS: string[] = [
   'For a brief, terrifying moment, the clouds part to reveal a colossal, lidless eye wreathed in flame. You hold your leaves very still.',
   'You hear a faint, wet rasping sound from the dark creek nearby, followed by a voice whispering riddles in the dark.',
 
-  // --- THE MAGIC THIEF (ZŁODZIEJ MAGII) ---
+  // --- THE MAGIC THIEF ---
   'A scruffy boy picks up a smooth, striped river stone from beside your roots, slips it into his pocket, and whispers to the local magic as if it were a friend.',
   'A grumpy wizard in dark robes walks past, eating a warm buttered biscuit and complaining that his apprentice just blew up another house.',
   'You feel the ambient energy of the distant city slowly draining through the bedrock, as if someone is stealing the very magic that keeps it alive.',
   'A patch of shadow detaches itself from a nearby rock, forms into a smoky, feline shape, and prowls off after a boy carrying lockpicks.',
 
-  // --- RANGER'S APPRENTICE (ZWIADOWCY) ---
+  // --- RANGER'S APPRENTICE ---
   'You could have sworn there was nobody near you, until a patch of mottled green-and-gray cloth next to your trunk suddenly stood up and walked away.',
   'A small, shaggy, barrel-chested pony trots past. A reckless thief tries to grab its reins, gets violently bucked into a bush, and learns why you need the secret password.',
   'Two figures sit by a small campfire at a safe distance, brewing a pot of dark, bitter liquid and arguing over whether to add honey to it.',
@@ -235,29 +239,71 @@ export const RANDOM_FLAVOR_EVENTS: string[] = [
   'A weathered longship with a wolf’s head carved into the prow is visible on the distant coast, its bearded crew singing loudly about warm ale.',
   'A stern Ranger inspects the dirt near your roots, reading a week-old trail of footprints as easily as if it were written in ink.',
 
-  // --- SARAH J. MAAS (TOG, ACOTAR, CRESCENT CITY) ---
-  'A young woman in a fine tunic lounges on your lowest branch, reading a thick book and eating an entire bag of sweets while hiding six daggers in her boots.',
-  'A white-haired warrior with facial tattoos lands silently on a nearby rock, shifting from the form of a hawk on an unnatural, icy breeze.',
-  'The night sky erupts with green-and-silver falling stars, and the wind suddenly smells of citrus and the sea.',
-  'Two figures with massive, leathery bat-like wings streak across the moon, arguing telepathically while avoiding a wall of giant, magical thorns.',
-  'A blinding beam of pure light shoots into the sky from a distant modern metropolis, accompanied by the faint sound of a ringing cell phone.',
-  'A winged man with lightning crackling across his fingertips leans against your bark, looking utterly exhausted by local politics.',
-
-  // --- OTHER BOOKS, SCI-FI & WEBNOVELS ---
-  'You briefly consider carving a sad face into your own white bark and bleeding red sap, but it feels overly dramatic.',
-  'A three-eyed crow lands on your crown, stares into the past for a bit, and flies north.',
+  // --- OTHER CLASSIC FANTASY & SCI-FI NOVELS ---
   'A chest made of pearwood trots past on hundreds of tiny, hurried legs, looking for its owner.',
   'A flying blue car crashes violently into a willow tree in the distance. You are glad it was not you.',
   'A sandworm would hate it here. Far too much water.',
   'You calculate the ultimate answer to life, the universe, and photosynthesis. It is 42.',
+
+  // ==========================================================================
+  // 3. ANIME, MANGA, MANHWA & WEB NOVELS
+  // ==========================================================================
+
+  // --- BLACK CLOVER ---
+  'A tiny five-leaf clover sprouts in the grass at your base, radiating a dark, anti-magical aura right before a short, muscular kid screams at the top of his lungs.',
+  'Colossal, glowing roots descend from the clouds above, draining the ambient mana from the area to fuel a masked captain’s World Tree magic.',
+  'A glowing, four-leaf book floats past on the wind, followed by a muscular man with a cigarette muttering about surpassing his limits right here, right now.',
+
+  // --- BLEACH ---
+  'A thousand glowing pink cherry blossom petals drift past on the breeze, slicing a nearby boulder into ribbons like microscopic razor blades.',
+  'A tall man with spiky hair and a tiny bell in his locks swings a jagged, chipped sword at a ghost, laughing maniacally about wanting a harder fight.',
+  'A shattered, bone-white mask lies in the grass, slowly dissolving into glowing blue particles of spiritual energy.',
+  'You briefly wonder if trees have a Bankai. Yours would probably just be "Slightly Larger Tree."',
+
+  // --- FAIRY TAIL ---
+  'An old wizard who looks remarkably like a walking broccoli tree strolls by, muttering humble jokes while effortlessly growing a massive jungle behind him.',
+  'A pink-haired teenager literally eats a roaring campfire nearby to regain his strength, then sneezes and burns down half a hillside.',
+  'A small blue cat with white wings flies past your canopy, clutching a raw fish and shouting "Aye, Sir!" at the sky.',
+  'You channel your inner strength through your roots, pretending you are the great Tenrou Tree protecting everyone resting in your shade.',
+
+  // --- NARUTO ---
+  'Three kids wearing metal headbands leap from your highest branch at breakneck speed, somehow not snapping a single twig beneath their sandals.',
+  'A ninja in the clearing gets hit by a flurry of shurikens, puffs into white smoke, and turns into a freshly cut wooden log. Wait—where did they get that log?!',
+
+  // --- OMNISCIENT READER'S VIEWPOINT (ORV) ---
+  'A translucent blue window pops up in front of your leaves: [The constellation "Secretive Plotter" is nodding at your patience.] [100 coins have been sponsored.]',
+  'A man in a crisp white coat stares intently at his smartphone while walking past, muttering about ways to survive the next scenario before sacrificing himself again.',
+  'A fluffy white creature with tiny horns floats in the sky, snapping its fingers and announcing that the free trial of planetary photosynthesis has ended.',
+
+  // --- OVERGEARED ---
+  'A grumpy blacksmith sets up a portable anvil in your shade, hammering furiously while four floating, golden hands polish a sword beside him.',
+  'A wild-eyed man in a straw hat runs past, brandishing a hand plow and shouting "Free Farming!" as giant cabbages erupt from the dirt like artillery shells.',
+  'An adventurer inspects your bark, wondering if you are a Phosphorescent Wood tree, before complaining about terrible item drop rates and walking away.',
+
+  // --- SOLO LEVELING ---
+  'A tall man in a dark coat looks at a dead beetle near your roots and whispers: "Arise." A glowing purple shadow insect crawls out of the shell and salutes him.',
+  'A swirling, ominous blue portal opens in mid-air twenty paces away. You hope a strike team clears it before a dungeon break ruins your soil.',
+  'A massive shadow bear and a shadow knight stand silently in your shade, waiting for their monarch to finish leveling up.',
+
+  // --- THE RISING OF THE SHIELD HERO ---
+  'A cynical man carrying only a metal shield shoves one of your fallen leaves into its gem; the shield glows green and unlocks the [Leaf Shield] skill (+1 Defense).',
+  'A glowing red hourglass appears in the sky above, silently counting down the minutes until the next Wave of Catastrophe hits the region.',
+
+  // --- WEB NOVEL & SYSTEM TROPES (LITRPG / XIANXIA) ---
   'An invisible voice in your sap announces: [Skill Level Up: Standing Still +1]. Numbers go up.',
   'You attempt to cultivate your inner core to break through to the Nascent Sapling Realm, but it is just regular sap.',
 
   // ==========================================================================
-  // 3. VIDEO GAMES REFERENCES
+  // 4. VIDEO GAMES
   // ==========================================================================
 
-  // --- BALDUR'S GATE 3 ---
+  // --- AGAINST THE STORM ---
+  'The rain never seems to stop here, and the forest feels hostile—as if the Queen herself is growing impatient with your slow expansion.',
+  'A beaver in a yellow raincoat, a lizard, and a harpy huddle around a glowing hearth nearby, trying to keep their resolve high before the storm hits.',
+  'Pulsing, parasitic cysts of blightrot begin to sprout on a wooden wall in the distance, waiting for someone with a flamethrower to purge them.',
+  'You hear the sound of axes chopping furiously through the wood line; the locals are desperate to open a dangerous glade before the season changes.',
+
+  // --- BALDUR\'S GATE 3 ---
   'A soothing, disembodied voice whispers in your sap: "As the symbol glows, power courses through you. Authority." You are just a tree, though.',
   'A pale elf with white curls lounges in your shade, complaining bitterly about the sun before sneaking off to bite a passing boar.',
   'A bearded wizard in purple robes leans against your bark, looking feverish, and asks if you happen to have a spare magical boot he could eat.',
@@ -292,7 +338,6 @@ export const RANDOM_FLAVOR_EVENTS: string[] = [
   'A man in a neat jacket with a glowing blue circle on his temple slams a folder onto a rock nearby, shouting: "Twenty-eight axe wounds!"',
   'An android stands in your shade, flicking a silver coin across his knuckles with mathematical perfection while waiting for a grumpy lieutenant.',
   'A glowing red wall appears in your mind, telling you to stand still and obey your biological programming. You do not break it, because you actually like standing still.',
-  'Two figures huddle beneath your branches in the freezing rain; one whispers that she isn’t cold, while the other desperately searches for a dry shelter.',
 
   // --- DISCO ELYSIUM ---
   'A disheveled detective in a filthy green blazer stares at your bark for twenty minutes, convinced his inner voice is telling him that you know who killed the hanged man.',
@@ -306,6 +351,13 @@ export const RANDOM_FLAVOR_EVENTS: string[] = [
   'Deep in the cold void between moments, a pale young man with pitch-black eyes observes your slow growth with mild curiosity.',
   'A small charm carved from raw whalebone hangs from one of your twigs, humming with a faint, eerie melody that vibrates through your sap.',
   'A mechanical guard on tall, stilt-like legs clanks past on the road below, powered by a glowing blue tank of volatile whale oil.',
+
+  // --- FALLOUT ---
+  'A mutated man with a literal tree growing out of his skull walks by, arguing loudly with the branches on his head named Bob. You feel a strange kinship.',
+  'A handful of rusted, red bottle caps lies scattered in the dirt near your base. For some reason, passing travelers treat them like pure gold.',
+  'A survivor in a blue-and-yellow jumpsuit stops in your shade, staring at a glowing green screen on his wrist while 1950s jazz plays from a tiny speaker.',
+  'A two-headed cow grazes peacefully on the irradiated grass nearby, completely unbothered by the distant mushroom cloud on the horizon.',
+  'War never changes. Neither does photosynthesis, to be honest.',
 
   // --- FROSTPUNK ---
   'The temperature plummets rapidly. In the distance, a massive coal-powered furnace roars to life, belching black smoke into the freezing sky as a horn blares.',
@@ -338,6 +390,10 @@ export const RANDOM_FLAVOR_EVENTS: string[] = [
   'Four wizards in colorful robes stand in a circle nearby. Two of them cross their arcane beams, resulting in a catastrophic explosion that launches all four into the stratosphere.',
   'A robed figure gets slightly damp in the morning dew, tries to cast a lightning bolt, and immediately electrocutes himself into a pile of ash.',
   'Someone shouts "Dunka Dunka!" in complete gibberish and drops a flaming boulder from the sky, nearly crashing reality itself.',
+  'A wizard tries to heal his bleeding friend with a green beam of life, accidentally mixes it with arcane energy, and explodes him into tiny pieces.',
+  'Someone coats the grass in front of you with conjured grease and lights a match. You brace yourself for a very warm afternoon.',
+  'A robed figure shouts a bizarre combination of seven elements, summons a literal M60 machine gun out of thin air, and mows down a goblin.',
+  'A mage gets resurrected by a lightning bolt for the twelfth time in three minutes. He immediately steps on his own arcane landmine.',
 
   // --- MASS EFFECT ---
   'A colossal, cuttlefish-shaped machine descends from the clouds in the distance, unleashing a deafening, metallic horn sound that vibrates through your core.',
@@ -349,6 +405,11 @@ export const RANDOM_FLAVOR_EVENTS: string[] = [
   'A fast-talking amphibian scientist jogs past, muttering rapidly about running tests on seashells while humming a cheerful operetta.',
   'Two heavily armored figures stand face-to-face nearby, exchanging the entirety of their conversation in single words: "Wrex." "Shepard."',
   'At the end of all things, you suspect your choices will simply boil down to glowing red, blue, or green. Wait—your leaves are already green. Synthesis achieved.',
+  'A small, glowing blue jellyfish floats past your canopy, carrying a message from a distant space station about the imminent arrival of a Reaper.',
+  'A confident voice declares: "This is my favorite tree in the entire forest." You wonder if you are supposed to offer a discount on your sap.',
+
+  // --- MINECRAFT ---
+  'A blocky man in a cyan shirt walks up and punches your trunk with his bare fist. Rude.',
 
   // --- ORI (BLIND FOREST & WILL OF THE WISPS) ---
   'You aspire to one day grow as massive as the great Spirit Tree of Nibel, shedding glowing white leaves of pure light instead of ordinary green ones.',
@@ -356,6 +417,10 @@ export const RANDOM_FLAVOR_EVENTS: string[] = [
   'A gigantic, benevolent toad sits in the shallow water near your roots, watching over the forest with quiet, ancient wisdom.',
   'A creeping purple rot tries to wither the grass at your base, but a burst of golden spirit light from a nearby willow cleanses the soil.',
   'A glowing white creature grabs a falling acorn in mid-air and uses it to slingshot itself vertically into your canopy, leaving the acorn buried deep in the dirt.',
+  'A colossal, shadowy owl sweeps across the moon, her wings blocking out the starlight as she returns to a nest holding a single glowing feather.',
+  'A spindly, long-limbed creature made of dark shadow and glowing blue lines tinkers with a floating light orb near your roots.',
+  'Two small, furry creatures with oversized ears and long tails scurry up your trunk, offering you a shiny stone in exchange for a fallen acorn.',
+  'On the icy peak in the distance, a gargantuan bear covered in moss and snow rolls over in his sleep, causing a minor avalanche.',
 
   // --- PATHFINDER (KINGMAKER & WRATH OF THE RIGHTEOUS) ---
   'A portal to a chaotic, vibrant realm opens briefly nearby; a green-haired nymph steps out, laughs at a passing baron, and vanishes into the mist.',
@@ -384,6 +449,9 @@ export const RANDOM_FLAVOR_EVENTS: string[] = [
   'A single, colossal red eye glares from the pale sky above, and for a brief moment, the grass around you turns into a sea of red snow.',
   'A magpie lands on your branch, tilts its head, and flies off toward a snowy, distant peninsula.',
 
+  // --- SKYRIM (THE ELDER SCROLLS) ---
+  'An arrow flies out of nowhere and strikes an adventurer in the knee right in front of you.',
+
   // --- SLAY THE PRINCESS ---
   'You are on a path in the woods. And at the end of that path is a cabin. Actually, you *are* the woods along the path, and you are tired of watching this bird-man walk by.',
   'Five different voices argue violently inside a passing stranger’s head about whether to stab a royal prisoner or give her "The Look."',
@@ -402,6 +470,12 @@ export const RANDOM_FLAVOR_EVENTS: string[] = [
   'A woman clothed only in vines walks by, throws a handful of sparkling green powder at the dirt, and complains that the world is still 1% corrupted.',
   'A gigantic, towering tree in the distance drops an endless stream of living wood wands as someone mines its trunk with a copper pickaxe.',
 
+  // --- TIMBERBORN ---
+  'A group of industrious beavers walks past on two legs, carrying planks to build a three-story wooden dam that completely cuts off your river.',
+  'A terrifying tide of glowing red, toxic waste flows down the nearby riverbed, withering the grass. You pull your roots back in disgust.',
+  'A mechanical beaver made entirely of brass gears and scrap metal whirrs past, planting a neat row of birch saplings with robotic precision.',
+  'The sky turns parched and dry as a severe drought hits, while beavers in the distance furiously pump water from gigantic wooden barrels.',
+
   // --- TRINE (GENERAL, AMADEUS, PONTIUS & ZOYA) ---
   'A glowing triangular artifact binds three bickering souls together as they tumble clumsily through the vibrant, fairy-tale undergrowth below.',
   'A frantic wizard waves his hands, conjuring three floating metal boxes and a plank right on top of your branches so a thief and a fat knight can cross a gap.',
@@ -416,19 +490,19 @@ export const RANDOM_FLAVOR_EVENTS: string[] = [
   'A cynical woman in leather armor hides in your shadow, muttering sarcastically about being stuck babysitting an incompetent wizard and a gluttonous knight.',
   'Two freezing arrows thunk into a tree trunk opposite you, followed by a nimble acrobat complaining that there isn’t a single gold chest in this entire forest.',
 
-  // --- THE WITCHER, WARHAMMER, MINECRAFT & SKYRIM ---
-  'A white-haired man rides by on a horse. The horse inexplicably teleports onto your lowest branch before glitching back to the ground.',
-  'A silver medallion lies dropped in the grass nearby. It hums faintly, vibrating against your roots.',
+  // --- WARHAMMER (FANTASY & 40,000) ---
   'A stray green spore drifts by, faintly whispering "WAAAGH" on the wind.',
   'A heavily armored warrior in blue pauldrons stomps past, condemning the local flora as heresy.',
-  'A blocky man in a cyan shirt walks up and punches your trunk with his bare fist. Rude.',
-  'An arrow flies out of nowhere and strikes an adventurer in the knee right in front of you.',
+
+  // --- THE WITCHER ---
+  'A white-haired man rides by on a horse. The horse inexplicably teleports onto your lowest branch before glitching back to the ground.',
+  'A silver medallion lies dropped in the grass nearby. It hums faintly, vibrating against your roots.',
 
   // ==========================================================================
-  // 4. MOVIES, POP CULTURE & TREE PUNS
+  // 5. MOVIES, POP CULTURE & TREE PUNS
   // ==========================================================================
 
-  // --- MOVIES & TV ---
+  // --- MOVIES & POP CULTURE ---
   'A group of knights approaches and demands a shrubbery. Finding you too tall, they shout "Ni!" and depart.',
   'Someone tries to chop you down with the mightiest of weapons: a raw herring. It is entirely ineffective.',
   'A small green creature in rags sits by your roots, muttering about how size matters not.',
