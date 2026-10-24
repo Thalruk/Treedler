@@ -16,11 +16,17 @@ export class LogService {
   public logs = signal<LogEntry[]>([]);
   public hasUnreadLogs = signal<boolean>(false);
 
+  // Istniejące sygnały
   public loggedFirstGrowth = signal<boolean>(false);
   public logged10Leaves = signal<boolean>(false);
   public logged25Leaves = signal<boolean>(false);
   public logged10Branches = signal<boolean>(false);
   public loggedMutation = signal<boolean>(false);
+
+  // NOWE SYGNAŁY PROGRESJI I FABUŁY
+  public logged50Leaves = signal<boolean>(false);
+  public loggedFirstBark = signal<boolean>(false);
+  public loggedBloomUnlocked = signal<boolean>(false);
 
   public addLog(text: string, category: LogCategory = LogCategory.Random): void {
     this.logs.update((currentLogs) => [
@@ -55,7 +61,11 @@ export class LogService {
   public checkStoryLogs(): void {
     const leaves = this.upgradeService.leaf.level();
     const branches = this.upgradeService.branch.level();
+    const bark = this.upgradeService.barkThickness.level();
 
+    // ----------------------------------------
+    // WCZESNA GRA (EARLY GAME)
+    // ----------------------------------------
     if (
       !this.loggedFirstGrowth() &&
       this.upgradeService.hasFirstStem() &&
@@ -76,14 +86,6 @@ export class LogService {
       );
     }
 
-    if (!this.logged25Leaves() && leaves >= 25) {
-      this.logged25Leaves.set(true);
-      this.addLog(
-        "The tree's demand for energy grows. You must multiply the leaves to prepare for the first mutation.",
-        LogCategory.Progress,
-      );
-    }
-
     if (!this.logged10Branches() && branches >= 10) {
       this.logged10Branches.set(true);
       this.addLog(
@@ -92,10 +94,48 @@ export class LogService {
       );
     }
 
+    if (!this.loggedFirstBark() && bark >= 1) {
+      this.loggedFirstBark.set(true);
+      this.addLog(
+        'The outer layer hardens. The tree prepares to store greater reserves of energy and water.',
+        LogCategory.Progress,
+      );
+    }
+
+    // ----------------------------------------
+    // ŚRODEK GRY (MID GAME)
+    // ----------------------------------------
+    if (!this.logged25Leaves() && leaves >= 25) {
+      this.logged25Leaves.set(true);
+      this.addLog(
+        "The tree's demand for energy grows. You must multiply the leaves to prepare for future adaptations.",
+        LogCategory.Progress,
+      );
+    }
+
+    if (!this.logged50Leaves() && leaves >= 50) {
+      this.logged50Leaves.set(true);
+      this.addLog(
+        'The canopy thickens significantly, casting a permanent, cooling shadow over the soil below.',
+        LogCategory.Progress,
+      );
+    }
+
     if (!this.loggedMutation() && leaves >= 100) {
       this.loggedMutation.set(true);
       this.addLog(
         'The excess energy is triggering spontaneous biological adaptations. A new path unfolds.',
+        LogCategory.Story,
+      );
+    }
+
+    // ----------------------------------------
+    // PÓŹNA GRA (LATE GAME - BLOOM)
+    // ----------------------------------------
+    if (!this.loggedBloomUnlocked() && leaves >= 250) {
+      this.loggedBloomUnlocked.set(true);
+      this.addLog(
+        'The tree feels heavy with purpose. A profound shift in the flow of energy signals a new phase of life.',
         LogCategory.Story,
       );
     }

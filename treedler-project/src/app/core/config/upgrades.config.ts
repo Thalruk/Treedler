@@ -9,9 +9,9 @@ export const UPGRADES_CONFIG: Record<string, CostConfig[]> = {
     { resourceId: ResourceId.Minerals, baseCost: 20, multiplier: 1.3 },
   ],
   leaf: [
-    { resourceId: ResourceId.Energy, baseCost: 1, multiplier: 1.06 },
-    { resourceId: ResourceId.Water, baseCost: 1, multiplier: 1.06 },
-    { resourceId: ResourceId.Minerals, baseCost: 1, multiplier: 1.06 },
+    { resourceId: ResourceId.Energy, baseCost: 1, multiplier: 1.05 },
+    { resourceId: ResourceId.Water, baseCost: 1, multiplier: 1.05 },
+    { resourceId: ResourceId.Minerals, baseCost: 1, multiplier: 1.05 },
   ],
   sunwardReach: [{ resourceId: ResourceId.Energy, baseCost: 60, multiplier: 1.4 }],
   canopySpread: [

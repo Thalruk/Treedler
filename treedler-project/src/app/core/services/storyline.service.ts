@@ -11,6 +11,7 @@ export class StorylineService {
   public hasReached10Leaves = signal<boolean>(false);
   public hasReached10Branches = signal<boolean>(false);
   public hasReachedLeafMilestone = signal<boolean>(false);
+  public isBloomUnlocked = signal<boolean>(false);
 
   public checkMilestones(): void {
     const leaves = this.upgradeService.leaf.level();
@@ -36,6 +37,9 @@ export class StorylineService {
     if (!this.hasReachedLeafMilestone() && leaves >= 100) {
       this.hasReachedLeafMilestone.set(true);
       this.isMutationUnlocked.set(true);
+    }
+    if (!this.isBloomUnlocked() && leaves >= 250) {
+      this.isBloomUnlocked.set(true);
     }
   }
 }

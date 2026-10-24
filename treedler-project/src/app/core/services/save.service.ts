@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { ResourceService } from './resource';
+import { ResourceService } from './resource.service';
 import { UpgradeService } from './upgrade.service';
 import { StorylineService } from './storyline.service';
 import { MutationService } from './mutation.service';
 import { LogService } from './log.service';
+import { BloomService } from './bloom.service';
 
 @Injectable({ providedIn: 'root' })
 export class SaveService {
@@ -16,6 +17,7 @@ export class SaveService {
   private storylineService = inject(StorylineService);
   private mutationService = inject(MutationService);
   private logService = inject(LogService);
+  private bloomService = inject(BloomService);
 
   private readonly SAVE_KEY = 'treedler_save';
 
@@ -54,18 +56,28 @@ export class SaveService {
         hasReached10Branches: this.storylineService.hasReached10Branches(),
         hasReachedFirstGrowth: this.storylineService.hasReachedFirstGrowth(),
         hasReached10Leaves: this.storylineService.hasReached10Leaves(),
+        isBloomUnlocked: this.storylineService.isBloomUnlocked(), // DODANO
       },
       mutations: {
         progresses: this.mutationService.progresses(),
         completed: this.mutationService.completed(),
+      },
+      bloom: {
+        currentStageIndex: this.bloomService.currentStageIndex(),
+        isActive: this.bloomService.isActive(),
+        invested: this.bloomService.invested(),
+        isFullyComplete: this.bloomService.isFullyComplete(),
       },
       logsData: {
         logs: this.logService.logs(),
         loggedFirstGrowth: this.logService.loggedFirstGrowth(),
         logged10Leaves: this.logService.logged10Leaves(),
         logged25Leaves: this.logService.logged25Leaves(),
+        logged50Leaves: this.logService.logged50Leaves(), // DODANE
         logged10Branches: this.logService.logged10Branches(),
         loggedMutation: this.logService.loggedMutation(),
+        loggedFirstBark: this.logService.loggedFirstBark(), // DODANE
+        loggedBloomUnlocked: this.logService.loggedBloomUnlocked(), // DODANE
       },
     };
 
@@ -96,6 +108,15 @@ export class SaveService {
         if (parsed.mutations.completed) {
           this.mutationService.completed.set(parsed.mutations.completed);
         }
+      }
+      if (parsed.bloom) {
+        if (parsed.bloom.currentStageIndex !== undefined)
+          this.bloomService.currentStageIndex.set(parsed.bloom.currentStageIndex);
+        if (parsed.bloom.isActive !== undefined)
+          this.bloomService.isActive.set(parsed.bloom.isActive);
+        if (parsed.bloom.invested) this.bloomService.invested.set(parsed.bloom.invested);
+        if (parsed.bloom.isFullyComplete !== undefined)
+          this.bloomService.isFullyComplete.set(parsed.bloom.isFullyComplete);
       }
     } catch (e) {
       console.error('Save load error:', e);

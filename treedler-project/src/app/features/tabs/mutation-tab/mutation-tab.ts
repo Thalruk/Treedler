@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MutationService } from '../../../core/services/mutation.service';
+import { ResourceName } from '../../../core/enums/resource.enum';
 
 @Component({
   selector: 'app-mutation-tab',
@@ -10,4 +11,5 @@ import { MutationService } from '../../../core/services/mutation.service';
 })
 export class MutationTabComponent {
   public mutationService = inject(MutationService);
+  public ResourceName = ResourceName;
 }

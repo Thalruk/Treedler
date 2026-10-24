@@ -5,4 +5,5 @@ export enum TabId {
   Settings,
   Log,
   Storyline,
+  Bloom,
 }

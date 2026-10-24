@@ -1,6 +1,6 @@
 import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ResourceService } from '../../../core/services/resource';
+import { ResourceService } from '../../../core/services/resource.service';
 import { UpgradeService } from '../../../core/services/upgrade.service';
 import { MutationService } from '../../../core/services/mutation.service';
 import {

@@ -1,10 +1,11 @@
 import { Injectable, inject } from '@angular/core';
-import { ResourceService } from './resource';
+import { ResourceService } from './resource.service';
 import { SaveService } from './save.service';
 import { UpgradeService } from './upgrade.service';
 import { MutationService } from './mutation.service';
 import { StorylineService } from './storyline.service';
 import { LogService } from './log.service';
+import { BloomService } from './bloom.service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,18 +14,17 @@ export class GameLoopService {
   // ==========================================
   // 1. INJECTIONS
   // ==========================================
-
   private resourceService = inject(ResourceService);
   private saveService = inject(SaveService);
   private upgradeService = inject(UpgradeService);
   private mutationService = inject(MutationService);
   private storylineService = inject(StorylineService);
   private logService = inject(LogService);
+  private bloomService = inject(BloomService);
 
   // ==========================================
   // 2. STATE & CONFIG
   // ==========================================
-
   private lastTickTime: number = 0;
   private lastSaveTime: number = 0;
   private isRunning: boolean = false;
@@ -37,7 +37,6 @@ export class GameLoopService {
   // ==========================================
   // 3. LIFECYCLE
   // ==========================================
-
   public start(): void {
     if (this.isRunning) return;
 
@@ -75,10 +74,7 @@ export class GameLoopService {
   // ==========================================
   // 4. CORE LOGIC
   // ==========================================
-
   private updateGame(deltaTime: number): void {
-    const dt = deltaTime;
-
     // ----------------------------------------
     // FAST TICK (10x per second)
     // ----------------------------------------
@@ -88,21 +84,19 @@ export class GameLoopService {
       energy: this.upgradeService.energyGeneration(),
     };
 
-    this.resourceService.tick(dt, generations);
-    this.mutationService.tick(dt);
+    this.resourceService.tick(deltaTime, generations);
+    this.mutationService.tick(deltaTime);
+    this.bloomService.tick(deltaTime);
 
     // ----------------------------------------
     // SLOW TICK (1x per second)
     // ----------------------------------------
-    this.timeSinceLastSlowTick += dt;
-
-    this.timeSinceLastSlowTick += dt;
+    this.timeSinceLastSlowTick += deltaTime;
 
     if (this.timeSinceLastSlowTick >= 1.0) {
       this.storylineService.checkMilestones();
       this.logService.checkStoryLogs();
 
-      // Szansa 1.5% na każdą sekundę (średnio jedno wydarzenie na ~66 sekund)
       if (Math.random() < 0.005) {
         this.logService.triggerRandomFlavorEvent();
       }

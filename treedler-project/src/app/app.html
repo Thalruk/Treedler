@@ -59,6 +59,18 @@
         </button>
       </div>
 
+      @if (storylineService.isBloomUnlocked()) {
+        <button
+          (click)="switchTab(Tab.Bloom)"
+          [class.bg-gray-700]="activeTab() === Tab.Bloom"
+          [class.text-pink-400]="activeTab() === Tab.Bloom"
+          [class.text-gray-400]="activeTab() !== Tab.Bloom"
+          class="font-bold px-4 py-1.5 rounded-md transition-colors hover:bg-gray-700 hover:text-pink-300"
+        >
+          Life Cycle
+        </button>
+      }
+
       <button
         (click)="switchTab(Tab.Settings)"
         [ngClass]="
@@ -73,7 +85,6 @@
     </div>
 
     <!-- CONTENT AREA -->
-    <!-- pb-20 zapewnia, że dolne kafelki na telefonie nie schowają się za menu -->
     <div class="flex-1 overflow-y-auto p-4 pb-20 md:pb-4 relative">
       @if (activeTab() === Tab.Tree) {
         <app-tree-tab></app-tree-tab>
@@ -85,6 +96,8 @@
         <app-log-sidebar></app-log-sidebar>
       } @else if (activeTab() === Tab.Storyline) {
         <app-storyline-tab></app-storyline-tab>
+      } @else if (activeTab() === Tab.Bloom) {
+        <app-bloom-tab></app-bloom-tab>
       }
     </div>
 
@@ -111,6 +124,17 @@
         >
           <span class="text-xl leading-none">🧬</span>
           <span class="text-[10px] uppercase font-bold mt-1">Mutate</span>
+        </button>
+      }
+      @if (storylineService.isBloomUnlocked()) {
+        <button
+          (click)="switchTab(Tab.Bloom)"
+          class="flex flex-col items-center p-2 transition-colors flex-1"
+          [class.text-pink-400]="activeTab() === Tab.Bloom"
+          [class.text-gray-500]="activeTab() !== Tab.Bloom"
+        >
+          <span class="text-xl leading-none">🌸</span>
+          <span class="text-[10px] uppercase font-bold mt-1">Bloom</span>
         </button>
       }
 

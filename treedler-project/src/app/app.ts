@@ -9,6 +9,7 @@ import { SettingsTabComponent } from './features/tabs/settings-tab/settings-tab'
 import { MutationTabComponent } from './features/tabs/mutation-tab/mutation-tab';
 import { LogSidebarComponent } from './features/sidebar/log-sidebar/log-sidebar';
 import { StorylineTabComponent } from './features/tabs/storyline-tab/storyline-tab';
+import { BloomTabComponent } from './features/tabs/bloom-tab/bloom-tab';
 
 @Component({
   selector: 'app-root',
@@ -21,6 +22,7 @@ import { StorylineTabComponent } from './features/tabs/storyline-tab/storyline-t
     MutationTabComponent,
     LogSidebarComponent,
     StorylineTabComponent,
+    BloomTabComponent,
   ],
   templateUrl: './app.html',
 })

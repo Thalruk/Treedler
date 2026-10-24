@@ -1,5 +1,5 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { ResourceService } from './resource';
+import { ResourceService } from './resource.service';
 import { ResourceId, ResourceName } from '../enums/resource.enum';
 import { MutationService } from './mutation.service';
 import { UpgradeBase } from '../classes/upgrade-base';
@@ -181,10 +181,13 @@ export class UpgradeService {
       let discount = 1.0;
 
       // ==========================================
-      // STORYLINE MILESTONES DISCOUNTS
+      // STORYLINE MILESTONES & DYNAMIC DISCOUNTS
       // ==========================================
       if (upgrade.id === 'leaf' && this.hasPermanentLeafDiscount()) {
-        discount = 0.9;
+        const branchCount = this.branch.level();
+        const discountPercentage = branchCount * 0.01;
+
+        discount = Math.max(0.2, 1.0 - discountPercentage);
       }
 
       for (let i = 0; i < quantity; i++) {

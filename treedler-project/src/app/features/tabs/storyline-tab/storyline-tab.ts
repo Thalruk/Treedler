@@ -41,7 +41,7 @@ export class StorylineTabComponent {
       title: 'Sturdy Framework',
       description:
         'The framework strengthens. The tree reaches higher, demanding an even thicker canopy.',
-      reward: 'Permanent -10% Leaf Cost.',
+      reward: '-1% Leaf Cost per Branch.',
       isUnlocked: () => this.storylineService.hasReached10Branches(),
     },
     {

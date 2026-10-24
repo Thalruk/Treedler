@@ -1,5 +1,5 @@
 import { Injectable, signal, inject, computed } from '@angular/core';
-import { ResourceService } from './resource';
+import { ResourceService } from './resource.service';
 import { ResourceId } from '../enums/resource.enum';
 import { MutationDef } from '../models/mutation.model';
 import { MUTATIONS_CONFIG } from '../config/mutation.config';
