@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { ResourceService } from './resource'; // Zaktualizuj ścieżki, jeśli potrzebne
+import { ResourceService } from './resource';
 import { UpgradeService } from './upgrade.service';
 import { StorylineService } from './storyline.service';
 import { MutationService } from './mutation.service';
@@ -89,15 +89,13 @@ export class SaveService {
       if (parsed.storyline) this.loadSignals(parsed.storyline, this.storylineService);
       if (parsed.logsData) this.loadSignals(parsed.logsData, this.logService);
 
-      if (parsed.logs && !parsed.logsData) {
-        this.logService.logs.set(parsed.logs);
-      }
-
       if (parsed.mutations) {
-        if (parsed.mutations.progresses)
+        if (parsed.mutations.progresses) {
           this.mutationService.progresses.set(parsed.mutations.progresses);
-        if (parsed.mutations.completed)
+        }
+        if (parsed.mutations.completed) {
           this.mutationService.completed.set(parsed.mutations.completed);
+        }
       }
     } catch (e) {
       console.error('Save load error:', e);
