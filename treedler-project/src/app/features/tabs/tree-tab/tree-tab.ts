@@ -63,6 +63,7 @@ export class TreeTabComponent {
         `+${this.upgradeService.singleLeafEnergy().toFixed(2)} Energy/s`,
       ],
       limit: this.upgradeService.maxLeaves(),
+      isVisible: () => this.upgradeService.branch.level() >= 1,
     },
     {
       model: this.upgradeService.sunwardReach,
