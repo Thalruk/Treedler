@@ -26,6 +26,7 @@ export class UpgradeButtonComponent {
   @Input({ required: true }) effect!: string[];
   @Input({ required: true }) canAfford!: boolean;
   @Input() isReachable: boolean = true;
+  @Input() isMaxed: boolean = false;
 
   @Output() buy = new EventEmitter<void>();
 

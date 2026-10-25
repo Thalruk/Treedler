@@ -6,7 +6,7 @@ export const MUTATIONS_CONFIG: MutationDef[] = [
     id: 'dense_branching',
     title: 'Dense Branching',
     description: 'Compact foliage structure allowing more leaves on a single branch.',
-    effect: ['+5 Leaves per Branch'],
+    effect: ['+5 Leaves per Branch', '+5 Max Canopy Spread Level', '+5 Max Root Hairs Level'],
     costs: [
       { resourceId: ResourceId.Energy, totalRequired: 600, drainPerSecond: 6 },
       { resourceId: ResourceId.Water, totalRequired: 400, drainPerSecond: 4 },
@@ -17,7 +17,7 @@ export const MUTATIONS_CONFIG: MutationDef[] = [
     id: 'stomata_optimization',
     title: 'Stomata Optimization',
     description: 'Refined microscopic pores reduce transpiration and mineral loss.',
-    effect: ['-35% Leaf Water & Mineral Upkeep'],
+    effect: ['-35% Leaf Water & Mineral Upkeep', '+7 Max Vascular Tissues Level'],
     costs: [
       { resourceId: ResourceId.Energy, totalRequired: 1200, drainPerSecond: 10 },
       { resourceId: ResourceId.Water, totalRequired: 1000, drainPerSecond: 8 },
@@ -28,7 +28,7 @@ export const MUTATIONS_CONFIG: MutationDef[] = [
     id: 'chloroplast_refinement',
     title: 'Chloroplast Refinement',
     description: 'Enhanced chlorophyll density drastically amplifies solar conversion.',
-    effect: ['x1.4 Total Leaf Energy Output'],
+    effect: ['x1.4 Total Leaf Energy Output', '+5 Max Sunward Reach Level'],
     costs: [
       { resourceId: ResourceId.Energy, totalRequired: 2500, drainPerSecond: 15 },
       { resourceId: ResourceId.Water, totalRequired: 1500, drainPerSecond: 10 },
@@ -39,7 +39,11 @@ export const MUTATIONS_CONFIG: MutationDef[] = [
     id: 'heartwood_formation',
     title: 'Heartwood Formation',
     description: 'Compress the inner core into dense, hollow-resistant timber for vast storage.',
-    effect: ['x1.5 Global Max Capacity'],
+    effect: [
+      'x1.5 Global Max Capacity',
+      '+5 Max Resin Secretion Level',
+      '+8 Max Vascular Tissues Level',
+    ],
     costs: [
       { resourceId: ResourceId.Energy, totalRequired: 4000, drainPerSecond: 20 },
       { resourceId: ResourceId.Water, totalRequired: 3000, drainPerSecond: 15 },
@@ -51,7 +55,11 @@ export const MUTATIONS_CONFIG: MutationDef[] = [
     title: 'Symbiotic Mycelium',
     description:
       'Fuse fungal threads directly into root cells for bi-directional nutrient synthesis.',
-    effect: ['Mycorrhiza grants +2 Water/s & +2 Energy/s per Lvl'],
+    effect: [
+      'Mycorrhiza: +2 Water/s & +2 Energy/s per Lvl',
+      '+7 Max Mycorrhiza & Root Vigor Level',
+      '+10 Max Root Hairs Level',
+    ],
     costs: [
       { resourceId: ResourceId.Energy, totalRequired: 8000, drainPerSecond: 30 },
       { resourceId: ResourceId.Water, totalRequired: 6000, drainPerSecond: 22 },
@@ -62,7 +70,11 @@ export const MUTATIONS_CONFIG: MutationDef[] = [
     id: 'fractal_canopy',
     title: 'Fractal Canopy',
     description: 'Self-repeating geometric sub-branches maximize exposure to the sky.',
-    effect: ['+10 Leaves per Branch'],
+    effect: [
+      '+10 Leaves per Branch',
+      '+7 Max Sunward Reach & Resin Level',
+      '+10 Max Canopy Spread Level',
+    ],
     costs: [
       { resourceId: ResourceId.Energy, totalRequired: 15000, drainPerSecond: 45 },
       { resourceId: ResourceId.Water, totalRequired: 10000, drainPerSecond: 30 },

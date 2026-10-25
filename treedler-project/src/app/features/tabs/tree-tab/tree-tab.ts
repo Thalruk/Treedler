@@ -29,6 +29,8 @@ export class TreeTabComponent {
   public mutationService = inject(MutationService);
 
   public getTitle(upgrade: UpgradeBase, baseTitle: string, limit?: number): string {
+    if (this.upgradeService.isMaxed(upgrade, limit)) return baseTitle;
+
     const mult = this.shortcutService.multiplier();
     if (mult <= 1) return baseTitle;
 
@@ -65,21 +67,25 @@ export class TreeTabComponent {
       model: this.upgradeService.sunwardReach,
       title: this.getTitle(
         this.upgradeService.sunwardReach,
-        `Sunward Reach (Lvl ${this.upgradeService.sunwardReach.level()})`,
+        `Sunward Reach (Lvl ${this.upgradeService.sunwardReach.level()} / ${this.upgradeService.maxSunwardReach()})`,
+        this.upgradeService.maxSunwardReach(),
       ),
       description: 'Bend your branches towards the sun, optimizing light absorption.',
       effect: ['+0.03 Base Energy per Leaf'],
+      limit: this.upgradeService.maxSunwardReach(),
       isVisible: () => this.upgradeService.branch.level() >= 3,
     },
     {
       model: this.upgradeService.canopySpread,
       title: this.getTitle(
         this.upgradeService.canopySpread,
-        `Canopy Spread (Lvl ${this.upgradeService.canopySpread.level()})`,
+        `Canopy Spread (Lvl ${this.upgradeService.canopySpread.level()} / ${this.upgradeService.maxCanopySpread()})`,
+        this.upgradeService.maxCanopySpread(),
       ),
       description:
         'Broaden the leafy canopy to capture more rain and dew, increasing global storage.',
       effect: ['+75 All Max Limits'],
+      limit: this.upgradeService.maxCanopySpread(),
       isVisible: () => this.upgradeService.leaf.level() >= 25,
     },
   ]);
@@ -98,20 +104,24 @@ export class TreeTabComponent {
       model: this.upgradeService.vascularTissues,
       title: this.getTitle(
         this.upgradeService.vascularTissues,
-        `Vascular Tissues (Lvl ${this.upgradeService.vascularTissues.level()})`,
+        `Vascular Tissues (Lvl ${this.upgradeService.vascularTissues.level()} / ${this.upgradeService.maxVascularTissues()})`,
+        this.upgradeService.maxVascularTissues(),
       ),
       description: 'Develop internal channels to better distribute and store resources.',
       effect: ['+20 All Max Limits', '+1.5 Energy/s'],
+      limit: this.upgradeService.maxVascularTissues(),
       isVisible: () => this.upgradeService.barkThickness.level() >= 3,
     },
     {
       model: this.upgradeService.resinSecretion,
       title: this.getTitle(
         this.upgradeService.resinSecretion,
-        `Resin Secretion (Lvl ${this.upgradeService.resinSecretion.level()})`,
+        `Resin Secretion (Lvl ${this.upgradeService.resinSecretion.level()} / ${this.upgradeService.maxResinSecretion()})`,
+        this.upgradeService.maxResinSecretion(),
       ),
       description: 'Seal the outer bark with hardened resin to vastly expand resource containment.',
       effect: ['+100 All Max Limits', '+10% Global Max Capacity'],
+      limit: this.upgradeService.maxResinSecretion(),
       isVisible: () => this.upgradeService.vascularTissues.level() >= 4,
     },
   ]);
@@ -139,10 +149,12 @@ export class TreeTabComponent {
       model: this.upgradeService.rootHairs,
       title: this.getTitle(
         this.upgradeService.rootHairs,
-        `Root Hairs (Lvl ${this.upgradeService.rootHairs.level()})`,
+        `Root Hairs (Lvl ${this.upgradeService.rootHairs.level()} / ${this.upgradeService.maxRootHairs()})`,
+        this.upgradeService.maxRootHairs(),
       ),
       description: 'Grow microscopic hairs on root tips, drastically increasing absorption area.',
       effect: ['+2.5 Water/s'],
+      limit: this.upgradeService.maxRootHairs(),
       isVisible: () =>
         this.upgradeService.rootWidth.level() >= 4 && this.upgradeService.rootDepth.level() >= 4,
     },
@@ -150,23 +162,27 @@ export class TreeTabComponent {
       model: this.upgradeService.mycorrhizalNetwork,
       title: this.getTitle(
         this.upgradeService.mycorrhizalNetwork,
-        `Mycorrhizal Network (Lvl ${this.upgradeService.mycorrhizalNetwork.level()})`,
+        `Mycorrhizal Network (Lvl ${this.upgradeService.mycorrhizalNetwork.level()} / ${this.upgradeService.maxMycorrhizalNetwork()})`,
+        this.upgradeService.maxMycorrhizalNetwork(),
       ),
       description: 'Trade energy with underground fungi for a massive influx of minerals.',
       effect: this.mutationService.isCompleted('symbiotic_mycelium')
         ? ['+3.5 Minerals/s', '+2 Water/s', '+2 Energy/s']
         : ['+3.5 Minerals/s'],
+      limit: this.upgradeService.maxMycorrhizalNetwork(),
       isVisible: () => this.upgradeService.rootHairs.level() >= 4,
     },
     {
       model: this.upgradeService.rootVigor,
       title: this.getTitle(
         this.upgradeService.rootVigor,
-        `Root Vigor (Lvl ${this.upgradeService.rootVigor.level()})`,
+        `Root Vigor (Lvl ${this.upgradeService.rootVigor.level()} / ${this.upgradeService.maxRootVigor()})`,
+        this.upgradeService.maxRootVigor(),
       ),
       description:
         'Strengthen the root system structure, boosting all water and mineral extraction by 10% per level.',
       effect: ['+10% Root Production'],
+      limit: this.upgradeService.maxRootVigor(),
       isVisible: () =>
         this.upgradeService.rootWidth.level() >= 6 &&
         this.upgradeService.rootDepth.level() >= 6 &&

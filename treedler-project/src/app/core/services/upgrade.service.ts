@@ -54,7 +54,7 @@ export class UpgradeService {
   public rootVigor = new UpgradeBase('rootVigor', UPGRADES_CONFIG['rootVigor']);
 
   // ==========================================
-  // 3. LIMITS & CONSTRAINTS
+  // 3. LIMITS & CONSTRAINTS (DYNAMIC CAPS)
   // ==========================================
 
   public leavesPerBranch = computed(() => {
@@ -64,9 +64,58 @@ export class UpgradeService {
     return base;
   });
 
-  public maxLeaves = computed(() => {
-    return this.branch.level() * this.leavesPerBranch();
+  public maxLeaves = computed(() => this.branch.level() * this.leavesPerBranch());
+
+  public maxSunwardReach = computed(() => {
+    let cap = 3;
+    if (this.mutationService.isCompleted('chloroplast_refinement')) cap += 5; // 8
+    if (this.mutationService.isCompleted('fractal_canopy')) cap += 7; // 15
+    return cap;
   });
+
+  public maxCanopySpread = computed(() => {
+    let cap = 5;
+    if (this.mutationService.isCompleted('dense_branching')) cap += 5; // 10
+    if (this.mutationService.isCompleted('fractal_canopy')) cap += 10; // 20
+    return cap;
+  });
+
+  public maxVascularTissues = computed(() => {
+    let cap = 5;
+    if (this.mutationService.isCompleted('stomata_optimization')) cap += 7; // 12
+    if (this.mutationService.isCompleted('heartwood_formation')) cap += 8; // 20
+    return cap;
+  });
+
+  public maxResinSecretion = computed(() => {
+    let cap = 3;
+    if (this.mutationService.isCompleted('heartwood_formation')) cap += 5; // 8
+    if (this.mutationService.isCompleted('fractal_canopy')) cap += 7; // 15
+    return cap;
+  });
+
+  public maxRootHairs = computed(() => {
+    let cap = 5;
+    if (this.mutationService.isCompleted('dense_branching')) cap += 5; // 10
+    if (this.mutationService.isCompleted('symbiotic_mycelium')) cap += 10; // 20
+    return cap;
+  });
+
+  public maxMycorrhizalNetwork = computed(() => {
+    let cap = 3;
+    if (this.mutationService.isCompleted('symbiotic_mycelium')) cap += 7; // 10
+    return cap;
+  });
+
+  public maxRootVigor = computed(() => {
+    let cap = 3;
+    if (this.mutationService.isCompleted('symbiotic_mycelium')) cap += 7; // 10
+    return cap;
+  });
+
+  public isMaxed(upgrade: UpgradeBase, limit?: number): boolean {
+    return limit !== undefined && upgrade.level() >= limit;
+  }
 
   // ==========================================
   // 4. RESOURCE GENERATION & BREAKDOWNS
@@ -249,6 +298,7 @@ export class UpgradeService {
   ): number {
     return Math.max(1, this.getAffordableQuantity(upgrade, requestedQuantity, limit));
   }
+
   private getCostsForQuantity(
     upgrade: UpgradeBase,
     quantity: number,
@@ -289,12 +339,14 @@ export class UpgradeService {
   }
 
   public canAfford(upgrade: UpgradeBase, limit?: number): boolean {
+    if (this.isMaxed(upgrade, limit)) return false;
     const qty = this.getTargetQuantity(upgrade, this.shortcutService.multiplier(), limit);
     const costs = this.getCostsForQuantity(upgrade, qty);
     return costs.every((c) => this.getResourceAmount(c.resourceId) >= c.amount);
   }
 
   public isReachable(upgrade: UpgradeBase, limit?: number): boolean {
+    if (this.isMaxed(upgrade, limit)) return true;
     const qty = this.getTargetQuantity(upgrade, this.shortcutService.multiplier(), limit);
     const costs = this.getCostsForQuantity(upgrade, qty);
     return costs.every((c) => this.getResourceMaxAmount(c.resourceId) >= c.amount);
@@ -322,6 +374,7 @@ export class UpgradeService {
   }
 
   public buyUpgrade(upgrade: UpgradeBase, limit?: number): void {
+    if (this.isMaxed(upgrade, limit)) return;
     const qty = this.getTargetQuantity(upgrade, this.shortcutService.multiplier(), limit);
     if (limit !== undefined && upgrade.level() + qty > limit) return;
 

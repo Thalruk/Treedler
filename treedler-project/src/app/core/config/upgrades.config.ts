@@ -13,10 +13,10 @@ export const UPGRADES_CONFIG: Record<string, CostConfig[]> = {
     { resourceId: ResourceId.Water, baseCost: 2, multiplier: 1.015 },
     { resourceId: ResourceId.Minerals, baseCost: 1, multiplier: 1.015 },
   ],
-  sunwardReach: [{ resourceId: ResourceId.Energy, baseCost: 50, multiplier: 1.3 }],
+  sunwardReach: [{ resourceId: ResourceId.Energy, baseCost: 45, multiplier: 1.25 }],
   canopySpread: [
-    { resourceId: ResourceId.Energy, baseCost: 120, multiplier: 1.2 },
-    { resourceId: ResourceId.Water, baseCost: 100, multiplier: 1.2 },
+    { resourceId: ResourceId.Energy, baseCost: 100, multiplier: 1.18 },
+    { resourceId: ResourceId.Water, baseCost: 80, multiplier: 1.18 },
   ],
 
   // --- BARK ---
@@ -25,12 +25,12 @@ export const UPGRADES_CONFIG: Record<string, CostConfig[]> = {
     { resourceId: ResourceId.Minerals, baseCost: 15, multiplier: 1.16 },
   ],
   vascularTissues: [
-    { resourceId: ResourceId.Energy, baseCost: 40, multiplier: 1.18 },
-    { resourceId: ResourceId.Water, baseCost: 35, multiplier: 1.18 },
+    { resourceId: ResourceId.Energy, baseCost: 40, multiplier: 1.16 },
+    { resourceId: ResourceId.Water, baseCost: 35, multiplier: 1.16 },
   ],
   resinSecretion: [
-    { resourceId: ResourceId.Water, baseCost: 150, multiplier: 1.22 },
-    { resourceId: ResourceId.Minerals, baseCost: 150, multiplier: 1.22 },
+    { resourceId: ResourceId.Water, baseCost: 140, multiplier: 1.2 },
+    { resourceId: ResourceId.Minerals, baseCost: 140, multiplier: 1.2 },
   ],
 
   // --- ROOTS ---
@@ -43,12 +43,12 @@ export const UPGRADES_CONFIG: Record<string, CostConfig[]> = {
     { resourceId: ResourceId.Water, baseCost: 12, multiplier: 1.2 },
   ],
   rootHairs: [
-    { resourceId: ResourceId.Energy, baseCost: 45, multiplier: 1.18 },
-    { resourceId: ResourceId.Minerals, baseCost: 60, multiplier: 1.18 },
+    { resourceId: ResourceId.Energy, baseCost: 40, multiplier: 1.16 },
+    { resourceId: ResourceId.Minerals, baseCost: 50, multiplier: 1.16 },
   ],
-  mycorrhizalNetwork: [{ resourceId: ResourceId.Energy, baseCost: 150, multiplier: 1.22 }],
+  mycorrhizalNetwork: [{ resourceId: ResourceId.Energy, baseCost: 130, multiplier: 1.2 }],
   rootVigor: [
-    { resourceId: ResourceId.Energy, baseCost: 120, multiplier: 1.28 },
-    { resourceId: ResourceId.Minerals, baseCost: 100, multiplier: 1.28 },
+    { resourceId: ResourceId.Energy, baseCost: 110, multiplier: 1.24 },
+    { resourceId: ResourceId.Minerals, baseCost: 90, multiplier: 1.24 },
   ],
 };

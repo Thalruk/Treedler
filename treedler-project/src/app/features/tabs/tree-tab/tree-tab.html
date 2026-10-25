@@ -16,14 +16,9 @@
             [description]="item.description"
             [costs]="upgradeService.getFormattedCosts(item.model, item.limit)"
             [effect]="item.effect"
-            [canAfford]="
-              upgradeService.canAfford(item.model, item.limit) &&
-              (item.limit === undefined || item.model.level() < item.limit)
-            "
-            [isReachable]="
-              upgradeService.isReachable(item.model, item.limit) &&
-              (item.limit === undefined || item.model.level() < item.limit)
-            "
+            [canAfford]="upgradeService.canAfford(item.model, item.limit)"
+            [isReachable]="upgradeService.isReachable(item.model, item.limit)"
+            [isMaxed]="upgradeService.isMaxed(item.model, item.limit)"
             (buy)="upgradeService.buyUpgrade(item.model, item.limit)"
           ></app-upgrade-button>
         }
@@ -63,14 +58,9 @@
               [description]="item.description"
               [costs]="upgradeService.getFormattedCosts(item.model, item.limit)"
               [effect]="item.effect"
-              [canAfford]="
-                upgradeService.canAfford(item.model, item.limit) &&
-                (item.limit === undefined || item.model.level() < item.limit)
-              "
-              [isReachable]="
-                upgradeService.isReachable(item.model, item.limit) &&
-                (item.limit === undefined || item.model.level() < item.limit)
-              "
+              [canAfford]="upgradeService.canAfford(item.model, item.limit)"
+              [isReachable]="upgradeService.isReachable(item.model, item.limit)"
+              [isMaxed]="upgradeService.isMaxed(item.model, item.limit)"
               (buy)="upgradeService.buyUpgrade(item.model, item.limit)"
             ></app-upgrade-button>
           }
@@ -108,14 +98,9 @@
             [description]="item.description"
             [costs]="upgradeService.getFormattedCosts(item.model, item.limit)"
             [effect]="item.effect"
-            [canAfford]="
-              upgradeService.canAfford(item.model, item.limit) &&
-              (item.limit === undefined || item.model.level() < item.limit)
-            "
-            [isReachable]="
-              upgradeService.isReachable(item.model, item.limit) &&
-              (item.limit === undefined || item.model.level() < item.limit)
-            "
+            [canAfford]="upgradeService.canAfford(item.model, item.limit)"
+            [isReachable]="upgradeService.isReachable(item.model, item.limit)"
+            [isMaxed]="upgradeService.isMaxed(item.model, item.limit)"
             (buy)="upgradeService.buyUpgrade(item.model, item.limit)"
           ></app-upgrade-button>
         }

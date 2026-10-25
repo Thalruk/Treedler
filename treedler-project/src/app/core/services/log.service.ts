@@ -1,8 +1,10 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { UpgradeService } from './upgrade.service';
 import { MutationService } from './mutation.service';
+import { BloomService } from './bloom.service';
 import { LogCategory } from '../enums/log.enum';
 import { RANDOM_FLAVOR_EVENTS } from '../config/random-events.config';
+import { MUTATIONS_CONFIG } from '../config/mutation.config';
 
 export interface LogEntry {
   id: string;
@@ -14,10 +16,12 @@ export interface LogEntry {
 export class LogService {
   private upgradeService = inject(UpgradeService);
   private mutationService = inject(MutationService);
+  private bloomService = inject(BloomService);
 
   public logs = signal<LogEntry[]>([]);
   public hasUnreadLogs = signal<boolean>(false);
 
+  // PROGRESS & STORY FLAGS
   public loggedFirstGrowth = signal<boolean>(false);
   public loggedFirstBark = signal<boolean>(false);
   public logged10Leaves = signal<boolean>(false);
@@ -29,6 +33,11 @@ export class LogService {
   public loggedAncientTimber = signal<boolean>(false);
   public loggedBloomUnlocked = signal<boolean>(false);
   public loggedApexFlora = signal<boolean>(false);
+
+  // RESEARCH FLAGS (MUTATIONS & BLOOM STAGES)
+  public loggedCompletedMutations = signal<Record<string, boolean>>({});
+  public loggedBloomStageIndex = signal<number>(0);
+  public loggedBloomComplete = signal<boolean>(false);
 
   public addLog(text: string, category: LogCategory = LogCategory.Random): void {
     this.logs.update((currentLogs) => [
@@ -66,10 +75,12 @@ export class LogService {
     const bark = this.upgradeService.barkThickness.level();
     const rootW = this.upgradeService.rootWidth.level();
     const rootD = this.upgradeService.rootDepth.level();
-    const completedMutationsCount = Object.values(this.mutationService.completed()).filter(
-      Boolean,
-    ).length;
+    const completedMap = this.mutationService.completed();
+    const completedMutationsCount = Object.values(completedMap).filter(Boolean).length;
 
+    // ----------------------------------------
+    // 1. PROGRESS & STORY LOGS
+    // ----------------------------------------
     if (
       !this.loggedFirstGrowth() &&
       this.upgradeService.hasFirstStem() &&
@@ -126,7 +137,7 @@ export class LogService {
       this.loggedMutation.set(true);
       this.addLog(
         'The excess energy is triggering spontaneous biological adaptations. The Mutations tab is now unlocked.',
-        LogCategory.Story,
+        LogCategory.Research,
       );
     }
 
@@ -158,6 +169,37 @@ export class LogService {
       this.loggedApexFlora.set(true);
       this.addLog(
         'Five hundred leaves and a perfected genome. You have become Apex Flora—energy flows like a river of light.',
+        LogCategory.Story,
+      );
+    }
+
+    // ----------------------------------------
+    // 2. RESEARCH LOGS (MUTATIONS & BLOOM)
+    // ----------------------------------------
+    const alreadyLoggedMuts = this.loggedCompletedMutations();
+    for (const mut of MUTATIONS_CONFIG) {
+      if (completedMap[mut.id] && !alreadyLoggedMuts[mut.id]) {
+        this.loggedCompletedMutations.update((prev) => ({ ...prev, [mut.id]: true }));
+        this.addLog(
+          `Adaptation complete: ${mut.title}. Evolutionary limits expanded (${mut.effect.join(', ')}).`,
+          LogCategory.Research,
+        );
+      }
+    }
+
+    const currentBloomIdx = this.bloomService.currentStageIndex();
+    if (currentBloomIdx > this.loggedBloomStageIndex()) {
+      const completedStage = this.bloomService.stages[this.loggedBloomStageIndex()];
+      this.loggedBloomStageIndex.set(currentBloomIdx);
+      if (completedStage) {
+        this.addLog(`Life Cycle phase completed: ${completedStage.name}.`, LogCategory.Research);
+      }
+    }
+
+    if (this.bloomService.isFullyComplete() && !this.loggedBloomComplete()) {
+      this.loggedBloomComplete.set(true);
+      this.addLog(
+        'The Primeval Seed has been formed. The genetic memory of this cycle is complete.',
         LogCategory.Story,
       );
     }

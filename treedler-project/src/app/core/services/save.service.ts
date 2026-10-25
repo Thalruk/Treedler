@@ -39,7 +39,6 @@ export class SaveService {
         hasApexFloraBonus: this.upgradeService.hasApexFloraBonus(),
         hasFirstRoot: this.upgradeService.hasFirstRoot(),
         hasFirstStem: this.upgradeService.hasFirstStem(),
-
         rootWidthLevel: this.upgradeService.rootWidth.level(),
         rootDepthLevel: this.upgradeService.rootDepth.level(),
         barkThicknessLevel: this.upgradeService.barkThickness.level(),
@@ -88,6 +87,9 @@ export class SaveService {
         loggedAncientTimber: this.logService.loggedAncientTimber(),
         loggedBloomUnlocked: this.logService.loggedBloomUnlocked(),
         loggedApexFlora: this.logService.loggedApexFlora(),
+        loggedCompletedMutations: this.logService.loggedCompletedMutations(),
+        loggedBloomStageIndex: this.logService.loggedBloomStageIndex(),
+        loggedBloomComplete: this.logService.loggedBloomComplete(),
       },
     };
 

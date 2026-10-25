@@ -37,6 +37,8 @@ export class LogSidebarComponent {
         return 'text-amber-400';
       case LogCategory.Progress:
         return 'text-green-400';
+      case LogCategory.Research:
+        return 'text-cyan-400';
       case LogCategory.Random:
         return 'text-purple-400';
       default:
