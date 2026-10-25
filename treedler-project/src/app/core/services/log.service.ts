@@ -1,10 +1,12 @@
-import { Injectable, signal, inject } from '@angular/core';
+import { Injectable, signal, WritableSignal, inject } from '@angular/core';
 import { UpgradeService } from './upgrade.service';
 import { MutationService } from './mutation.service';
 import { BloomService } from './bloom.service';
 import { LogCategory } from '../enums/log.enum';
+import { MutationId } from '../enums/mutation.enum';
 import { RANDOM_FLAVOR_EVENTS } from '../config/random-events.config';
 import { MUTATIONS_CONFIG } from '../config/mutation.config';
+import { StoryLogKey, STORY_LOGS_CONFIG, RESEARCH_LOG_TEMPLATES } from '../config/logs.config';
 
 export interface LogEntry {
   id: string;
@@ -35,7 +37,7 @@ export class LogService {
   public loggedApexFlora = signal<boolean>(false);
 
   // RESEARCH FLAGS (MUTATIONS & BLOOM STAGES)
-  public loggedCompletedMutations = signal<Record<string, boolean>>({});
+  public loggedCompletedMutations = signal<Partial<Record<MutationId, boolean>>>({});
   public loggedBloomStageIndex = signal<number>(0);
   public loggedBloomComplete = signal<boolean>(false);
 
@@ -45,6 +47,14 @@ export class LogService {
       { id: Math.random().toString(36).substring(2, 9), text, category },
     ]);
     this.hasUnreadLogs.set(true);
+  }
+
+  private triggerStoryLog(key: StoryLogKey, flag: WritableSignal<boolean>): void {
+    if (!flag()) {
+      flag.set(true);
+      const config = STORY_LOGS_CONFIG[key];
+      this.addLog(config.text, config.category);
+    }
   }
 
   public markAsRead(): void {
@@ -81,96 +91,24 @@ export class LogService {
     // ----------------------------------------
     // 1. PROGRESS & STORY LOGS
     // ----------------------------------------
-    if (
-      !this.loggedFirstGrowth() &&
-      this.upgradeService.hasFirstStem() &&
-      this.upgradeService.hasFirstRoot()
-    ) {
-      this.loggedFirstGrowth.set(true);
-      this.addLog(
-        'The foundation is set. The sapling must now grow branches and sprout leaves to gather energy.',
-        LogCategory.Progress,
-      );
+    if (this.upgradeService.hasFirstStem() && this.upgradeService.hasFirstRoot()) {
+      this.triggerStoryLog(StoryLogKey.FirstGrowth, this.loggedFirstGrowth);
     }
-
-    if (!this.loggedFirstBark() && bark >= 1) {
-      this.loggedFirstBark.set(true);
-      this.addLog(
-        'The outer layer hardens. The tree prepares to store greater reserves of energy and water.',
-        LogCategory.Progress,
-      );
+    if (bark >= 1) this.triggerStoryLog(StoryLogKey.FirstBark, this.loggedFirstBark);
+    if (leaves >= 10) this.triggerStoryLog(StoryLogKey.Leaves10, this.logged10Leaves);
+    if (leaves >= 25) this.triggerStoryLog(StoryLogKey.Leaves25, this.logged25Leaves);
+    if (leaves >= 50) this.triggerStoryLog(StoryLogKey.Leaves50, this.logged50Leaves);
+    if (branches >= 10) this.triggerStoryLog(StoryLogKey.Branches10, this.logged10Branches);
+    if (leaves >= 100) this.triggerStoryLog(StoryLogKey.MutationUnlocked, this.loggedMutation);
+    if (rootW >= 10 && rootD >= 10) {
+      this.triggerStoryLog(StoryLogKey.DeepAnchorage, this.loggedDeepAnchorage);
     }
-
-    if (!this.logged10Leaves() && leaves >= 10) {
-      this.logged10Leaves.set(true);
-      this.addLog(
-        "A small canopy begins to form. More leaves are required to harness the sun's full potential.",
-        LogCategory.Progress,
-      );
+    if (bark >= 10 && completedMutationsCount >= 3) {
+      this.triggerStoryLog(StoryLogKey.AncientTimber, this.loggedAncientTimber);
     }
-
-    if (!this.logged25Leaves() && leaves >= 25) {
-      this.logged25Leaves.set(true);
-      this.addLog(
-        "The tree's demand for energy grows. Multiply your branches and leaves to prepare for biological adaptations.",
-        LogCategory.Progress,
-      );
-    }
-
-    if (!this.logged50Leaves() && leaves >= 50) {
-      this.logged50Leaves.set(true);
-      this.addLog(
-        'Fifty leaves rustle in the wind, casting a permanent, cooling shadow over the soil below.',
-        LogCategory.Progress,
-      );
-    }
-
-    if (!this.logged10Branches() && branches >= 10) {
-      this.logged10Branches.set(true);
-      this.addLog(
-        'The framework strengthens. Each new branch now makes sprouting future leaves slightly easier.',
-        LogCategory.Story,
-      );
-    }
-
-    if (!this.loggedMutation() && leaves >= 100) {
-      this.loggedMutation.set(true);
-      this.addLog(
-        'The excess energy is triggering spontaneous biological adaptations. The Mutations tab is now unlocked.',
-        LogCategory.Research,
-      );
-    }
-
-    if (!this.loggedDeepAnchorage() && rootW >= 10 && rootD >= 10) {
-      this.loggedDeepAnchorage.set(true);
-      this.addLog(
-        'Your roots breach deep subterranean aquifers. Water and mineral extraction permanently surged.',
-        LogCategory.Story,
-      );
-    }
-
-    if (!this.loggedAncientTimber() && bark >= 10 && completedMutationsCount >= 3) {
-      this.loggedAncientTimber.set(true);
-      this.addLog(
-        'Mutated tissues and thick bark fuse into Ancient Timber, vastly expanding your internal storage.',
-        LogCategory.Story,
-      );
-    }
-
-    if (!this.loggedBloomUnlocked() && leaves >= 300) {
-      this.loggedBloomUnlocked.set(true);
-      this.addLog(
-        'Three hundred leaves drink the light. A profound shift in your sap unlocks the Life Cycle tab.',
-        LogCategory.Story,
-      );
-    }
-
-    if (!this.loggedApexFlora() && leaves >= 500 && completedMutationsCount >= 6) {
-      this.loggedApexFlora.set(true);
-      this.addLog(
-        'Five hundred leaves and a perfected genome. You have become Apex Flora—energy flows like a river of light.',
-        LogCategory.Story,
-      );
+    if (leaves >= 300) this.triggerStoryLog(StoryLogKey.BloomUnlocked, this.loggedBloomUnlocked);
+    if (leaves >= 500 && completedMutationsCount >= 6) {
+      this.triggerStoryLog(StoryLogKey.ApexFlora, this.loggedApexFlora);
     }
 
     // ----------------------------------------
@@ -181,7 +119,7 @@ export class LogService {
       if (completedMap[mut.id] && !alreadyLoggedMuts[mut.id]) {
         this.loggedCompletedMutations.update((prev) => ({ ...prev, [mut.id]: true }));
         this.addLog(
-          `Adaptation complete: ${mut.title}. Evolutionary limits expanded (${mut.effect.join(', ')}).`,
+          RESEARCH_LOG_TEMPLATES.mutationComplete(mut.title, mut.effect),
           LogCategory.Research,
         );
       }
@@ -192,16 +130,15 @@ export class LogService {
       const completedStage = this.bloomService.stages[this.loggedBloomStageIndex()];
       this.loggedBloomStageIndex.set(currentBloomIdx);
       if (completedStage) {
-        this.addLog(`Life Cycle phase completed: ${completedStage.name}.`, LogCategory.Research);
+        this.addLog(
+          RESEARCH_LOG_TEMPLATES.bloomStageComplete(completedStage.name),
+          LogCategory.Research,
+        );
       }
     }
 
-    if (this.bloomService.isFullyComplete() && !this.loggedBloomComplete()) {
-      this.loggedBloomComplete.set(true);
-      this.addLog(
-        'The Primeval Seed has been formed. The genetic memory of this cycle is complete.',
-        LogCategory.Story,
-      );
+    if (this.bloomService.isFullyComplete()) {
+      this.triggerStoryLog(StoryLogKey.BloomComplete, this.loggedBloomComplete);
     }
   }
 }

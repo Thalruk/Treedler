@@ -1,6 +1,7 @@
 import { Injectable, signal, inject, computed } from '@angular/core';
 import { ResourceService } from './resource.service';
 import { ResourceId } from '../enums/resource.enum';
+import { MutationId } from '../enums/mutation.enum';
 import { MutationDef } from '../models/mutation.model';
 import { MUTATIONS_CONFIG } from '../config/mutation.config';
 
@@ -13,9 +14,9 @@ export class MutationService {
   // ==========================================
   // 1. STATE & CONFIG
   // ==========================================
-  public activeMutationId = signal<string | null>(null);
-  public progresses = signal<Record<string, MutationProgress>>({});
-  public completed = signal<Record<string, boolean>>({});
+  public activeMutationId = signal<MutationId | null>(null);
+  public progresses = signal<Partial<Record<MutationId, MutationProgress>>>({});
+  public completed = signal<Partial<Record<MutationId, boolean>>>({});
 
   public readonly availableMutations: MutationDef[] = MUTATIONS_CONFIG;
 
@@ -47,11 +48,11 @@ export class MutationService {
   // ==========================================
   // 3. ACTIONS & LOGIC
   // ==========================================
-  public isCompleted(id: string): boolean {
+  public isCompleted(id: MutationId): boolean {
     return this.completed()[id] || false;
   }
 
-  public getProgress(id: string): number {
+  public getProgress(id: MutationId): number {
     const currentProgress = this.progresses()[id];
     if (!currentProgress) return 0;
 
@@ -67,11 +68,11 @@ export class MutationService {
     return totalPercentage / mutation.costs.length;
   }
 
-  public toggleMutation(id: string): void {
+  public toggleMutation(id: MutationId): void {
     this.activeMutationId.set(this.activeMutationId() === id ? null : id);
   }
 
-  private completeMutation(id: string): void {
+  private completeMutation(id: MutationId): void {
     this.completed.update((c) => ({ ...c, [id]: true }));
     this.activeMutationId.set(null);
   }

@@ -1,9 +1,10 @@
 import { MutationDef } from '../models/mutation.model';
 import { ResourceId } from '../enums/resource.enum';
+import { MutationId } from '../enums/mutation.enum';
 
 export const MUTATIONS_CONFIG: MutationDef[] = [
   {
-    id: 'dense_branching',
+    id: MutationId.DenseBranching,
     title: 'Dense Branching',
     description: 'Compact foliage structure allowing more leaves on a single branch.',
     effect: ['+5 Leaves per Branch', '+5 Max Canopy Spread Level', '+5 Max Root Hairs Level'],
@@ -14,7 +15,7 @@ export const MUTATIONS_CONFIG: MutationDef[] = [
     ],
   },
   {
-    id: 'stomata_optimization',
+    id: MutationId.StomataOptimization,
     title: 'Stomata Optimization',
     description: 'Refined microscopic pores reduce transpiration and mineral loss.',
     effect: ['-35% Leaf Water & Mineral Upkeep', '+7 Max Vascular Tissues Level'],
@@ -25,7 +26,7 @@ export const MUTATIONS_CONFIG: MutationDef[] = [
     ],
   },
   {
-    id: 'chloroplast_refinement',
+    id: MutationId.ChloroplastRefinement,
     title: 'Chloroplast Refinement',
     description: 'Enhanced chlorophyll density drastically amplifies solar conversion.',
     effect: ['x1.4 Total Leaf Energy Output', '+5 Max Sunward Reach Level'],
@@ -36,7 +37,7 @@ export const MUTATIONS_CONFIG: MutationDef[] = [
     ],
   },
   {
-    id: 'heartwood_formation',
+    id: MutationId.HeartwoodFormation,
     title: 'Heartwood Formation',
     description: 'Compress the inner core into dense, hollow-resistant timber for vast storage.',
     effect: [
@@ -51,7 +52,7 @@ export const MUTATIONS_CONFIG: MutationDef[] = [
     ],
   },
   {
-    id: 'symbiotic_mycelium',
+    id: MutationId.SymbioticMycelium,
     title: 'Symbiotic Mycelium',
     description:
       'Fuse fungal threads directly into root cells for bi-directional nutrient synthesis.',
@@ -67,7 +68,7 @@ export const MUTATIONS_CONFIG: MutationDef[] = [
     ],
   },
   {
-    id: 'fractal_canopy',
+    id: MutationId.FractalCanopy,
     title: 'Fractal Canopy',
     description: 'Self-repeating geometric sub-branches maximize exposure to the sky.',
     effect: [

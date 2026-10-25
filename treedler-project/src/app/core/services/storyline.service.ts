@@ -1,6 +1,7 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { UpgradeService } from './upgrade.service';
 import { MutationService } from './mutation.service';
+import { MilestoneId } from '../config/storyline.config';
 
 @Injectable({ providedIn: 'root' })
 export class StorylineService {
@@ -21,6 +22,27 @@ export class StorylineService {
   public hasReachedBloomMilestone = signal<boolean>(false);
   public hasReachedApexFlora = signal<boolean>(false);
 
+  public isMilestoneUnlocked(id: MilestoneId): boolean {
+    switch (id) {
+      case MilestoneId.FirstGrowth:
+        return this.hasReachedFirstGrowth();
+      case MilestoneId.Leaves10:
+        return this.hasReached10Leaves();
+      case MilestoneId.Branches10:
+        return this.hasReached10Branches();
+      case MilestoneId.MutationUnlocked:
+        return this.hasReachedLeafMilestone();
+      case MilestoneId.DeepAnchorage:
+        return this.hasReachedDeepAnchorage();
+      case MilestoneId.AncientTimber:
+        return this.hasReachedAncientTimber();
+      case MilestoneId.BloomUnlocked:
+        return this.hasReachedBloomMilestone();
+      case MilestoneId.ApexFlora:
+        return this.hasReachedApexFlora();
+    }
+  }
+
   public checkMilestones(): void {
     const leaves = this.upgradeService.leaf.level();
     const branches = this.upgradeService.branch.level();
@@ -31,7 +53,6 @@ export class StorylineService {
       Boolean,
     ).length;
 
-    // 1. First Growth
     if (
       !this.hasReachedFirstGrowth() &&
       this.upgradeService.hasFirstStem() &&
@@ -40,42 +61,35 @@ export class StorylineService {
       this.hasReachedFirstGrowth.set(true);
     }
 
-    // 2. Small Canopy (10 Leaves)
     if (!this.hasReached10Leaves() && leaves >= 10) {
       this.hasReached10Leaves.set(true);
     }
 
-    // 3. Sturdy Framework (10 Branches) -> -1% Leaf Cost per Branch
     if (!this.hasReached10Branches() && branches >= 10) {
       this.hasReached10Branches.set(true);
       this.upgradeService.hasPermanentLeafDiscount.set(true);
     }
 
-    // 4. Biological Adaptation (100 Leaves) -> Unlocks Mutations
     if (!this.hasReachedLeafMilestone() && leaves >= 100) {
       this.hasReachedLeafMilestone.set(true);
       this.isMutationUnlocked.set(true);
     }
 
-    // 5. Deep Anchorage (Root Width 10 & Root Depth 10) -> x1.25 Root Production
     if (!this.hasReachedDeepAnchorage() && rootW >= 10 && rootD >= 10) {
       this.hasReachedDeepAnchorage.set(true);
       this.upgradeService.hasDeepAnchorageBonus.set(true);
     }
 
-    // 6. Ancient Timber (Bark 10 & 3 Mutations) -> x1.25 Max Capacity
     if (!this.hasReachedAncientTimber() && bark >= 10 && completedMutationsCount >= 3) {
       this.hasReachedAncientTimber.set(true);
       this.upgradeService.hasAncientTimberBonus.set(true);
     }
 
-    // 7. The Awakening (300 Leaves) -> Unlocks Life Cycle (Bloom)
     if (!this.hasReachedBloomMilestone() && leaves >= 300) {
       this.hasReachedBloomMilestone.set(true);
       this.isBloomUnlocked.set(true);
     }
 
-    // 8. Apex Flora (500 Leaves & All 6 Mutations) -> x1.5 Total Energy
     if (!this.hasReachedApexFlora() && leaves >= 500 && completedMutationsCount >= 6) {
       this.hasReachedApexFlora.set(true);
       this.upgradeService.hasApexFloraBonus.set(true);

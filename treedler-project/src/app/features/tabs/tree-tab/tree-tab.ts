@@ -6,6 +6,7 @@ import { ShortcutService } from '../../../core/services/shortcut.service';
 import { MutationService } from '../../../core/services/mutation.service';
 import { UpgradeButtonComponent } from '../../../shared/ui/upgrade-button/upgrade-button';
 import { UpgradeBase } from '../../../core/classes/upgrade-base';
+import { MutationId } from '../../../core/enums/mutation.enum';
 
 export interface UpgradeView {
   model: UpgradeBase;
@@ -166,7 +167,7 @@ export class TreeTabComponent {
         this.upgradeService.maxMycorrhizalNetwork(),
       ),
       description: 'Trade energy with underground fungi for a massive influx of minerals.',
-      effect: this.mutationService.isCompleted('symbiotic_mycelium')
+      effect: this.mutationService.isCompleted(MutationId.SymbioticMycelium)
         ? ['+3.5 Minerals/s', '+2 Water/s', '+2 Energy/s']
         : ['+3.5 Minerals/s'],
       limit: this.upgradeService.maxMycorrhizalNetwork(),
