@@ -218,17 +218,15 @@ export class UpgradeService {
     return 0;
   }
 
-  public getTargetQuantity(
+  public getAffordableQuantity(
     upgrade: UpgradeBase,
     requestedQuantity: number,
     limit?: number,
   ): number {
     const maxAllowed = limit !== undefined ? limit - upgrade.level() : Infinity;
-    if (maxAllowed <= 0) return 1;
+    if (maxAllowed <= 0) return 0;
 
     const cap = Math.min(requestedQuantity, maxAllowed);
-    if (cap === 1) return 1;
-
     let affordableQty = 0;
 
     for (let i = 1; i <= cap; i++) {
@@ -241,9 +239,16 @@ export class UpgradeService {
         break;
       }
     }
-    return Math.max(1, affordableQty);
+    return affordableQty;
   }
 
+  public getTargetQuantity(
+    upgrade: UpgradeBase,
+    requestedQuantity: number,
+    limit?: number,
+  ): number {
+    return Math.max(1, this.getAffordableQuantity(upgrade, requestedQuantity, limit));
+  }
   private getCostsForQuantity(
     upgrade: UpgradeBase,
     quantity: number,

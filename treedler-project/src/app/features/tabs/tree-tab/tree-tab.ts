@@ -29,12 +29,11 @@ export class TreeTabComponent {
   public mutationService = inject(MutationService);
 
   public getTitle(upgrade: UpgradeBase, baseTitle: string, limit?: number): string {
-    const qty = this.upgradeService.getTargetQuantity(
-      upgrade,
-      this.shortcutService.multiplier(),
-      limit,
-    );
-    return qty > 1 ? `${baseTitle} [+${qty}]` : baseTitle;
+    const mult = this.shortcutService.multiplier();
+    if (mult <= 1) return baseTitle;
+
+    const affordable = this.upgradeService.getAffordableQuantity(upgrade, mult, limit);
+    return `${baseTitle} [+${affordable}/${mult}]`;
   }
 
   public crownUpgrades = computed<UpgradeView[]>(() => [
