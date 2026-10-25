@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ResourceService } from '../../../core/services/resource.service';
 import { UpgradeService } from '../../../core/services/upgrade.service';
 import { MutationService } from '../../../core/services/mutation.service';
+import { BloomService } from '../../../core/services/bloom.service';
 import {
   ResourceBarComponent,
   ResourceBreakdownItem,
@@ -22,22 +23,31 @@ export class SidebarComponent {
   public resourceService = inject(ResourceService);
   public upgradeService = inject(UpgradeService);
   public mutationService = inject(MutationService);
+  public bloomService = inject(BloomService);
 
   // ==========================================
   // 2. NET GENERATION (COMPUTED)
   // ==========================================
 
   public netWaterGeneration = computed(
-    () => this.resourceService.water().generationPerSecond - this.mutationService.waterDrain(),
+    () =>
+      this.resourceService.water().generationPerSecond -
+      this.mutationService.waterDrain() -
+      this.bloomService.waterDrain(),
   );
 
   public netMineralsGeneration = computed(
     () =>
-      this.resourceService.minerals().generationPerSecond - this.mutationService.mineralsDrain(),
+      this.resourceService.minerals().generationPerSecond -
+      this.mutationService.mineralsDrain() -
+      this.bloomService.mineralsDrain(),
   );
 
   public netEnergyGeneration = computed(
-    () => this.resourceService.energy().generationPerSecond - this.mutationService.energyDrain(),
+    () =>
+      this.resourceService.energy().generationPerSecond -
+      this.mutationService.energyDrain() -
+      this.bloomService.energyDrain(),
   );
 
   // ==========================================
@@ -50,11 +60,13 @@ export class SidebarComponent {
 
     if (breakdown.base > 0) items.push({ label: 'Base', amount: breakdown.base });
 
-    const rootSubs = [];
+    const rootSubs: { label: string; amountText: string }[] = [];
     if (breakdown.rootWidth > 0)
       rootSubs.push({ label: 'Expand Roots', amountText: `+${breakdown.rootWidth}` });
     if (breakdown.rootHairs > 0)
       rootSubs.push({ label: 'Root Hairs', amountText: `+${breakdown.rootHairs}` });
+    if (breakdown.myceliumWater > 0)
+      rootSubs.push({ label: 'Symbiotic Mycelium', amountText: `+${breakdown.myceliumWater}` });
 
     if (breakdown.rootVigorPercent > 0) {
       const multiplier = 1 + breakdown.rootVigorPercent / 100;
@@ -72,8 +84,11 @@ export class SidebarComponent {
     if (breakdown.leaves < 0)
       items.push({ label: 'Leaves Upkeep', amount: breakdown.leaves, isNegative: true });
 
-    const drain = this.mutationService.waterDrain();
-    if (drain > 0) items.push({ label: 'Mutation', amount: -drain, isNegative: true });
+    const mutDrain = this.mutationService.waterDrain();
+    if (mutDrain > 0) items.push({ label: 'Mutation', amount: -mutDrain, isNegative: true });
+
+    const bloomDrain = this.bloomService.waterDrain();
+    if (bloomDrain > 0) items.push({ label: 'Life Cycle', amount: -bloomDrain, isNegative: true });
 
     return items;
   });
@@ -86,9 +101,14 @@ export class SidebarComponent {
     if (breakdown.leaves > 0) items.push({ label: 'Leaves', amount: breakdown.leaves });
     if (breakdown.vascularTissues > 0)
       items.push({ label: 'Vascular Tissues', amount: breakdown.vascularTissues });
+    if (breakdown.symbioticMycelium > 0)
+      items.push({ label: 'Symbiotic Mycelium', amount: breakdown.symbioticMycelium });
 
-    const drain = this.mutationService.energyDrain();
-    if (drain > 0) items.push({ label: 'Mutation', amount: -drain, isNegative: true });
+    const mutDrain = this.mutationService.energyDrain();
+    if (mutDrain > 0) items.push({ label: 'Mutation', amount: -mutDrain, isNegative: true });
+
+    const bloomDrain = this.bloomService.energyDrain();
+    if (bloomDrain > 0) items.push({ label: 'Life Cycle', amount: -bloomDrain, isNegative: true });
 
     return items;
   });
@@ -99,7 +119,7 @@ export class SidebarComponent {
 
     if (breakdown.base > 0) items.push({ label: 'Base', amount: breakdown.base });
 
-    const mineralSubs = [];
+    const mineralSubs: { label: string; amountText: string }[] = [];
     if (breakdown.rootDepth > 0)
       mineralSubs.push({ label: 'Deepen Roots', amountText: `+${breakdown.rootDepth}` });
 
@@ -125,8 +145,11 @@ export class SidebarComponent {
     if (breakdown.leaves < 0)
       items.push({ label: 'Leaves Upkeep', amount: breakdown.leaves, isNegative: true });
 
-    const drain = this.mutationService.mineralsDrain();
-    if (drain > 0) items.push({ label: 'Mutation', amount: -drain, isNegative: true });
+    const mutDrain = this.mutationService.mineralsDrain();
+    if (mutDrain > 0) items.push({ label: 'Mutation', amount: -mutDrain, isNegative: true });
+
+    const bloomDrain = this.bloomService.mineralsDrain();
+    if (bloomDrain > 0) items.push({ label: 'Life Cycle', amount: -bloomDrain, isNegative: true });
 
     return items;
   });
@@ -134,6 +157,15 @@ export class SidebarComponent {
   public globalCapacityBreakdown = computed(() => {
     const items: ResourceBreakdownItem[] = [];
     const breakdown = this.upgradeService.capacityBreakdown();
+
+    const multiplierSubs: { label: string; amountText: string }[] = [];
+    if (breakdown.resinPercent > 0) {
+      const mult = 1 + breakdown.resinPercent / 100;
+      multiplierSubs.push({ label: 'Resin Bonus', amountText: `x${mult.toFixed(1)}` });
+    }
+    if (breakdown.hasHeartwood) {
+      multiplierSubs.push({ label: 'Heartwood', amountText: 'x1.5' });
+    }
 
     if (breakdown.base > 0) items.push({ label: 'Base', amount: breakdown.base });
     if (breakdown.bark > 0) items.push({ label: 'Bark', amount: breakdown.bark });
@@ -143,6 +175,10 @@ export class SidebarComponent {
       items.push({ label: 'Canopy Spread', amount: breakdown.canopySpread });
     if (breakdown.resinSecretion > 0)
       items.push({ label: 'Resin Secretion', amount: breakdown.resinSecretion });
+
+    if (multiplierSubs.length > 0 && items.length > 0) {
+      items[items.length - 1].subItems = multiplierSubs;
+    }
 
     return items;
   });

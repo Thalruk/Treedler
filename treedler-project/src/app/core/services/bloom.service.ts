@@ -10,7 +10,7 @@ export class BloomService {
   private resourceService = inject(ResourceService);
 
   // ==========================================
-  // STATE
+  // 1. STATE
   // ==========================================
   public currentStageIndex = signal<number>(0);
   public isActive = signal<boolean>(false);
@@ -40,7 +40,29 @@ export class BloomService {
   });
 
   // ==========================================
-  // ACTIONS
+  // 2. COMPUTED DRAINS
+  // ==========================================
+  private getDrain(resourceId: ResourceId): number {
+    if (!this.isActive() || this.isFullyComplete()) return 0;
+
+    const stage = this.currentStage();
+    if (!stage) return 0;
+
+    const cost = stage.costs.find((c) => c.resourceId === resourceId);
+    if (!cost) return 0;
+
+    const currentInvested = this.invested()[resourceId] || 0;
+    if (currentInvested >= cost.totalRequired) return 0;
+
+    return cost.drainPerSecond;
+  }
+
+  public energyDrain = computed(() => this.getDrain(ResourceId.Energy));
+  public waterDrain = computed(() => this.getDrain(ResourceId.Water));
+  public mineralsDrain = computed(() => this.getDrain(ResourceId.Minerals));
+
+  // ==========================================
+  // 3. ACTIONS
   // ==========================================
   public toggleActive(): void {
     if (!this.isFullyComplete()) {
@@ -61,7 +83,7 @@ export class BloomService {
   }
 
   // ==========================================
-  // GAME LOOP
+  // 4. GAME LOOP
   // ==========================================
   public tick(deltaTime: number): void {
     if (!this.isActive() || this.isFullyComplete()) return;

@@ -84,7 +84,9 @@ export class GameLoopService {
       energy: this.upgradeService.energyGeneration(),
     };
 
-    this.resourceService.tick(deltaTime, generations);
+    const maxCapacity = this.upgradeService.totalMaxCapacity();
+
+    this.resourceService.tick(deltaTime, generations, maxCapacity);
     this.mutationService.tick(deltaTime);
     this.bloomService.tick(deltaTime);
 

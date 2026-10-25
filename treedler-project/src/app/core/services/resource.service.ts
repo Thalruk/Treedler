@@ -41,11 +41,11 @@ export class ResourceService {
 
   public consume(resourceId: ResourceId, amount: number): void {
     if (resourceId === ResourceId.Water)
-      this.water.update((r) => ({ ...r, amount: r.amount - amount }));
+      this.water.update((r) => ({ ...r, amount: Math.max(0, r.amount - amount) }));
     if (resourceId === ResourceId.Minerals)
-      this.minerals.update((r) => ({ ...r, amount: r.amount - amount }));
+      this.minerals.update((r) => ({ ...r, amount: Math.max(0, r.amount - amount) }));
     if (resourceId === ResourceId.Energy)
-      this.energy.update((r) => ({ ...r, amount: r.amount - amount }));
+      this.energy.update((r) => ({ ...r, amount: Math.max(0, r.amount - amount) }));
   }
 
   public unlock(resourceId: ResourceId): void {
@@ -55,12 +55,6 @@ export class ResourceService {
     if (resourceId === ResourceId.Energy) this.energy.update((r) => ({ ...r, isUnlocked: true }));
   }
 
-  public increaseMaxAmount(amount: number): void {
-    this.water.update((r) => ({ ...r, maxAmount: r.maxAmount + amount }));
-    this.minerals.update((r) => ({ ...r, maxAmount: r.maxAmount + amount }));
-    this.energy.update((r) => ({ ...r, maxAmount: r.maxAmount + amount }));
-  }
-
   // ==========================================
   // 3. GAME LOOP LOGIC
   // ==========================================
@@ -68,20 +62,25 @@ export class ResourceService {
   public tick(
     deltaTime: number,
     generations: { water: number; minerals: number; energy: number },
+    maxCapacity: number,
   ): void {
-    this.updateResource(this.water, deltaTime, generations.water);
-    this.updateResource(this.minerals, deltaTime, generations.minerals);
-    this.updateResource(this.energy, deltaTime, generations.energy);
+    this.updateResource(this.water, deltaTime, generations.water, maxCapacity);
+    this.updateResource(this.minerals, deltaTime, generations.minerals, maxCapacity);
+    this.updateResource(this.energy, deltaTime, generations.energy, maxCapacity);
   }
 
   private updateResource(
     res: WritableSignal<Resource>,
     deltaTime: number,
     genPerSec: number,
+    maxCapacity: number,
   ): void {
     res.update((current) => {
-      const updated = { ...current, generationPerSecond: genPerSec };
-      if (genPerSec === 0) return updated;
+      const updated = {
+        ...current,
+        generationPerSecond: genPerSec,
+        maxAmount: maxCapacity,
+      };
 
       let newAmount = updated.amount + genPerSec * deltaTime;
       newAmount = Math.max(0, Math.min(newAmount, updated.maxAmount));

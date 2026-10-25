@@ -6,7 +6,7 @@
     <span class="font-semibold justify-self-start" [ngClass]="colorClass">{{ name }}</span>
 
     <span class="text-gray-200 font-mono text-xs justify-self-center">
-      {{ amount | number: '1.0-0' }} / {{ maxAmount }}
+      {{ amount | number: '1.0-0' }} / {{ maxAmount | number: '1.0-0' }}
     </span>
 
     <span
@@ -34,7 +34,7 @@
   <div
     class="hidden md:flex absolute top-full left-0 mt-2 w-80 bg-gray-900 border border-gray-600 rounded p-3 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-[100] pointer-events-none gap-3"
   >
-    <!-- Kolumna: Produkcja -->
+    <!-- Column: Production -->
     <div class="flex-1 border-r border-gray-700 pr-3">
       <div class="text-xs font-bold text-gray-200 mb-2 border-b border-gray-700 pb-1">
         Production
@@ -73,19 +73,30 @@
       </div>
     </div>
 
+    <!-- Column: Capacity -->
     <div class="flex-1 pl-1">
       <div class="text-xs font-bold text-gray-200 mb-2 border-b border-gray-700 pb-1">Capacity</div>
       <div class="flex flex-col gap-1">
         @for (item of capacityBreakdown; track item.label) {
-          <div class="flex justify-between text-xs">
-            <span class="text-gray-400">{{ item.label }}:</span>
-            <span class="font-mono text-blue-300"> +{{ item.amount }} </span>
+          <div class="flex flex-col">
+            <div class="flex justify-between text-xs">
+              <span class="text-gray-400">{{ item.label }}:</span>
+              <span class="font-mono text-blue-300"> +{{ item.amount | number: '1.0-0' }} </span>
+            </div>
+            @if (item.subItems) {
+              @for (sub of item.subItems; track sub.label) {
+                <div class="flex justify-between text-[11px] pl-3 text-gray-500">
+                  <span>↳ {{ sub.label }}</span>
+                  <span class="font-mono text-blue-400/80">{{ sub.amountText }}</span>
+                </div>
+              }
+            }
           </div>
         }
         <div class="flex justify-between text-xs border-t border-gray-700 mt-1 pt-1 font-bold">
           <span class="text-gray-300">Total:</span>
           <span class="font-mono text-blue-300">
-            {{ maxAmount }}
+            {{ maxAmount | number: '1.0-0' }}
           </span>
         </div>
       </div>
