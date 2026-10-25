@@ -4,13 +4,12 @@
   (mouseleave)="onMouseLeave()"
 >
   <button
-    (click)="buy.emit()"
-    [disabled]="!canAfford"
-    class="w-full h-full text-left px-3 py-4 rounded transition-colors border"
+    (click)="canAfford && buy.emit()"
+    class="w-full h-full text-left px-3 py-4 rounded transition-all duration-100 border"
     [ngClass]="{
-      'bg-gray-600 hover:bg-gray-500 border-gray-500': canAfford,
-      'bg-gray-800 border-gray-700 cursor-not-allowed': !canAfford && isReachable,
-      'bg-black border-gray-900 cursor-not-allowed': !isReachable,
+      'bg-gray-600 hover:bg-gray-500 border-gray-500 cursor-pointer active:scale-95': canAfford,
+      'bg-gray-800 border-gray-700 cursor-not-allowed opacity-75': !canAfford && isReachable,
+      'bg-black border-gray-900 cursor-not-allowed opacity-50': !isReachable,
     }"
   >
     <div
