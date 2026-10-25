@@ -1,8 +1,85 @@
-<div class="flex flex-col gap-6">
+<div class="flex flex-col gap-8 max-w-xl">
+  <!-- ========================================== -->
+  <!-- AUDIO SETTINGS                             -->
+  <!-- ========================================== -->
+  <div class="flex flex-col">
+    <h3
+      class="w-full text-xs font-bold text-green-500 uppercase tracking-wider border-b border-gray-700 mb-4 pb-1"
+    >
+      Audio & Atmosphere
+    </h3>
+
+    <div class="flex flex-col gap-4 bg-gray-900/50 p-4 rounded border border-gray-700">
+      <!-- Ambient Music Row -->
+      <div class="flex flex-col gap-1.5">
+        <div class="flex justify-between items-center text-sm">
+          <span class="text-gray-200 font-semibold">Ambient Music (Zen Drone)</span>
+          <button
+            (click)="toggleMusic()"
+            class="px-3 py-1 rounded text-xs font-bold border transition-colors"
+            [ngClass]="
+              audioService.isMusicMuted()
+                ? 'bg-red-900/40 text-red-400 border-red-700/50'
+                : 'bg-green-900/40 text-green-400 border-green-700/50'
+            "
+          >
+            {{ audioService.isMusicMuted() ? 'Muted' : 'Active' }}
+          </button>
+        </div>
+        <div class="flex items-center gap-3">
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            [value]="audioService.musicVolume()"
+            (input)="onMusicVolumeChange($event)"
+            class="w-full accent-green-500 cursor-pointer h-1.5 bg-gray-700 rounded-lg"
+          />
+          <span class="text-xs font-mono text-gray-400 w-10 text-right">
+            {{ audioService.musicVolume() * 100 | number: '1.0-0' }}%
+          </span>
+        </div>
+      </div>
+
+      <!-- Sound Effects Row -->
+      <div class="flex flex-col gap-1.5 pt-2 border-t border-gray-800">
+        <div class="flex justify-between items-center text-sm">
+          <span class="text-gray-200 font-semibold">Sound Effects (Clicks & Alerts)</span>
+          <button
+            (click)="toggleSfx()"
+            class="px-3 py-1 rounded text-xs font-bold border transition-colors"
+            [ngClass]="
+              audioService.isSfxMuted()
+                ? 'bg-red-900/40 text-red-400 border-red-700/50'
+                : 'bg-green-900/40 text-green-400 border-green-700/50'
+            "
+          >
+            {{ audioService.isSfxMuted() ? 'Muted' : 'Active' }}
+          </button>
+        </div>
+        <div class="flex items-center gap-3">
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            [value]="audioService.sfxVolume()"
+            (input)="onSfxVolumeChange($event)"
+            class="w-full accent-green-500 cursor-pointer h-1.5 bg-gray-700 rounded-lg"
+          />
+          <span class="text-xs font-mono text-gray-400 w-10 text-right">
+            {{ audioService.sfxVolume() * 100 | number: '1.0-0' }}%
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- DANGER ZONE                                -->
+  <!-- ========================================== -->
   <div class="flex flex-col items-center text-center md:items-start md:text-left">
-    <!-- ========================================== -->
-    <!-- DANGER ZONE                                -->
-    <!-- ========================================== -->
     <h3
       class="w-full text-xs font-bold text-red-500 uppercase tracking-wider border-b border-gray-700 mb-2 pb-1"
     >

@@ -7,6 +7,7 @@ import { MutationId } from '../enums/mutation.enum';
 import { RANDOM_FLAVOR_EVENTS } from '../config/random-events.config';
 import { MUTATIONS_CONFIG } from '../config/mutation.config';
 import { StoryLogKey, STORY_LOGS_CONFIG, RESEARCH_LOG_TEMPLATES } from '../config/logs.config';
+import { AudioService } from './audio.service';
 
 export interface LogEntry {
   id: string;
@@ -19,6 +20,7 @@ export class LogService {
   private upgradeService = inject(UpgradeService);
   private mutationService = inject(MutationService);
   private bloomService = inject(BloomService);
+  private audioService = inject(AudioService);
 
   public logs = signal<LogEntry[]>([]);
   public hasUnreadLogs = signal<boolean>(false);
@@ -46,6 +48,8 @@ export class LogService {
       ...currentLogs,
       { id: Math.random().toString(36).substring(2, 9), text, category },
     ]);
+    if (category === LogCategory.Story || category === LogCategory.Research)
+      this.audioService.playUnlock();
     this.hasUnreadLogs.set(true);
   }
 

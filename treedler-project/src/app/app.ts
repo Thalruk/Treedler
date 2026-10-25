@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GameLoopService } from './core/services/game-loop';
 import { StorylineService } from './core/services/storyline.service';
+import { AudioService } from './core/services/audio.service';
 import { SidebarComponent } from './features/sidebar/resource-sidebar/resource-sidebar';
 import { TreeTabComponent } from './features/tabs/tree-tab/tree-tab';
 import { TabId } from './core/enums/tab.enum';
@@ -28,6 +29,7 @@ import { BloomTabComponent } from './features/tabs/bloom-tab/bloom-tab';
 })
 export class AppComponent implements OnInit {
   private gameLoop = inject(GameLoopService);
+  private audioService = inject(AudioService);
   public storylineService = inject(StorylineService);
   public activeTab = signal<TabId>(TabId.Tree);
   public Tab = TabId;
@@ -37,6 +39,9 @@ export class AppComponent implements OnInit {
   }
 
   public switchTab(tab: TabId): void {
-    this.activeTab.set(tab);
+    if (this.activeTab() !== tab) {
+      this.activeTab.set(tab);
+      this.audioService.playTabSwitch();
+    }
   }
 }

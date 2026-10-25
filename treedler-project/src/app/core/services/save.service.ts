@@ -5,6 +5,7 @@ import { StorylineService } from './storyline.service';
 import { MutationService } from './mutation.service';
 import { LogService } from './log.service';
 import { BloomService } from './bloom.service';
+import { AudioService } from './audio.service';
 
 @Injectable({ providedIn: 'root' })
 export class SaveService {
@@ -18,6 +19,7 @@ export class SaveService {
   private mutationService = inject(MutationService);
   private logService = inject(LogService);
   private bloomService = inject(BloomService);
+  private audioService = inject(AudioService);
 
   private readonly SAVE_KEY = 'treedler_save';
 
@@ -91,6 +93,12 @@ export class SaveService {
         loggedBloomStageIndex: this.logService.loggedBloomStageIndex(),
         loggedBloomComplete: this.logService.loggedBloomComplete(),
       },
+      audio: {
+        isSfxMuted: this.audioService.isSfxMuted(),
+        sfxVolume: this.audioService.sfxVolume(),
+        isMusicMuted: this.audioService.isMusicMuted(),
+        musicVolume: this.audioService.musicVolume(),
+      },
     };
 
     localStorage.setItem(this.SAVE_KEY, JSON.stringify(saveState));
@@ -130,6 +138,7 @@ export class SaveService {
         if (parsed.bloom.isFullyComplete !== undefined)
           this.bloomService.isFullyComplete.set(parsed.bloom.isFullyComplete);
       }
+      if (parsed.audio) this.loadSignals(parsed.audio, this.audioService);
     } catch (e) {
       console.error('Save load error:', e);
     }

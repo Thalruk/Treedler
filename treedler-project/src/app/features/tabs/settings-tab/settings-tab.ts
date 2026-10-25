@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SaveService } from '../../../core/services/save.service';
+import { AudioService } from '../../../core/services/audio.service';
 
 @Component({
   selector: 'app-settings-tab',
@@ -9,15 +10,30 @@ import { SaveService } from '../../../core/services/save.service';
   templateUrl: './settings-tab.html',
 })
 export class SettingsTabComponent {
-  // ==========================================
-  // 1. INJECTIONS
-  // ==========================================
-
   private saveService = inject(SaveService);
+  public audioService = inject(AudioService);
 
-  // ==========================================
-  // 2. ACTIONS
-  // ==========================================
+  public onSfxVolumeChange(event: Event): void {
+    const val = parseFloat((event.target as HTMLInputElement).value);
+    this.audioService.setSfxVolume(val);
+    this.saveService.saveGame();
+  }
+
+  public onMusicVolumeChange(event: Event): void {
+    const val = parseFloat((event.target as HTMLInputElement).value);
+    this.audioService.setMusicVolume(val);
+    this.saveService.saveGame();
+  }
+
+  public toggleSfx(): void {
+    this.audioService.toggleSfxMute();
+    this.saveService.saveGame();
+  }
+
+  public toggleMusic(): void {
+    this.audioService.toggleMusicMute();
+    this.saveService.saveGame();
+  }
 
   public wipeSave(): void {
     const isConfirmed = window.confirm(

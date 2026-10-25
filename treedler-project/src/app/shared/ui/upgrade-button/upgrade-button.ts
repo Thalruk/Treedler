@@ -1,5 +1,6 @@
-import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AudioService } from '../../../core/services/audio.service';
 
 export interface UpgradeCost {
   amount: number;
@@ -16,6 +17,8 @@ export interface UpgradeCost {
   },
 })
 export class UpgradeButtonComponent {
+  private audioService = inject(AudioService);
+
   // ==========================================
   // 1. INPUTS & OUTPUTS
   // ==========================================
@@ -40,6 +43,13 @@ export class UpgradeButtonComponent {
   // ==========================================
   // 3. UI EVENTS
   // ==========================================
+
+  public onButtonClick(): void {
+    if (this.canAfford && !this.isMaxed) {
+      this.audioService.playClick();
+      this.buy.emit();
+    }
+  }
 
   public onMouseEnter(event: MouseEvent): void {
     const buttonElement = event.currentTarget as HTMLElement;
