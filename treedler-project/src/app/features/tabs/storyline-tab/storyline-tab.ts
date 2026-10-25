@@ -41,7 +41,7 @@ export class StorylineTabComponent {
       title: 'Sturdy Framework',
       description:
         'The framework strengthens. The tree reaches higher, demanding an even thicker canopy.',
-      reward: '-1% Leaf Cost per Branch.',
+      reward: 'Permanent -1% Leaf Cost per Branch (up to 80%).',
       isUnlocked: () => this.storylineService.hasReached10Branches(),
     },
     {
@@ -49,8 +49,40 @@ export class StorylineTabComponent {
       title: 'Biological Adaptation',
       description:
         'The excess energy is triggering spontaneous biological adaptations. A new path unfolds.',
-      reward: 'Unlocks the Mutation System.',
+      reward: 'Unlocks the Mutation System (100 Leaves).',
       isUnlocked: () => this.storylineService.hasReachedLeafMilestone(),
+    },
+    {
+      id: 'deep_anchorage',
+      title: 'Deep Anchorage',
+      description:
+        'Your roots pierce through the shifting topsoil into ancient subterranean aquifers and mineral veins.',
+      reward: 'x1.25 Root Water & Mineral Production (Width 10 & Depth 10).',
+      isUnlocked: () => this.storylineService.hasReachedDeepAnchorage(),
+    },
+    {
+      id: 'ancient_timber',
+      title: 'Ancient Timber',
+      description:
+        'Mutated cells and hardened rings of bark fuse into an unyielding, colossal trunk.',
+      reward: 'x1.25 Global Max Capacity (Bark 10 & 3 Mutations).',
+      isUnlocked: () => this.storylineService.hasReachedAncientTimber(),
+    },
+    {
+      id: 'bloom_unlocked',
+      title: 'The Awakening',
+      description:
+        'A profound shift ripples through your sap. Survival is no longer enough—it is time to create new life.',
+      reward: 'Unlocks the Life Cycle Tab (300 Leaves).',
+      isUnlocked: () => this.storylineService.hasReachedBloomMilestone(),
+    },
+    {
+      id: 'apex_flora',
+      title: 'Apex Flora',
+      description:
+        'Towering above the world with a fully mutated genome, your canopy drinks the sun like a living star.',
+      reward: 'x1.5 Total Energy Generation (500 Leaves & 6 Mutations).',
+      isUnlocked: () => this.storylineService.hasReachedApexFlora(),
     },
   ]);
 }

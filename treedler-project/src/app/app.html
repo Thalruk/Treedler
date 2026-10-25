@@ -2,7 +2,7 @@
   class="h-screen w-full bg-gray-900 text-gray-100 font-sans flex flex-col md:flex-row overflow-hidden"
 >
   <!-- ========================================== -->
-  <!-- 1. MOBILE TOP BAR (Pasek zasobów)          -->
+  <!-- 1. MOBILE TOP BAR (Resource Bar)           -->
   <!-- ========================================== -->
   <div
     class="md:hidden flex-none bg-gray-800 border-b border-gray-700 z-40 max-h-40 overflow-y-auto shadow-md"
@@ -11,7 +11,7 @@
   </div>
 
   <!-- ========================================== -->
-  <!-- 2. DESKTOP LEFT PANEL (Sidebar zasobów)    -->
+  <!-- 2. DESKTOP LEFT PANEL (Resource Sidebar)   -->
   <!-- ========================================== -->
   <div class="hidden md:block w-72 shrink-0 p-6 pr-3 z-50">
     <app-sidebar></app-sidebar>
@@ -41,11 +41,22 @@
           <button
             (click)="switchTab(Tab.Mutation)"
             [class.bg-gray-700]="activeTab() === Tab.Mutation"
-            [class.text-green-400]="activeTab() === Tab.Mutation"
+            [class.text-purple-400]="activeTab() === Tab.Mutation"
             [class.text-gray-400]="activeTab() !== Tab.Mutation"
-            class="font-bold px-4 py-1.5 rounded-md transition-colors hover:bg-gray-700 hover:text-green-300"
+            class="font-bold px-4 py-1.5 rounded-md transition-colors hover:bg-gray-700 hover:text-purple-300"
           >
             Mutations
+          </button>
+        }
+        @if (storylineService.isBloomUnlocked()) {
+          <button
+            (click)="switchTab(Tab.Bloom)"
+            [class.bg-gray-700]="activeTab() === Tab.Bloom"
+            [class.text-pink-400]="activeTab() === Tab.Bloom"
+            [class.text-gray-400]="activeTab() !== Tab.Bloom"
+            class="font-bold px-4 py-1.5 rounded-md transition-colors hover:bg-gray-700 hover:text-pink-300"
+          >
+            Life Cycle
           </button>
         }
         <button
@@ -58,18 +69,6 @@
           Story
         </button>
       </div>
-
-      @if (storylineService.isBloomUnlocked()) {
-        <button
-          (click)="switchTab(Tab.Bloom)"
-          [class.bg-gray-700]="activeTab() === Tab.Bloom"
-          [class.text-pink-400]="activeTab() === Tab.Bloom"
-          [class.text-gray-400]="activeTab() !== Tab.Bloom"
-          class="font-bold px-4 py-1.5 rounded-md transition-colors hover:bg-gray-700 hover:text-pink-300"
-        >
-          Life Cycle
-        </button>
-      }
 
       <button
         (click)="switchTab(Tab.Settings)"
@@ -126,6 +125,7 @@
           <span class="text-[10px] uppercase font-bold mt-1">Mutate</span>
         </button>
       }
+
       @if (storylineService.isBloomUnlocked()) {
         <button
           (click)="switchTab(Tab.Bloom)"

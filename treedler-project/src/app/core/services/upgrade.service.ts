@@ -21,6 +21,9 @@ export class UpgradeService {
 
   // STORYLINE PERMANENT REWARDS
   public hasPermanentLeafDiscount = signal<boolean>(false);
+  public hasDeepAnchorageBonus = signal<boolean>(false);
+  public hasAncientTimberBonus = signal<boolean>(false);
+  public hasApexFloraBonus = signal<boolean>(false);
 
   public readonly firstRootCost = 5;
   public readonly firstStemCost = 5;
@@ -75,15 +78,22 @@ export class UpgradeService {
 
   public leafEnergyBase = computed(() => 0.1);
 
-  public leafEnergyMultiplier = computed(() =>
-    this.mutationService.isCompleted('chloroplast_refinement') ? 1.4 : 1.0,
-  );
+  public leafEnergyMultiplier = computed(() => {
+    let mult = 1.0;
+    if (this.mutationService.isCompleted('chloroplast_refinement')) mult *= 1.4;
+    if (this.hasApexFloraBonus()) mult *= 1.5;
+    return mult;
+  });
 
   public singleLeafEnergy = computed(
     () => (this.leafEnergyBase() + this.sunwardReach.level() * 0.03) * this.leafEnergyMultiplier(),
   );
 
-  public rootMultiplier = computed(() => 1 + this.rootVigor.level() * 0.1);
+  public rootMultiplier = computed(() => {
+    const vigorMult = 1 + this.rootVigor.level() * 0.1;
+    const anchorageMult = this.hasDeepAnchorageBonus() ? 1.25 : 1.0;
+    return vigorMult * anchorageMult;
+  });
 
   public waterGeneration = computed(() => {
     const base = this.hasFirstRoot() ? 1 : 0;
@@ -133,23 +143,29 @@ export class UpgradeService {
   }));
 
   public energyGeneration = computed(() => {
-    const base = this.hasFirstStem() ? 1 : 0;
+    const apexMult = this.hasApexFloraBonus() ? 1.5 : 1.0;
+    const base = (this.hasFirstStem() ? 1 : 0) * apexMult;
     const fromLeaves = this.leaf.level() * this.singleLeafEnergy();
-    const fromVascular = this.vascularTissues.level() * 1.5;
-    const fromMycelium = this.mutationService.isCompleted('symbiotic_mycelium')
-      ? this.mycorrhizalNetwork.level() * 2
-      : 0;
+    const fromVascular = this.vascularTissues.level() * 1.5 * apexMult;
+    const fromMycelium =
+      (this.mutationService.isCompleted('symbiotic_mycelium')
+        ? this.mycorrhizalNetwork.level() * 2
+        : 0) * apexMult;
     return base + fromLeaves + fromVascular + fromMycelium;
   });
 
-  public energyBreakdown = computed(() => ({
-    base: this.hasFirstStem() ? 1 : 0,
-    leaves: this.leaf.level() * this.singleLeafEnergy(),
-    vascularTissues: this.vascularTissues.level() * 1.5,
-    symbioticMycelium: this.mutationService.isCompleted('symbiotic_mycelium')
-      ? this.mycorrhizalNetwork.level() * 2
-      : 0,
-  }));
+  public energyBreakdown = computed(() => {
+    const apexMult = this.hasApexFloraBonus() ? 1.5 : 1.0;
+    return {
+      base: (this.hasFirstStem() ? 1 : 0) * apexMult,
+      leaves: this.leaf.level() * this.singleLeafEnergy(),
+      vascularTissues: this.vascularTissues.level() * 1.5 * apexMult,
+      symbioticMycelium:
+        (this.mutationService.isCompleted('symbiotic_mycelium')
+          ? this.mycorrhizalNetwork.level() * 2
+          : 0) * apexMult,
+    };
+  });
 
   // ==========================================
   // 5. CAPACITY CALCULATION & BREAKDOWN
@@ -165,8 +181,9 @@ export class UpgradeService {
     const flatTotal = base + bark + vascularTissues + canopySpread + resinSecretion;
     const resinMultiplier = 1 + this.resinSecretion.level() * 0.1;
     const heartwoodMultiplier = this.mutationService.isCompleted('heartwood_formation') ? 1.5 : 1.0;
+    const timberMultiplier = this.hasAncientTimberBonus() ? 1.25 : 1.0;
 
-    const total = Math.floor(flatTotal * resinMultiplier * heartwoodMultiplier);
+    const total = Math.floor(flatTotal * resinMultiplier * heartwoodMultiplier * timberMultiplier);
 
     return {
       base,
@@ -176,6 +193,7 @@ export class UpgradeService {
       resinSecretion,
       resinPercent: this.resinSecretion.level() * 10,
       hasHeartwood: this.mutationService.isCompleted('heartwood_formation'),
+      hasAncientTimber: this.hasAncientTimberBonus(),
       total,
     };
   });

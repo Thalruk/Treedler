@@ -2,15 +2,15 @@
   <!-- ========================================== -->
   <!-- MAIN VALUES                                -->
   <!-- ========================================== -->
-  <div class="grid grid-cols-3 items-center z-10">
-    <span class="font-semibold justify-self-start" [ngClass]="colorClass">{{ name }}</span>
+  <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 z-10">
+    <span class="font-semibold justify-self-start truncate" [ngClass]="colorClass">{{ name }}</span>
 
-    <span class="text-gray-200 font-mono text-xs justify-self-center">
+    <span class="text-gray-200 font-mono text-xs justify-self-center whitespace-nowrap">
       {{ amount | number: '1.0-0' }} / {{ maxAmount | number: '1.0-0' }}
     </span>
 
     <span
-      class="text-xs font-mono justify-self-end"
+      class="text-xs font-mono justify-self-end whitespace-nowrap"
       [ngClass]="netGeneration >= 0 ? 'text-green-400' : 'text-red-400'"
     >
       {{ netGeneration > 0 ? '+' : '' }}{{ netGeneration | number: '1.0-2' }}/s

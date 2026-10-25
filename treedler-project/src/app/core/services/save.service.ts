@@ -34,6 +34,9 @@ export class SaveService {
       },
       upgrades: {
         hasPermanentLeafDiscount: this.upgradeService.hasPermanentLeafDiscount(),
+        hasDeepAnchorageBonus: this.upgradeService.hasDeepAnchorageBonus(),
+        hasAncientTimberBonus: this.upgradeService.hasAncientTimberBonus(),
+        hasApexFloraBonus: this.upgradeService.hasApexFloraBonus(),
         hasFirstRoot: this.upgradeService.hasFirstRoot(),
         hasFirstStem: this.upgradeService.hasFirstStem(),
 
@@ -51,12 +54,16 @@ export class SaveService {
         rootVigorLevel: this.upgradeService.rootVigor.level(),
       },
       storyline: {
-        hasReachedLeafMilestone: this.storylineService.hasReachedLeafMilestone(),
         isMutationUnlocked: this.storylineService.isMutationUnlocked(),
-        hasReached10Branches: this.storylineService.hasReached10Branches(),
+        isBloomUnlocked: this.storylineService.isBloomUnlocked(),
         hasReachedFirstGrowth: this.storylineService.hasReachedFirstGrowth(),
         hasReached10Leaves: this.storylineService.hasReached10Leaves(),
-        isBloomUnlocked: this.storylineService.isBloomUnlocked(), // DODANO
+        hasReached10Branches: this.storylineService.hasReached10Branches(),
+        hasReachedLeafMilestone: this.storylineService.hasReachedLeafMilestone(),
+        hasReachedDeepAnchorage: this.storylineService.hasReachedDeepAnchorage(),
+        hasReachedAncientTimber: this.storylineService.hasReachedAncientTimber(),
+        hasReachedBloomMilestone: this.storylineService.hasReachedBloomMilestone(),
+        hasReachedApexFlora: this.storylineService.hasReachedApexFlora(),
       },
       mutations: {
         progresses: this.mutationService.progresses(),
@@ -71,13 +78,16 @@ export class SaveService {
       logsData: {
         logs: this.logService.logs(),
         loggedFirstGrowth: this.logService.loggedFirstGrowth(),
+        loggedFirstBark: this.logService.loggedFirstBark(),
         logged10Leaves: this.logService.logged10Leaves(),
         logged25Leaves: this.logService.logged25Leaves(),
-        logged50Leaves: this.logService.logged50Leaves(), // DODANE
+        logged50Leaves: this.logService.logged50Leaves(),
         logged10Branches: this.logService.logged10Branches(),
         loggedMutation: this.logService.loggedMutation(),
-        loggedFirstBark: this.logService.loggedFirstBark(), // DODANE
-        loggedBloomUnlocked: this.logService.loggedBloomUnlocked(), // DODANE
+        loggedDeepAnchorage: this.logService.loggedDeepAnchorage(),
+        loggedAncientTimber: this.logService.loggedAncientTimber(),
+        loggedBloomUnlocked: this.logService.loggedBloomUnlocked(),
+        loggedApexFlora: this.logService.loggedApexFlora(),
       },
     };
 
