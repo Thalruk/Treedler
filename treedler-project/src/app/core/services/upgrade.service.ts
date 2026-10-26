@@ -240,6 +240,7 @@ export class UpgradeService {
       rootHairs: this.rootHairs.level() * 2.5,
       myceliumWater: myceliumBonus,
       rootVigorPercent: this.rootVigor.level() * 10,
+      hasDeepAnchorage: this.hasDeepAnchorageBonus(),
       subtotalRoots:
         (this.rootWidth.level() * 1 + this.rootHairs.level() * 2.5 + myceliumBonus) *
         this.rootMultiplier(),
@@ -262,12 +263,12 @@ export class UpgradeService {
     rootDepth: this.rootDepth.level() * 1,
     mycorrhizalNetwork: this.mycorrhizalNetwork.level() * 3.5,
     rootVigorPercent: this.rootVigor.level() * 10,
+    hasDeepAnchorage: this.hasDeepAnchorageBonus(),
     subtotalRoots:
       (this.rootDepth.level() * 1 + this.mycorrhizalNetwork.level() * 3.5) * this.rootMultiplier(),
     sapPressure: this.sapPressureProduction(),
     leaves: -(this.leaf.level() * this.leafResourceUpkeep()),
   }));
-
   public energyGeneration = computed(() => {
     const apexMult = this.hasApexFloraBonus() ? 1.5 : 1.0;
     const base = (this.hasFirstStem() ? 1 : 0) * apexMult;
@@ -283,9 +284,14 @@ export class UpgradeService {
 
   public energyBreakdown = computed(() => {
     const apexMult = this.hasApexFloraBonus() ? 1.5 : 1.0;
+    const leafCount = this.leaf.level();
     return {
       base: (this.hasFirstStem() ? 1 : 0) * apexMult,
-      leaves: this.leaf.level() * this.singleLeafEnergy(),
+      leaves: leafCount * this.singleLeafEnergy(),
+      leafBaseTotal: leafCount * this.leafEnergyBase(),
+      sunwardReachTotal: leafCount * (this.sunwardReach.level() * 0.03),
+      hasChloroplast: this.mutationService.isCompleted(MutationId.ChloroplastRefinement),
+      hasApexFlora: this.hasApexFloraBonus(),
       vascularTissues: this.vascularTissues.level() * 1.5 * apexMult,
       sapPressure: this.sapPressureProduction() * apexMult,
       symbioticMycelium:

@@ -60,7 +60,7 @@ export class SidebarComponent {
 
     if (breakdown.base > 0) items.push({ label: 'Base', amount: breakdown.base });
 
-    const rootSubs: { label: string; amountText: string }[] = [];
+    const rootSubs: { label: string; amountText: string; isMultiplier?: boolean }[] = [];
     if (breakdown.rootWidth > 0)
       rootSubs.push({ label: 'Expand Roots', amountText: `+${breakdown.rootWidth}` });
     if (breakdown.rootHairs > 0)
@@ -70,7 +70,18 @@ export class SidebarComponent {
 
     if (breakdown.rootVigorPercent > 0) {
       const multiplier = 1 + breakdown.rootVigorPercent / 100;
-      rootSubs.push({ label: 'Root Vigor', amountText: `x${multiplier.toFixed(1)}` });
+      rootSubs.push({
+        label: 'Root Vigor',
+        amountText: `x${multiplier.toFixed(2)}`,
+        isMultiplier: true,
+      });
+    }
+    if (breakdown.hasDeepAnchorage) {
+      rootSubs.push({
+        label: 'Deep Anchorage',
+        amountText: 'x1.25',
+        isMultiplier: true,
+      });
     }
 
     if (breakdown.subtotalRoots > 0) {
@@ -81,7 +92,6 @@ export class SidebarComponent {
       });
     }
 
-    // DODANE: Bonus z ciśnienia soków
     if (breakdown.sapPressure > 0)
       items.push({ label: 'Sap Pressure', amount: breakdown.sapPressure });
 
@@ -102,13 +112,47 @@ export class SidebarComponent {
     const breakdown = this.upgradeService.energyBreakdown();
 
     if (breakdown.base > 0) items.push({ label: 'Base', amount: breakdown.base });
-    if (breakdown.leaves > 0) items.push({ label: 'Leaves', amount: breakdown.leaves });
+
+    if (breakdown.leaves > 0) {
+      const leafSubs: { label: string; amountText: string; isMultiplier?: boolean }[] = [];
+      if (breakdown.leafBaseTotal > 0) {
+        leafSubs.push({
+          label: 'Base Leaves',
+          amountText: `+${breakdown.leafBaseTotal.toFixed(1)}`,
+        });
+      }
+      if (breakdown.sunwardReachTotal > 0) {
+        leafSubs.push({
+          label: 'Sunward Reach',
+          amountText: `+${breakdown.sunwardReachTotal.toFixed(1)}`,
+        });
+      }
+      if (breakdown.hasChloroplast) {
+        leafSubs.push({
+          label: 'Chloroplast Mut.',
+          amountText: 'x1.40',
+          isMultiplier: true,
+        });
+      }
+      if (breakdown.hasApexFlora) {
+        leafSubs.push({
+          label: 'Apex Flora',
+          amountText: 'x1.50',
+          isMultiplier: true,
+        });
+      }
+
+      items.push({
+        label: 'Leaves',
+        amount: breakdown.leaves,
+        subItems: leafSubs.length > 0 ? leafSubs : undefined,
+      });
+    }
+
     if (breakdown.vascularTissues > 0)
       items.push({ label: 'Vascular Tissues', amount: breakdown.vascularTissues });
     if (breakdown.symbioticMycelium > 0)
       items.push({ label: 'Symbiotic Mycelium', amount: breakdown.symbioticMycelium });
-
-    // DODANE: Bonus z ciśnienia soków
     if (breakdown.sapPressure > 0)
       items.push({ label: 'Sap Pressure', amount: breakdown.sapPressure });
 
@@ -127,7 +171,7 @@ export class SidebarComponent {
 
     if (breakdown.base > 0) items.push({ label: 'Base', amount: breakdown.base });
 
-    const mineralSubs: { label: string; amountText: string }[] = [];
+    const mineralSubs: { label: string; amountText: string; isMultiplier?: boolean }[] = [];
     if (breakdown.rootDepth > 0)
       mineralSubs.push({ label: 'Deepen Roots', amountText: `+${breakdown.rootDepth}` });
 
@@ -139,7 +183,18 @@ export class SidebarComponent {
 
     if (breakdown.rootVigorPercent > 0) {
       const multiplier = 1 + breakdown.rootVigorPercent / 100;
-      mineralSubs.push({ label: 'Root Vigor', amountText: `x${multiplier.toFixed(1)}` });
+      mineralSubs.push({
+        label: 'Root Vigor',
+        amountText: `x${multiplier.toFixed(2)}`,
+        isMultiplier: true,
+      });
+    }
+    if (breakdown.hasDeepAnchorage) {
+      mineralSubs.push({
+        label: 'Deep Anchorage',
+        amountText: 'x1.25',
+        isMultiplier: true,
+      });
     }
 
     if (breakdown.subtotalRoots > 0) {
@@ -150,7 +205,6 @@ export class SidebarComponent {
       });
     }
 
-    // DODANE: Bonus z ciśnienia soków
     if (breakdown.sapPressure > 0)
       items.push({ label: 'Sap Pressure', amount: breakdown.sapPressure });
 
@@ -170,7 +224,7 @@ export class SidebarComponent {
     const items: ResourceBreakdownItem[] = [];
     const breakdown = this.upgradeService.capacityBreakdown();
 
-    // 1. Wartości płaskie
+    // 1. Flat additions
     if (breakdown.base > 0) items.push({ label: 'Base', amount: breakdown.base });
     if (breakdown.bark > 0) items.push({ label: 'Bark', amount: breakdown.bark });
     if (breakdown.vascularTissues > 0)
@@ -180,13 +234,28 @@ export class SidebarComponent {
     if (breakdown.resinSecretion > 0)
       items.push({ label: 'Resin Secretion', amount: breakdown.resinSecretion });
 
-    // 2. Globalne mnożniki (dodawane jako niezależne elementy na listę, z flagą isMultiplier)
+    // 2. Global Multipliers (rendered below the separator line)
     if (breakdown.resinPercent > 0) {
       const mult = 1 + breakdown.resinPercent / 100;
-      items.push({ label: 'Resin Bonus', amountText: `x${mult.toFixed(2)}`, isMultiplier: true });
+      items.push({
+        label: 'Resin Bonus',
+        amountText: `x${mult.toFixed(2)}`,
+        isMultiplier: true,
+      });
     }
     if (breakdown.hasHeartwood) {
-      items.push({ label: 'Heartwood', amountText: 'x1.50', isMultiplier: true });
+      items.push({
+        label: 'Heartwood',
+        amountText: 'x1.50',
+        isMultiplier: true,
+      });
+    }
+    if (breakdown.hasAncientTimber) {
+      items.push({
+        label: 'Ancient Timber',
+        amountText: 'x1.25',
+        isMultiplier: true,
+      });
     }
 
     return items;

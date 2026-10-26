@@ -6,8 +6,8 @@ export interface ResourceBreakdownItem {
   amount?: number;
   amountText?: string;
   isNegative?: boolean;
-  subItems?: { label: string; amountText: string }[];
-  isMultiplier?: boolean; // DODANE
+  isMultiplier?: boolean;
+  subItems?: { label: string; amountText: string; isMultiplier?: boolean }[];
 }
 
 @Component({
