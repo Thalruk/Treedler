@@ -25,6 +25,12 @@ export class SettingsTabComponent {
     this.saveService.saveGame();
   }
 
+  public onWindVolumeChange(event: Event): void {
+    const val = parseFloat((event.target as HTMLInputElement).value);
+    this.audioService.setWindVolume(val);
+    this.saveService.saveGame();
+  }
+
   public toggleSfx(): void {
     this.audioService.toggleSfxMute();
     this.saveService.saveGame();
@@ -32,6 +38,11 @@ export class SettingsTabComponent {
 
   public toggleMusic(): void {
     this.audioService.toggleMusicMute();
+    this.saveService.saveGame();
+  }
+
+  public toggleWind(): void {
+    this.audioService.toggleWindMute();
     this.saveService.saveGame();
   }
 

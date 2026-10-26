@@ -14,11 +14,15 @@ export class AudioService {
   public isMusicMuted = signal<boolean>(false);
   public musicVolume = signal<number>(0.25);
 
+  public isWindMuted = signal<boolean>(false);
+  public windVolume = signal<number>(0.3);
+
   // ==========================================
-  // 2. AMBIENT MUSIC NODES
+  // 2. AUDIO NODES
   // ==========================================
   private isMusicPlaying = false;
   private musicMasterGain: GainNode | null = null;
+  private windMasterGain: GainNode | null = null;
   private ambientOscillators: OscillatorNode[] = [];
 
   // ==========================================
@@ -40,7 +44,7 @@ export class AudioService {
       if (this.ctx && !this.noiseBuffer) {
         this.noiseBuffer = this.createPinkNoiseBuffer(this.ctx, 5);
       }
-      if (this.ctx && !this.isMusicPlaying && !this.isMusicMuted()) {
+      if (this.ctx && !this.isMusicPlaying && (!this.isMusicMuted() || !this.isWindMuted())) {
         this.startAmbientMusic();
       }
       return this.ctx;
@@ -50,10 +54,6 @@ export class AudioService {
     }
   }
 
-  /**
-   * Generates a 5-second Pink Noise buffer (Paul Kellet's filtering method)
-   * Pink noise has a natural 1/f spectrum matching real wind and rustling leaves.
-   */
   private createPinkNoiseBuffer(ctx: AudioContext, durationSeconds: number): AudioBuffer {
     const bufferSize = ctx.sampleRate * durationSeconds;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
@@ -76,7 +76,7 @@ export class AudioService {
       b4 = 0.55 * b4 + white * 0.5329522;
       b5 = -0.7616 * b5 - white * 0.016898;
       output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-      output[i] *= 0.04; // Normalize gain
+      output[i] *= 0.04;
       b6 = white * 0.115926;
     }
 
@@ -84,12 +84,9 @@ export class AudioService {
   }
 
   // ==========================================
-  // 4. PROCEDURAL SOUND EFFECTS (SFX)
+  // 4. SOUND EFFECTS (SFX)
   // ==========================================
 
-  /**
-   * Soft wooden tap + subtle leaf rustle
-   */
   public playClick(): void {
     if (this.isSfxMuted() || this.sfxVolume() <= 0) return;
     try {
@@ -121,9 +118,6 @@ export class AudioService {
     } catch {}
   }
 
-  /**
-   * Crisp foliage rustle when switching tabs
-   */
   public playTabSwitch(): void {
     if (this.isSfxMuted() || this.sfxVolume() <= 0) return;
     try {
@@ -134,7 +128,6 @@ export class AudioService {
       const noise = ctx.createBufferSource();
       noise.buffer = this.noiseBuffer;
 
-      // Pick a random slice of the 5-second noise buffer
       const randomOffset = Math.random() * 4.5;
 
       const filter = ctx.createBiquadFilter();
@@ -187,7 +180,7 @@ export class AudioService {
   }
 
   // ==========================================
-  // 5. PROCEDURAL AMBIENT MUSIC + WIND IN LEAVES
+  // 5. AMBIENT MUSIC & WIND LAYERS
   // ==========================================
 
   public startAmbientMusic(): void {
@@ -198,11 +191,23 @@ export class AudioService {
       const ctx = this.ctx;
       const now = ctx.currentTime;
 
+      // --- MASTER GAIN: MUSIC ---
       this.musicMasterGain = ctx.createGain();
-      const targetGain = this.isMusicMuted() ? 0.0001 : Math.max(0.0001, this.musicVolume() * 0.18);
+      const targetMusicGain = this.isMusicMuted()
+        ? 0.0001
+        : Math.max(0.0001, this.musicVolume() * 0.18);
       this.musicMasterGain.gain.setValueAtTime(0.0001, now);
-      this.musicMasterGain.gain.linearRampToValueAtTime(targetGain, now + 3.0);
+      this.musicMasterGain.gain.linearRampToValueAtTime(targetMusicGain, now + 3.0);
       this.musicMasterGain.connect(ctx.destination);
+
+      // --- MASTER GAIN: WIND ---
+      this.windMasterGain = ctx.createGain();
+      const targetWindGain = this.isWindMuted()
+        ? 0.0001
+        : Math.max(0.0001, this.windVolume() * 0.35);
+      this.windMasterGain.gain.setValueAtTime(0.0001, now);
+      this.windMasterGain.gain.linearRampToValueAtTime(targetWindGain, now + 3.0);
+      this.windMasterGain.connect(ctx.destination);
 
       // --- LAYER A: ZEN HARMONIC DRONE ---
       const filter = ctx.createBiquadFilter();
@@ -260,47 +265,40 @@ export class AudioService {
     }
   }
 
-  /**
-   * Creates a continuous looping pink-noise wind layer that swells and fades
-   * like gusts of wind blowing through leaves.
-   */
   private setupWindAndLeavesLayer(ctx: AudioContext, now: number): void {
-    if (!this.noiseBuffer || !this.musicMasterGain) return;
+    if (!this.noiseBuffer || !this.windMasterGain) return;
 
     const windSource = ctx.createBufferSource();
     windSource.buffer = this.noiseBuffer;
     windSource.loop = true;
 
-    // Bandpass filter shapes pink noise into soft leafy "shhh" sweeps
     const windFilter = ctx.createBiquadFilter();
     windFilter.type = 'bandpass';
     windFilter.Q.setValueAtTime(1.8, now);
     windFilter.frequency.setValueAtTime(550, now);
 
-    // Slow LFO 1 sweeps the wind pitch between 300 Hz (deep breeze) and 800 Hz (leaf rustle)
     const windPitchLfo = ctx.createOscillator();
     const windPitchLfoGain = ctx.createGain();
     windPitchLfo.type = 'sine';
-    windPitchLfo.frequency.setValueAtTime(0.09, now); // ~11s wind cycle
+    windPitchLfo.frequency.setValueAtTime(0.09, now);
     windPitchLfoGain.gain.setValueAtTime(260, now);
     windPitchLfo.connect(windPitchLfoGain);
     windPitchLfoGain.connect(windFilter.frequency);
 
-    // Slow LFO 2 modulates wind volume so gusts come and go naturally
     const windGain = ctx.createGain();
     windGain.gain.setValueAtTime(0.28, now);
 
     const windAmpLfo = ctx.createOscillator();
     const windAmpLfoGain = ctx.createGain();
     windAmpLfo.type = 'sine';
-    windAmpLfo.frequency.setValueAtTime(0.065, now); // ~15s gust cycle
+    windAmpLfo.frequency.setValueAtTime(0.065, now);
     windAmpLfoGain.gain.setValueAtTime(0.18, now);
     windAmpLfo.connect(windAmpLfoGain);
     windAmpLfoGain.connect(windGain.gain);
 
     windSource.connect(windFilter);
     windFilter.connect(windGain);
-    windGain.connect(this.musicMasterGain);
+    windGain.connect(this.windMasterGain);
 
     windSource.start(now);
     windPitchLfo.start(now);
@@ -309,20 +307,28 @@ export class AudioService {
     this.ambientOscillators.push(windPitchLfo, windAmpLfo);
   }
 
-  public updateMusicGain(): void {
+  public updateGains(): void {
     try {
       if (!this.ctx) {
-        if (!this.isMusicMuted()) this.initContext();
+        if (!this.isMusicMuted() || !this.isWindMuted()) this.initContext();
         return;
       }
-      if (!this.isMusicPlaying && !this.isMusicMuted()) {
+      if (!this.isMusicPlaying && (!this.isMusicMuted() || !this.isWindMuted())) {
         this.startAmbientMusic();
         return;
       }
-      if (this.musicMasterGain && this.ctx) {
-        const now = this.ctx.currentTime;
-        const target = this.isMusicMuted() ? 0.0001 : Math.max(0.0001, this.musicVolume() * 0.18);
-        this.musicMasterGain.gain.setTargetAtTime(target, now, 0.15);
+      const now = this.ctx.currentTime;
+
+      if (this.musicMasterGain) {
+        const targetMusic = this.isMusicMuted()
+          ? 0.0001
+          : Math.max(0.0001, this.musicVolume() * 0.18);
+        this.musicMasterGain.gain.setTargetAtTime(targetMusic, now, 0.15);
+      }
+
+      if (this.windMasterGain) {
+        const targetWind = this.isWindMuted() ? 0.0001 : Math.max(0.0001, this.windVolume() * 0.35);
+        this.windMasterGain.gain.setTargetAtTime(targetWind, now, 0.15);
       }
     } catch {}
   }
@@ -334,7 +340,12 @@ export class AudioService {
 
   public toggleMusicMute(): void {
     this.isMusicMuted.set(!this.isMusicMuted());
-    this.updateMusicGain();
+    this.updateGains();
+  }
+
+  public toggleWindMute(): void {
+    this.isWindMuted.set(!this.isWindMuted());
+    this.updateGains();
   }
 
   public setSfxVolume(val: number): void {
@@ -345,6 +356,12 @@ export class AudioService {
   public setMusicVolume(val: number): void {
     this.musicVolume.set(val);
     if (val > 0 && this.isMusicMuted()) this.isMusicMuted.set(false);
-    this.updateMusicGain();
+    this.updateGains();
+  }
+
+  public setWindVolume(val: number): void {
+    this.windVolume.set(val);
+    if (val > 0 && this.isWindMuted()) this.isWindMuted.set(false);
+    this.updateGains();
   }
 }

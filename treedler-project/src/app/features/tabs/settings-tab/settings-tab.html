@@ -42,6 +42,38 @@
         </div>
       </div>
 
+      <!-- Wind & Canopy Leaves Noise Row -->
+      <div class="flex flex-col gap-1.5 pt-2 border-t border-gray-800">
+        <div class="flex justify-between items-center text-sm">
+          <span class="text-gray-200 font-semibold">Canopy Wind & Leaf Rustle</span>
+          <button
+            (click)="toggleWind()"
+            class="px-3 py-1 rounded text-xs font-bold border transition-colors"
+            [ngClass]="
+              audioService.isWindMuted()
+                ? 'bg-red-900/40 text-red-400 border-red-700/50'
+                : 'bg-green-900/40 text-green-400 border-green-700/50'
+            "
+          >
+            {{ audioService.isWindMuted() ? 'Muted' : 'Active' }}
+          </button>
+        </div>
+        <div class="flex items-center gap-3">
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            [value]="audioService.windVolume()"
+            (input)="onWindVolumeChange($event)"
+            class="w-full accent-green-500 cursor-pointer h-1.5 bg-gray-700 rounded-lg"
+          />
+          <span class="text-xs font-mono text-gray-400 w-10 text-right">
+            {{ audioService.windVolume() * 100 | number: '1.0-0' }}%
+          </span>
+        </div>
+      </div>
+
       <!-- Sound Effects Row -->
       <div class="flex flex-col gap-1.5 pt-2 border-t border-gray-800">
         <div class="flex justify-between items-center text-sm">
