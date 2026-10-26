@@ -81,6 +81,10 @@ export class SidebarComponent {
       });
     }
 
+    // DODANE: Bonus z ciśnienia soków
+    if (breakdown.sapPressure > 0)
+      items.push({ label: 'Sap Pressure', amount: breakdown.sapPressure });
+
     if (breakdown.leaves < 0)
       items.push({ label: 'Leaves Upkeep', amount: breakdown.leaves, isNegative: true });
 
@@ -103,6 +107,10 @@ export class SidebarComponent {
       items.push({ label: 'Vascular Tissues', amount: breakdown.vascularTissues });
     if (breakdown.symbioticMycelium > 0)
       items.push({ label: 'Symbiotic Mycelium', amount: breakdown.symbioticMycelium });
+
+    // DODANE: Bonus z ciśnienia soków
+    if (breakdown.sapPressure > 0)
+      items.push({ label: 'Sap Pressure', amount: breakdown.sapPressure });
 
     const mutDrain = this.mutationService.energyDrain();
     if (mutDrain > 0) items.push({ label: 'Mutation', amount: -mutDrain, isNegative: true });
@@ -142,6 +150,10 @@ export class SidebarComponent {
       });
     }
 
+    // DODANE: Bonus z ciśnienia soków
+    if (breakdown.sapPressure > 0)
+      items.push({ label: 'Sap Pressure', amount: breakdown.sapPressure });
+
     if (breakdown.leaves < 0)
       items.push({ label: 'Leaves Upkeep', amount: breakdown.leaves, isNegative: true });
 
@@ -158,15 +170,7 @@ export class SidebarComponent {
     const items: ResourceBreakdownItem[] = [];
     const breakdown = this.upgradeService.capacityBreakdown();
 
-    const multiplierSubs: { label: string; amountText: string }[] = [];
-    if (breakdown.resinPercent > 0) {
-      const mult = 1 + breakdown.resinPercent / 100;
-      multiplierSubs.push({ label: 'Resin Bonus', amountText: `x${mult.toFixed(1)}` });
-    }
-    if (breakdown.hasHeartwood) {
-      multiplierSubs.push({ label: 'Heartwood', amountText: 'x1.5' });
-    }
-
+    // 1. Wartości płaskie
     if (breakdown.base > 0) items.push({ label: 'Base', amount: breakdown.base });
     if (breakdown.bark > 0) items.push({ label: 'Bark', amount: breakdown.bark });
     if (breakdown.vascularTissues > 0)
@@ -176,8 +180,13 @@ export class SidebarComponent {
     if (breakdown.resinSecretion > 0)
       items.push({ label: 'Resin Secretion', amount: breakdown.resinSecretion });
 
-    if (multiplierSubs.length > 0 && items.length > 0) {
-      items[items.length - 1].subItems = multiplierSubs;
+    // 2. Globalne mnożniki (dodawane jako niezależne elementy na listę, z flagą isMultiplier)
+    if (breakdown.resinPercent > 0) {
+      const mult = 1 + breakdown.resinPercent / 100;
+      items.push({ label: 'Resin Bonus', amountText: `x${mult.toFixed(2)}`, isMultiplier: true });
+    }
+    if (breakdown.hasHeartwood) {
+      items.push({ label: 'Heartwood', amountText: 'x1.50', isMultiplier: true });
     }
 
     return items;

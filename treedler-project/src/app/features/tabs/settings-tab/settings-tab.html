@@ -1,5 +1,38 @@
 <div class="flex flex-col gap-8 max-w-xl">
   <!-- ========================================== -->
+  <!-- GAMEPLAY & UI PREFERENCES                  -->
+  <!-- ========================================== -->
+  <div class="flex flex-col">
+    <h3
+      class="w-full text-xs font-bold text-green-500 uppercase tracking-wider border-b border-gray-700 mb-4 pb-1"
+    >
+      Gameplay & Interface
+    </h3>
+
+    <div class="flex flex-col gap-4 bg-gray-900/50 p-4 rounded border border-gray-700">
+      <div class="flex justify-between items-center text-sm">
+        <div>
+          <div class="text-gray-200 font-semibold">Hide Maxed Upgrades</div>
+          <div class="text-xs text-gray-400">
+            Automatically hide upgrades in the Tree tab once they reach their current level cap.
+          </div>
+        </div>
+        <button
+          (click)="toggleHideMaxed()"
+          class="px-3 py-1 rounded text-xs font-bold border transition-colors shrink-0 ml-4"
+          [ngClass]="
+            settingsService.hideMaxedUpgrades()
+              ? 'bg-green-900/40 text-green-400 border-green-700/50'
+              : 'bg-gray-800 text-gray-400 border-gray-600'
+          "
+        >
+          {{ settingsService.hideMaxedUpgrades() ? 'Hidden' : 'Visible' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
   <!-- AUDIO SETTINGS                             -->
   <!-- ========================================== -->
   <div class="flex flex-col">

@@ -6,6 +6,7 @@ import { MutationService } from './mutation.service';
 import { LogService } from './log.service';
 import { BloomService } from './bloom.service';
 import { AudioService } from './audio.service';
+import { SettingsService } from './settings.service';
 
 @Injectable({ providedIn: 'root' })
 export class SaveService {
@@ -20,6 +21,7 @@ export class SaveService {
   private logService = inject(LogService);
   private bloomService = inject(BloomService);
   private audioService = inject(AudioService);
+  private settingsService = inject(SettingsService);
 
   private readonly SAVE_KEY = 'treedler_save';
 
@@ -48,6 +50,7 @@ export class SaveService {
         leafLevel: this.upgradeService.leaf.level(),
         sunwardReachLevel: this.upgradeService.sunwardReach.level(),
         vascularTissuesLevel: this.upgradeService.vascularTissues.level(),
+        sapPressureLevel: this.upgradeService.sapPressure.level(),
         rootHairsLevel: this.upgradeService.rootHairs.level(),
         canopySpreadLevel: this.upgradeService.canopySpread.level(),
         resinSecretionLevel: this.upgradeService.resinSecretion.level(),
@@ -56,6 +59,7 @@ export class SaveService {
       },
       storyline: {
         isMutationUnlocked: this.storylineService.isMutationUnlocked(),
+        isOverMutationUnlocked: this.storylineService.isOverMutationUnlocked(),
         isBloomUnlocked: this.storylineService.isBloomUnlocked(),
         hasReachedFirstGrowth: this.storylineService.hasReachedFirstGrowth(),
         hasReached10Leaves: this.storylineService.hasReached10Leaves(),
@@ -69,6 +73,7 @@ export class SaveService {
       mutations: {
         progresses: this.mutationService.progresses(),
         completed: this.mutationService.completed(),
+        isOverMutationEnabled: this.mutationService.isOverMutationEnabled(),
       },
       bloom: {
         currentStageIndex: this.bloomService.currentStageIndex(),
@@ -99,6 +104,7 @@ export class SaveService {
         isMusicMuted: this.audioService.isMusicMuted(),
         musicVolume: this.audioService.musicVolume(),
       },
+      settings: { hideMaxedUpgrades: this.settingsService.hideMaxedUpgrades() },
     };
 
     localStorage.setItem(this.SAVE_KEY, JSON.stringify(saveState));
@@ -128,6 +134,9 @@ export class SaveService {
         if (parsed.mutations.completed) {
           this.mutationService.completed.set(parsed.mutations.completed);
         }
+        if (parsed.mutations.isOverMutationEnabled !== undefined) {
+          this.mutationService.isOverMutationEnabled.set(parsed.mutations.isOverMutationEnabled);
+        }
       }
       if (parsed.bloom) {
         if (parsed.bloom.currentStageIndex !== undefined)
@@ -139,6 +148,7 @@ export class SaveService {
           this.bloomService.isFullyComplete.set(parsed.bloom.isFullyComplete);
       }
       if (parsed.audio) this.loadSignals(parsed.audio, this.audioService);
+      if (parsed.settings) this.loadSignals(parsed.settings, this.settingsService);
     } catch (e) {
       console.error('Save load error:', e);
     }

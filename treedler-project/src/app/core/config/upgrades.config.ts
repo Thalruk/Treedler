@@ -29,6 +29,11 @@ export const UPGRADES_CONFIG: Record<UpgradeId, CostConfig[]> = {
     { resourceId: ResourceId.Energy, baseCost: 40, multiplier: 1.16 },
     { resourceId: ResourceId.Water, baseCost: 35, multiplier: 1.16 },
   ],
+  [UpgradeId.SapPressure]: [
+    { resourceId: ResourceId.Energy, baseCost: 90, multiplier: 1.22 },
+    { resourceId: ResourceId.Water, baseCost: 90, multiplier: 1.22 },
+    { resourceId: ResourceId.Minerals, baseCost: 60, multiplier: 1.22 },
+  ],
   [UpgradeId.ResinSecretion]: [
     { resourceId: ResourceId.Water, baseCost: 140, multiplier: 1.2 },
     { resourceId: ResourceId.Minerals, baseCost: 140, multiplier: 1.2 },

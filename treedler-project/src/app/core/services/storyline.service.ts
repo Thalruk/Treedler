@@ -21,6 +21,7 @@ export class StorylineService {
   public hasReachedAncientTimber = signal<boolean>(false);
   public hasReachedBloomMilestone = signal<boolean>(false);
   public hasReachedApexFlora = signal<boolean>(false);
+  public isOverMutationUnlocked = signal<boolean>(false);
 
   public isMilestoneUnlocked(id: MilestoneId): boolean {
     switch (id) {
@@ -40,6 +41,8 @@ export class StorylineService {
         return this.hasReachedBloomMilestone();
       case MilestoneId.ApexFlora:
         return this.hasReachedApexFlora();
+      case MilestoneId.MetabolicOverdrive:
+        return this.isOverMutationUnlocked();
     }
   }
 
@@ -93,6 +96,9 @@ export class StorylineService {
     if (!this.hasReachedApexFlora() && leaves >= 500 && completedMutationsCount >= 6) {
       this.hasReachedApexFlora.set(true);
       this.upgradeService.hasApexFloraBonus.set(true);
+    }
+    if (!this.isOverMutationUnlocked() && leaves >= 200) {
+      this.isOverMutationUnlocked.set(true);
     }
   }
 }

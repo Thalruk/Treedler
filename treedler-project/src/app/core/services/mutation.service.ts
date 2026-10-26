@@ -18,11 +18,58 @@ export class MutationService {
   public progresses = signal<Partial<Record<MutationId, MutationProgress>>>({});
   public completed = signal<Partial<Record<MutationId, boolean>>>({});
 
+  public isOverMutationEnabled = signal<boolean>(false);
+  public readonly OVER_MUTATION_BONUS_PER_MULTIPLE = 0.05; // +5% speed per extra multiple
+
   public readonly availableMutations: MutationDef[] = MUTATIONS_CONFIG;
 
   // ==========================================
-  // 2. COMPUTED DRAINS
+  // 2. OVER-MUTATION & COMPUTED DRAINS
   // ==========================================
+
+  private getResourceGeneration(id: ResourceId): number {
+    if (id === ResourceId.Energy) return this.resourceService.energy().generationPerSecond;
+    if (id === ResourceId.Water) return this.resourceService.water().generationPerSecond;
+    if (id === ResourceId.Minerals) return this.resourceService.minerals().generationPerSecond;
+    return 0;
+  }
+
+  /**
+   * Calculates how many full extra multiples of base drain the player's current production can sustain
+   * Formula: floor((generation - baseDrain) / baseDrain) across all active cost channels
+   */
+  public overMutationMultiples = computed(() => {
+    if (!this.isOverMutationEnabled()) return 0;
+    const active = this.activeMutationId();
+    if (!active) return 0;
+
+    const mutation = this.availableMutations.find((m) => m.id === active);
+    if (!mutation || !mutation.costs || mutation.costs.length === 0) return 0;
+
+    const currentProgress = this.progresses()[active] || {};
+    let minExtraMultiples = Infinity;
+
+    for (const cost of mutation.costs) {
+      const invested = currentProgress[cost.resourceId] || 0;
+      if (invested >= cost.totalRequired) continue;
+
+      const gen = this.getResourceGeneration(cost.resourceId);
+      if (gen <= cost.drainPerSecond) {
+        return 0;
+      }
+      const extra = Math.floor((gen - cost.drainPerSecond) / cost.drainPerSecond);
+      minExtraMultiples = Math.min(minExtraMultiples, extra);
+    }
+
+    return minExtraMultiples === Infinity ? 0 : Math.max(0, minExtraMultiples);
+  });
+
+  public drainMultiplier = computed(() => 1 + this.overMutationMultiples());
+
+  public overMutationSpeedMultiplier = computed(
+    () => 1 + this.overMutationMultiples() * this.OVER_MUTATION_BONUS_PER_MULTIPLE,
+  );
+
   private getDrain(resourceId: ResourceId): number {
     const active = this.activeMutationId();
     if (!active) return 0;
@@ -38,7 +85,7 @@ export class MutationService {
 
     if (invested >= cost.totalRequired) return 0;
 
-    return cost.drainPerSecond;
+    return cost.drainPerSecond * this.drainMultiplier();
   }
 
   public energyDrain = computed(() => this.getDrain(ResourceId.Energy));
@@ -48,6 +95,10 @@ export class MutationService {
   // ==========================================
   // 3. ACTIONS & LOGIC
   // ==========================================
+  public toggleOverMutation(): void {
+    this.isOverMutationEnabled.update((v) => !v);
+  }
+
   public isCompleted(id: MutationId): boolean {
     return this.completed()[id] || false;
   }
@@ -90,6 +141,9 @@ export class MutationService {
     const allProgresses = this.progresses();
     const currentInvested: MutationProgress = { ...(allProgresses[active] || {}) };
 
+    const drainMult = this.drainMultiplier();
+    const progressMult = this.overMutationSpeedMultiplier();
+
     let tickFraction = 1.0;
     let allCompleted = true;
 
@@ -99,7 +153,7 @@ export class MutationService {
 
       if (remaining > 0) {
         allCompleted = false;
-        const maxDrain = Math.min(cost.drainPerSecond * deltaTime, remaining);
+        const maxResourceDrain = cost.drainPerSecond * drainMult * deltaTime;
 
         let available = 0;
         if (cost.resourceId === ResourceId.Energy) available = this.resourceService.energy().amount;
@@ -108,8 +162,8 @@ export class MutationService {
         else if (cost.resourceId === ResourceId.Minerals)
           available = this.resourceService.minerals().amount;
 
-        if (available < maxDrain) {
-          tickFraction = Math.min(tickFraction, available / maxDrain);
+        if (available < maxResourceDrain && maxResourceDrain > 0) {
+          tickFraction = Math.min(tickFraction, available / maxResourceDrain);
         }
       }
     }
@@ -128,11 +182,15 @@ export class MutationService {
         const remaining = cost.totalRequired - invested;
 
         if (remaining > 0) {
-          const actualDrain = Math.min(cost.drainPerSecond * deltaTime, remaining) * tickFraction;
+          const resourceDrained = cost.drainPerSecond * drainMult * deltaTime * tickFraction;
+          const progressAdded = Math.min(
+            remaining,
+            cost.drainPerSecond * progressMult * deltaTime * tickFraction,
+          );
 
-          if (actualDrain > 0) {
-            this.resourceService.consume(cost.resourceId, actualDrain);
-            currentInvested[cost.resourceId] = invested + actualDrain;
+          if (resourceDrained > 0) {
+            this.resourceService.consume(cost.resourceId, resourceDrained);
+            currentInvested[cost.resourceId] = invested + progressAdded;
             updated = true;
           }
 

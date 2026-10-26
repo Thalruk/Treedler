@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SaveService } from '../../../core/services/save.service';
 import { AudioService } from '../../../core/services/audio.service';
+import { SettingsService } from '../../../core/services/settings.service';
 
 @Component({
   selector: 'app-settings-tab',
@@ -12,6 +13,12 @@ import { AudioService } from '../../../core/services/audio.service';
 export class SettingsTabComponent {
   private saveService = inject(SaveService);
   public audioService = inject(AudioService);
+  public settingsService = inject(SettingsService);
+
+  public toggleHideMaxed(): void {
+    this.settingsService.toggleHideMaxed();
+    this.saveService.saveGame();
+  }
 
   public onSfxVolumeChange(event: Event): void {
     const val = parseFloat((event.target as HTMLInputElement).value);

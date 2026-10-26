@@ -8,6 +8,7 @@ export enum UpgradeId {
   // Bark
   BarkThickness = 'barkThickness',
   VascularTissues = 'vascularTissues',
+  SapPressure = 'sapPressure',
   ResinSecretion = 'resinSecretion',
 
   // Roots

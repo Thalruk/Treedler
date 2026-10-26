@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GameLoopService } from './core/services/game-loop';
+import { SaveService } from './core/services/save.service';
 import { StorylineService } from './core/services/storyline.service';
 import { AudioService } from './core/services/audio.service';
 import { SidebarComponent } from './features/sidebar/resource-sidebar/resource-sidebar';
@@ -29,12 +30,14 @@ import { BloomTabComponent } from './features/tabs/bloom-tab/bloom-tab';
 })
 export class AppComponent implements OnInit {
   private gameLoop = inject(GameLoopService);
+  private saveService = inject(SaveService);
   private audioService = inject(AudioService);
   public storylineService = inject(StorylineService);
   public activeTab = signal<TabId>(TabId.Tree);
   public Tab = TabId;
 
   ngOnInit(): void {
+    this.saveService.loadGame();
     this.gameLoop.start();
   }
 

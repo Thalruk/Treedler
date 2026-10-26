@@ -3,9 +3,11 @@ import { CommonModule } from '@angular/common';
 
 export interface ResourceBreakdownItem {
   label: string;
-  amount: number;
+  amount?: number;
+  amountText?: string;
   isNegative?: boolean;
   subItems?: { label: string; amountText: string }[];
+  isMultiplier?: boolean; // DODANE
 }
 
 @Component({

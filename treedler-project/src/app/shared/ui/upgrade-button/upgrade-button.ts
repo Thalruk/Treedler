@@ -7,6 +7,12 @@ export interface UpgradeCost {
   resourceName: string;
 }
 
+export interface UpgradeBreakdownRow {
+  label: string;
+  value: string;
+  tone?: 'neutral' | 'bonus' | 'total' | 'negative';
+}
+
 @Component({
   selector: 'app-upgrade-button',
   standalone: true,
@@ -27,6 +33,7 @@ export class UpgradeButtonComponent {
   @Input() description: string = '';
   @Input({ required: true }) costs!: UpgradeCost[];
   @Input({ required: true }) effect!: string[];
+  @Input() breakdown: UpgradeBreakdownRow[] = [];
   @Input({ required: true }) canAfford!: boolean;
   @Input() isReachable: boolean = true;
   @Input() isMaxed: boolean = false;
@@ -56,7 +63,7 @@ export class UpgradeButtonComponent {
     const rect = buttonElement.getBoundingClientRect();
     const spaceBelow = window.innerHeight - rect.bottom;
 
-    if (spaceBelow < 150) {
+    if (spaceBelow < 220) {
       this.position.set('top');
     } else {
       this.position.set('bottom');

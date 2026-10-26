@@ -1,177 +1,112 @@
-<div
-  class="h-screen w-full bg-gray-900 text-gray-100 font-sans flex flex-col md:flex-row overflow-hidden"
->
-  <!-- ========================================== -->
-  <!-- 1. MOBILE TOP BAR (Resource Bar)           -->
-  <!-- ========================================== -->
-  <div
-    class="md:hidden flex-none bg-gray-800 border-b border-gray-700 z-40 max-h-40 overflow-y-auto shadow-md"
-  >
-    <app-sidebar></app-sidebar>
-  </div>
-
-  <!-- ========================================== -->
-  <!-- 2. DESKTOP LEFT PANEL (Resource Sidebar)   -->
-  <!-- ========================================== -->
-  <div class="hidden md:block w-72 shrink-0 p-6 pr-3 z-50">
-    <app-sidebar></app-sidebar>
-  </div>
-
-  <!-- ========================================== -->
-  <!-- 3. MAIN CONTENT WINDOW                     -->
-  <!-- ========================================== -->
-  <div
-    class="flex-1 flex flex-col min-w-0 bg-gray-800 md:my-6 md:rounded-lg shadow-lg md:border border-gray-700 relative overflow-hidden"
-  >
-    <!-- DESKTOP NAVIGATION TABS -->
+<div class="h-screen w-screen bg-gray-900 text-gray-100 p-4 flex flex-col overflow-hidden">
+  <div class="w-full flex-1 min-h-0 flex flex-col md:flex-row gap-4">
+    <!-- LEFT SIDEBAR: RESOURCES -->
     <div
-      class="hidden md:flex h-12 items-center justify-between px-4 border-b border-gray-700 text-sm bg-gray-900/30"
+      class="w-full md:w-64 shrink-0 h-full bg-gray-800 p-4 rounded shadow-lg border border-gray-700 flex flex-col"
     >
-      <div class="flex gap-2">
-        <button
-          (click)="switchTab(Tab.Tree)"
-          [class.bg-gray-700]="activeTab() === Tab.Tree"
-          [class.text-green-400]="activeTab() === Tab.Tree"
-          [class.text-gray-400]="activeTab() !== Tab.Tree"
-          class="font-bold px-4 py-1.5 rounded-md transition-colors hover:bg-gray-700 hover:text-green-300"
-        >
-          Tree
-        </button>
-        @if (storylineService.isMutationUnlocked()) {
+      <app-sidebar class="flex-1 min-h-0 block"></app-sidebar>
+    </div>
+
+    <!-- CENTER MAIN PANEL -->
+    <div
+      class="flex-1 bg-gray-800 p-6 rounded shadow-lg border border-gray-700 flex flex-col h-full overflow-hidden"
+    >
+      <!-- TOP NAVIGATION TABS (Storyline on the far right) -->
+      <div
+        class="h-10 flex items-center justify-between mb-6 border-b border-gray-700 pb-2 shrink-0"
+      >
+        <div class="flex gap-2">
           <button
-            (click)="switchTab(Tab.Mutation)"
-            [class.bg-gray-700]="activeTab() === Tab.Mutation"
-            [class.text-purple-400]="activeTab() === Tab.Mutation"
-            [class.text-gray-400]="activeTab() !== Tab.Mutation"
-            class="font-bold px-4 py-1.5 rounded-md transition-colors hover:bg-gray-700 hover:text-purple-300"
+            (click)="switchTab(Tab.Tree)"
+            class="px-4 py-1.5 rounded font-bold text-sm transition-colors cursor-pointer"
+            [ngClass]="
+              activeTab() === Tab.Tree
+                ? 'bg-gray-700 text-green-400'
+                : 'text-gray-400 hover:bg-gray-700/50'
+            "
           >
-            Mutations
+            Tree
           </button>
-        }
-        @if (storylineService.isBloomUnlocked()) {
-          <button
-            (click)="switchTab(Tab.Bloom)"
-            [class.bg-gray-700]="activeTab() === Tab.Bloom"
-            [class.text-pink-400]="activeTab() === Tab.Bloom"
-            [class.text-gray-400]="activeTab() !== Tab.Bloom"
-            class="font-bold px-4 py-1.5 rounded-md transition-colors hover:bg-gray-700 hover:text-pink-300"
-          >
-            Life Cycle
-          </button>
-        }
+
+          @if (storylineService.isMutationUnlocked()) {
+            <button
+              (click)="switchTab(Tab.Mutation)"
+              class="px-4 py-1.5 rounded font-bold text-sm transition-colors cursor-pointer"
+              [ngClass]="
+                activeTab() === Tab.Mutation
+                  ? 'bg-gray-700 text-purple-400'
+                  : 'text-purple-400/60 hover:bg-gray-700/50'
+              "
+            >
+              Mutations
+            </button>
+          }
+
+          @if (storylineService.isBloomUnlocked()) {
+            <button
+              (click)="switchTab(Tab.Bloom)"
+              class="px-4 py-1.5 rounded font-bold text-sm transition-colors cursor-pointer"
+              [ngClass]="
+                activeTab() === Tab.Bloom
+                  ? 'bg-gray-700 text-pink-400'
+                  : 'text-pink-400/60 hover:bg-gray-700/50'
+              "
+            >
+              Life Cycle
+            </button>
+          }
+        </div>
+
+        <!-- FAR RIGHT: STORYLINE TAB -->
         <button
           (click)="switchTab(Tab.Storyline)"
-          [class.bg-gray-700]="activeTab() === Tab.Storyline"
-          [class.text-amber-400]="activeTab() === Tab.Storyline"
-          [class.text-gray-400]="activeTab() !== Tab.Storyline"
-          class="font-bold px-4 py-1.5 rounded-md transition-colors hover:bg-gray-700 hover:text-amber-300"
+          class="px-4 py-1.5 rounded font-bold text-sm transition-colors ml-auto cursor-pointer"
+          [ngClass]="
+            activeTab() === Tab.Storyline
+              ? 'bg-gray-700 text-amber-400'
+              : 'text-amber-500/70 hover:bg-gray-700/50'
+          "
         >
-          Story
+          Storyline
         </button>
       </div>
 
+      <!-- TAB CONTENT -->
+      <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar min-h-0">
+        @if (activeTab() === Tab.Tree) {
+          <app-tree-tab></app-tree-tab>
+        }
+        @if (activeTab() === Tab.Storyline) {
+          <app-storyline-tab></app-storyline-tab>
+        }
+        @if (activeTab() === Tab.Mutation) {
+          <app-mutation-tab></app-mutation-tab>
+        }
+        @if (activeTab() === Tab.Bloom) {
+          <app-bloom-tab></app-bloom-tab>
+        }
+        @if (activeTab() === Tab.Settings) {
+          <app-settings-tab></app-settings-tab>
+        }
+      </div>
+    </div>
+
+    <!-- RIGHT SIDEBAR: SETTINGS ON TOP + NARROW LOG PANEL BELOW -->
+    <div class="w-full md:w-60 shrink-0 flex flex-col gap-3 h-full min-h-0">
       <button
         (click)="switchTab(Tab.Settings)"
+        class="w-full py-2 px-4 rounded font-bold text-xs uppercase tracking-wider transition-all border flex items-center justify-center gap-2 shadow cursor-pointer shrink-0"
         [ngClass]="
           activeTab() === Tab.Settings
-            ? 'bg-gray-600 text-white border-gray-500'
-            : 'bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700'
+            ? 'bg-gray-700 text-green-400 border-green-500/60 shadow-[0_0_10px_rgba(34,197,94,0.15)]'
+            : 'bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700 hover:text-white'
         "
-        class="font-bold px-4 py-1.5 rounded-md text-xs border transition-colors shadow-sm"
       >
-        Settings
+        <span>⚙</span>
+        <span>Settings</span>
       </button>
+
+      <app-log-sidebar class="flex-1 min-h-0 block"></app-log-sidebar>
     </div>
-
-    <!-- CONTENT AREA -->
-    <div class="flex-1 overflow-y-auto p-4 pb-20 md:pb-4 relative">
-      @if (activeTab() === Tab.Tree) {
-        <app-tree-tab></app-tree-tab>
-      } @else if (activeTab() === Tab.Mutation) {
-        <app-mutation-tab></app-mutation-tab>
-      } @else if (activeTab() === Tab.Settings) {
-        <app-settings-tab></app-settings-tab>
-      } @else if (activeTab() === Tab.Log) {
-        <app-log-sidebar></app-log-sidebar>
-      } @else if (activeTab() === Tab.Storyline) {
-        <app-storyline-tab></app-storyline-tab>
-      } @else if (activeTab() === Tab.Bloom) {
-        <app-bloom-tab></app-bloom-tab>
-      }
-    </div>
-
-    <!-- MOBILE BOTTOM NAVIGATION -->
-    <div
-      class="md:hidden absolute bottom-0 left-0 w-full bg-gray-800 border-t border-gray-700 flex justify-around items-center h-16 z-50"
-    >
-      <button
-        (click)="switchTab(Tab.Tree)"
-        class="flex flex-col items-center p-2 transition-colors flex-1"
-        [class.text-green-400]="activeTab() === Tab.Tree"
-        [class.text-gray-500]="activeTab() !== Tab.Tree"
-      >
-        <span class="text-xl leading-none">🌳</span>
-        <span class="text-[10px] uppercase font-bold mt-1">Tree</span>
-      </button>
-
-      @if (storylineService.isMutationUnlocked()) {
-        <button
-          (click)="switchTab(Tab.Mutation)"
-          class="flex flex-col items-center p-2 transition-colors flex-1"
-          [class.text-purple-400]="activeTab() === Tab.Mutation"
-          [class.text-gray-500]="activeTab() !== Tab.Mutation"
-        >
-          <span class="text-xl leading-none">🧬</span>
-          <span class="text-[10px] uppercase font-bold mt-1">Mutate</span>
-        </button>
-      }
-
-      @if (storylineService.isBloomUnlocked()) {
-        <button
-          (click)="switchTab(Tab.Bloom)"
-          class="flex flex-col items-center p-2 transition-colors flex-1"
-          [class.text-pink-400]="activeTab() === Tab.Bloom"
-          [class.text-gray-500]="activeTab() !== Tab.Bloom"
-        >
-          <span class="text-xl leading-none">🌸</span>
-          <span class="text-[10px] uppercase font-bold mt-1">Bloom</span>
-        </button>
-      }
-
-      <button
-        (click)="switchTab(Tab.Log)"
-        class="flex flex-col items-center p-2 transition-colors flex-1"
-        [class.text-blue-400]="activeTab() === Tab.Log"
-        [class.text-gray-500]="activeTab() !== Tab.Log"
-      >
-        <span class="text-xl leading-none">📜</span>
-        <span class="text-[10px] uppercase font-bold mt-1">Log</span>
-      </button>
-      <button
-        (click)="switchTab(Tab.Storyline)"
-        class="flex flex-col items-center p-2 transition-colors flex-1"
-        [class.text-amber-400]="activeTab() === Tab.Storyline"
-        [class.text-gray-500]="activeTab() !== Tab.Storyline"
-      >
-        <span class="text-xl leading-none">📖</span>
-        <span class="text-[10px] uppercase font-bold mt-1">Story</span>
-      </button>
-      <button
-        (click)="switchTab(Tab.Settings)"
-        class="flex flex-col items-center p-2 transition-colors flex-1"
-        [class.text-gray-200]="activeTab() === Tab.Settings"
-        [class.text-gray-500]="activeTab() !== Tab.Settings"
-      >
-        <span class="text-xl leading-none">⚙️</span>
-        <span class="text-[10px] uppercase font-bold mt-1">Setup</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- ========================================== -->
-  <!-- 4. DESKTOP RIGHT PANEL (Log Sidebar)       -->
-  <!-- ========================================== -->
-  <div class="hidden md:block w-80 shrink-0 p-6 pl-3 overflow-y-auto">
-    <app-log-sidebar></app-log-sidebar>
   </div>
 </div>

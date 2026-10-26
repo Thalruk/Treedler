@@ -4,6 +4,7 @@ export enum MilestoneId {
   Branches10 = 'branches_10',
   MutationUnlocked = 'mutation_unlocked',
   DeepAnchorage = 'deep_anchorage',
+  MetabolicOverdrive = 'metabolic_overdrive',
   AncientTimber = 'ancient_timber',
   BloomUnlocked = 'bloom_unlocked',
   ApexFlora = 'apex_flora',
@@ -72,5 +73,12 @@ export const STORYLINE_MILESTONES_CONFIG: MilestoneConfig[] = [
     description:
       'Towering above the world with a fully mutated genome, your canopy drinks the sun like a living star.',
     reward: 'x1.5 Total Energy Generation (500 Leaves & 6 Mutations).',
+  },
+  {
+    id: MilestoneId.MetabolicOverdrive,
+    title: 'Metabolic Overdrive',
+    description:
+      'Your vascular system can now funnel massive surpluses of raw sap directly into genetic restructuring.',
+    reward: 'Unlocks Over-Mutation toggle (+5% mutation speed per extra multiple of base drain).',
   },
 ];

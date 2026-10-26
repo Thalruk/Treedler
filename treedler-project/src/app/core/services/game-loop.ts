@@ -1,109 +1,86 @@
 import { Injectable, inject } from '@angular/core';
 import { ResourceService } from './resource.service';
-import { SaveService } from './save.service';
 import { UpgradeService } from './upgrade.service';
-import { MutationService } from './mutation.service';
-import { StorylineService } from './storyline.service';
+import { SaveService } from './save.service';
 import { LogService } from './log.service';
+import { StorylineService } from './storyline.service';
+import { MutationService } from './mutation.service';
 import { BloomService } from './bloom.service';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class GameLoopService {
-  // ==========================================
-  // 1. INJECTIONS
-  // ==========================================
   private resourceService = inject(ResourceService);
-  private saveService = inject(SaveService);
   private upgradeService = inject(UpgradeService);
-  private mutationService = inject(MutationService);
-  private storylineService = inject(StorylineService);
+  private saveService = inject(SaveService);
   private logService = inject(LogService);
+  private storylineService = inject(StorylineService);
+  private mutationService = inject(MutationService);
   private bloomService = inject(BloomService);
 
-  // ==========================================
-  // 2. STATE & CONFIG
-  // ==========================================
-  private lastTickTime: number = 0;
-  private lastSaveTime: number = 0;
-  private isRunning: boolean = false;
-  private tickInterval: any;
+  private fastIntervalId: ReturnType<typeof setInterval> | null = null;
+  private slowIntervalId: ReturnType<typeof setInterval> | null = null;
 
-  private ticksPerSecond: number = 10;
-  private saveIntervalSeconds: number = 30;
-  private timeSinceLastSlowTick: number = 0;
+  private readonly FAST_TICK_RATE = 100; // 10x per second
+  private readonly SLOW_TICK_RATE = 1000; // 1x per second
 
-  // ==========================================
-  // 3. LIFECYCLE
-  // ==========================================
+  private secondsCounter = 0;
+
   public start(): void {
-    if (this.isRunning) return;
+    if (this.fastIntervalId) return;
 
-    this.saveService.loadGame();
+    this.fastIntervalId = setInterval(() => {
+      this.fastTick();
+    }, this.FAST_TICK_RATE);
 
-    this.isRunning = true;
-    this.lastTickTime = Date.now();
-    this.lastSaveTime = this.lastTickTime;
-    this.timeSinceLastSlowTick = 0;
-
-    const intervalMs = 1000 / this.ticksPerSecond;
-
-    this.tickInterval = setInterval(() => {
-      const currentTime = Date.now();
-      const deltaTime = (currentTime - this.lastTickTime) / 1000;
-
-      this.lastTickTime = currentTime;
-      this.updateGame(deltaTime);
-
-      if ((currentTime - this.lastSaveTime) / 1000 >= this.saveIntervalSeconds) {
-        this.saveService.saveGame();
-        this.lastSaveTime = currentTime;
-      }
-    }, intervalMs);
+    this.slowIntervalId = setInterval(() => {
+      this.slowTick();
+    }, this.SLOW_TICK_RATE);
   }
 
   public stop(): void {
-    this.isRunning = false;
-    if (this.tickInterval) {
-      clearInterval(this.tickInterval);
+    if (this.fastIntervalId) {
+      clearInterval(this.fastIntervalId);
+      this.fastIntervalId = null;
     }
-    this.saveService.saveGame();
+    if (this.slowIntervalId) {
+      clearInterval(this.slowIntervalId);
+      this.slowIntervalId = null;
+    }
   }
 
-  // ==========================================
-  // 4. CORE LOGIC
-  // ==========================================
-  private updateGame(deltaTime: number): void {
-    // ----------------------------------------
-    // FAST TICK (10x per second)
-    // ----------------------------------------
-    const generations = {
-      water: this.upgradeService.waterGeneration(),
-      minerals: this.upgradeService.mineralsGeneration(),
-      energy: this.upgradeService.energyGeneration(),
-    };
+  private fastTick(): void {
+    const deltaTime = this.FAST_TICK_RATE / 1000;
 
-    const maxCapacity = this.upgradeService.totalMaxCapacity();
-
-    this.resourceService.tick(deltaTime, generations, maxCapacity);
+    // 1. Drain resources for active mutations & bloom FIRST
     this.mutationService.tick(deltaTime);
     this.bloomService.tick(deltaTime);
 
-    // ----------------------------------------
-    // SLOW TICK (1x per second)
-    // ----------------------------------------
-    this.timeSinceLastSlowTick += deltaTime;
+    // 2. Produce resources & update maxCapacity SECOND so full storage clamps cleanly without jitter
+    this.resourceService.tick(
+      deltaTime,
+      {
+        water: this.upgradeService.waterGeneration(),
+        minerals: this.upgradeService.mineralsGeneration(),
+        energy: this.upgradeService.energyGeneration(),
+      },
+      this.upgradeService.totalMaxCapacity(),
+    );
+  }
 
-    if (this.timeSinceLastSlowTick >= 1.0) {
-      this.storylineService.checkMilestones();
-      this.logService.checkStoryLogs();
+  private slowTick(): void {
+    this.secondsCounter++;
 
-      if (Math.random() < 0.005) {
+    this.storylineService.checkMilestones();
+    this.logService.checkStoryLogs();
+
+    if (this.secondsCounter % 30 === 0) {
+      this.saveService.saveGame();
+    }
+
+    if (this.secondsCounter % 60 === 0) {
+      if (Math.random() < 0.25) {
         this.logService.triggerRandomFlavorEvent();
       }
-
-      this.timeSinceLastSlowTick -= 1.0;
     }
   }
 }
