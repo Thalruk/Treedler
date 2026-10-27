@@ -10,7 +10,7 @@
       'bg-gray-600 hover:bg-gray-500 border-gray-500 cursor-pointer active:scale-95':
         canAfford && !isMaxed,
       'bg-emerald-950/30 border-emerald-700/50 cursor-default': isMaxed,
-      'bg-gray-800 border-gray-700 cursor-not-allowed opacity-75':
+      'bg-gray-700/60 border-gray-600 cursor-not-allowed opacity-75':
         !canAfford && isReachable && !isMaxed,
       'bg-black border-gray-900 cursor-not-allowed opacity-50': !isReachable && !isMaxed,
     }"
@@ -23,7 +23,7 @@
           : canAfford
             ? 'text-gray-100'
             : isReachable
-              ? 'text-gray-400'
+              ? 'text-gray-300'
               : 'text-gray-600'
       "
     >
@@ -40,10 +40,13 @@
 
   @if (isHovered()) {
     <div
-      class="absolute left-1/2 -translate-x-1/2 w-68 p-3 bg-gray-900 border border-gray-600 rounded shadow-xl pointer-events-none z-50"
+      class="absolute w-68 p-3 bg-gray-900 border border-gray-600 rounded shadow-xl pointer-events-none z-50"
       [ngClass]="{
         'top-full mt-2': position() === 'bottom',
         'bottom-full mb-2': position() === 'top',
+        'left-0': hPosition() === 'left',
+        'right-0': hPosition() === 'right',
+        'left-1/2 -translate-x-1/2': hPosition() === 'center',
       }"
     >
       <div class="font-bold text-gray-200 mb-1 border-b border-gray-700 pb-1">{{ title }}</div>

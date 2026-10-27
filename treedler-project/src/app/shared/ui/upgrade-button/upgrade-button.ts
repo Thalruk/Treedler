@@ -46,6 +46,7 @@ export class UpgradeButtonComponent {
 
   public isHovered = signal<boolean>(false);
   public position = signal<'top' | 'bottom'>('bottom');
+  public hPosition = signal<'left' | 'center' | 'right'>('center');
 
   // ==========================================
   // 3. UI EVENTS
@@ -61,12 +62,27 @@ export class UpgradeButtonComponent {
   public onMouseEnter(event: MouseEvent): void {
     const buttonElement = event.currentTarget as HTMLElement;
     const rect = buttonElement.getBoundingClientRect();
+
+    const scrollContainer = buttonElement.closest('.overflow-y-auto') || document.body;
+    const containerRect = scrollContainer.getBoundingClientRect();
+
     const spaceBelow = window.innerHeight - rect.bottom;
+
+    const spaceLeft = rect.left - containerRect.left;
+    const spaceRight = containerRect.right - rect.right;
 
     if (spaceBelow < 220) {
       this.position.set('top');
     } else {
       this.position.set('bottom');
+    }
+
+    if (spaceLeft < 100) {
+      this.hPosition.set('left');
+    } else if (spaceRight < 100) {
+      this.hPosition.set('right');
+    } else {
+      this.hPosition.set('center');
     }
 
     this.isHovered.set(true);
