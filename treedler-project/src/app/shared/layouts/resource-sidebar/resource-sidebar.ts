@@ -4,10 +4,7 @@ import { ResourceService } from '../../../core/services/resource.service';
 import { UpgradeService } from '../../../core/services/upgrade.service';
 import { MutationService } from '../../../core/services/mutation.service';
 import { BloomService } from '../../../core/services/bloom.service';
-import {
-  ResourceBarComponent,
-  ResourceBreakdownItem,
-} from '../../../shared/ui/resource-bar/resource-bar';
+import { ResourceBarComponent, ResourceBreakdownItem } from '../../ui/resource-bar/resource-bar';
 
 @Component({
   selector: 'app-sidebar',
