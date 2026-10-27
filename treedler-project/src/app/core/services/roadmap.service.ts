@@ -1,12 +1,13 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { MutationService } from './mutation.service';
 import { UpgradeService } from './upgrade.service';
+import { BloomService } from './bloom.service';
 import { ROADMAP_CONFIG, RoadmapConfig } from '../config/roadmap.config';
 
 @Injectable({ providedIn: 'root' })
 export class RoadmapService {
   private mutationService = inject(MutationService);
-  private upgradeService = inject(UpgradeService);
+  private bloomService = inject(BloomService);
 
   public isModalOpen = signal<boolean>(false);
   public config: RoadmapConfig = ROADMAP_CONFIG;
@@ -14,9 +15,8 @@ export class RoadmapService {
   public isEndGameReached = computed(() => {
     const allMutationsCompleted =
       this.mutationService.completedCount() >= this.config.requiredCompletedMutations;
-    const highLevelBranch = this.upgradeService.branch.level() >= this.config.requiredBranchLevel;
 
-    return allMutationsCompleted || highLevelBranch;
+    return allMutationsCompleted && this.bloomService.isFullyComplete();
   });
 
   public openModal(): void {

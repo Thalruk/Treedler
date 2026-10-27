@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GameLoopService } from './core/services/game-loop';
 import { SaveService } from './core/services/save.service';
@@ -14,6 +14,7 @@ import { StorylineTabComponent } from './features/tabs/storyline-tab/storyline-t
 import { BloomTabComponent } from './features/tabs/bloom-tab/bloom-tab';
 import { RoadmapModalComponent } from './shared/ui/roadmap-modal/roadmap-modal';
 import { RoadmapService } from './core/services/roadmap.service';
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -41,6 +42,36 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.saveService.loadGame();
     this.gameLoop.start();
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  public handleKeyboardShortcuts(event: KeyboardEvent): void {
+    const target = event.target as HTMLElement;
+    if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
+      return;
+    }
+
+    switch (event.key) {
+      case '1':
+        this.switchTab(TabId.Tree);
+        break;
+      case '2':
+        if (this.storylineService.isMutationUnlocked()) {
+          this.switchTab(TabId.Mutation);
+        }
+        break;
+      case '3':
+        if (this.storylineService.isBloomUnlocked()) {
+          this.switchTab(TabId.Bloom);
+        }
+        break;
+      case '9':
+        this.switchTab(TabId.Storyline);
+        break;
+      case '0':
+        this.switchTab(TabId.Settings);
+        break;
+    }
   }
 
   public switchTab(tab: TabId): void {
