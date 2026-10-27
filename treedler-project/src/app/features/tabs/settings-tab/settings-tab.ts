@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { SaveService } from '../../../core/services/save.service';
 import { AudioService } from '../../../core/services/audio.service';
 import { SettingsService } from '../../../core/services/settings.service';
+import { ShortcutService } from '../../../core/services/shortcut.service';
 
 @Component({
   selector: 'app-settings-tab',
@@ -14,6 +15,7 @@ export class SettingsTabComponent {
   private saveService = inject(SaveService);
   public audioService = inject(AudioService);
   public settingsService = inject(SettingsService);
+  public shortcutService = inject(ShortcutService);
 
   public toggleHideMaxed(): void {
     this.settingsService.toggleHideMaxed();

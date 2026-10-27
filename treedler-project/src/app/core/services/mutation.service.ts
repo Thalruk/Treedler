@@ -2,6 +2,7 @@ import { Injectable, signal, inject, computed } from '@angular/core';
 import { ResourceService } from './resource.service';
 import { ResourceId } from '../enums/resource.enum';
 import { MutationId } from '../enums/mutation.enum';
+import { UpgradeId } from '../enums/upgrade.enum';
 import { MutationDef } from '../models/mutation.model';
 import { MUTATIONS_CONFIG } from '../config/mutation.config';
 
@@ -10,6 +11,13 @@ export type MutationProgress = Partial<Record<ResourceId, number>>;
 @Injectable({ providedIn: 'root' })
 export class MutationService {
   private resourceService = inject(ResourceService);
+
+  // Funkcja pomocnicza rejestrowana przez UpgradeService (unika Circular Dependency)
+  private upgradeLevelLookup: ((id: UpgradeId) => number) | null = null;
+
+  public registerUpgradeLevelLookup(fn: (id: UpgradeId) => number): void {
+    this.upgradeLevelLookup = fn;
+  }
 
   // ==========================================
   // 1. STATE & CONFIG
@@ -24,7 +32,51 @@ export class MutationService {
   public readonly availableMutations: MutationDef[] = MUTATIONS_CONFIG;
 
   // ==========================================
-  // 2. OVER-MUTATION & COMPUTED DRAINS
+  // 2. REQUIREMENTS & VISIBILITY
+  // ==========================================
+
+  public getUpgradeLevel(id: UpgradeId): number {
+    return this.upgradeLevelLookup ? this.upgradeLevelLookup(id) : 0;
+  }
+
+  public areUpgradeRequirementsMet(id: MutationId): boolean {
+    const mutation = this.availableMutations.find((m) => m.id === id);
+    if (!mutation || !mutation.requiredUpgrades || mutation.requiredUpgrades.length === 0) {
+      return true;
+    }
+    return mutation.requiredUpgrades.every(
+      (req) => this.getUpgradeLevel(req.upgradeId) >= req.level,
+    );
+  }
+
+  public getUpgradeRequirementsStatus(
+    id: MutationId,
+  ): { label: string; current: number; required: number; met: boolean }[] {
+    const mutation = this.availableMutations.find((m) => m.id === id);
+    if (!mutation || !mutation.requiredUpgrades) return [];
+
+    return mutation.requiredUpgrades.map((req) => {
+      const current = this.getUpgradeLevel(req.upgradeId);
+      return {
+        label: req.label,
+        current,
+        required: req.level,
+        met: current >= req.level,
+      };
+    });
+  }
+
+  public visibleMutations = computed(() => {
+    const completedMap = this.completed();
+    return this.availableMutations.filter((mut) => {
+      if (completedMap[mut.id]) return true;
+      if (!mut.requiredMutations || mut.requiredMutations.length === 0) return true;
+      return mut.requiredMutations.every((reqId) => !!completedMap[reqId]);
+    });
+  });
+
+  // ==========================================
+  // 3. OVER-MUTATION & COMPUTED DRAINS
   // ==========================================
 
   private getResourceGeneration(id: ResourceId): number {
@@ -34,10 +86,6 @@ export class MutationService {
     return 0;
   }
 
-  /**
-   * Calculates how many full extra multiples of base drain the player's current production can sustain
-   * Formula: floor((generation - baseDrain) / baseDrain) across all active cost channels
-   */
   public overMutationMultiples = computed(() => {
     if (!this.isOverMutationEnabled()) return 0;
     const active = this.activeMutationId();
@@ -62,15 +110,6 @@ export class MutationService {
     }
 
     return minExtraMultiples === Infinity ? 0 : Math.max(0, minExtraMultiples);
-  });
-
-  public visibleMutations = computed(() => {
-    const completedMap = this.completed();
-    return this.availableMutations.filter((mut) => {
-      if (completedMap[mut.id]) return true;
-      if (!mut.requiredMutations || mut.requiredMutations.length === 0) return true;
-      return mut.requiredMutations.every((reqId) => !!completedMap[reqId]);
-    });
   });
 
   public completedCount = computed(
@@ -106,7 +145,7 @@ export class MutationService {
   public mineralsDrain = computed(() => this.getDrain(ResourceId.Minerals));
 
   // ==========================================
-  // 3. ACTIONS & LOGIC
+  // 4. ACTIONS & LOGIC
   // ==========================================
   public toggleOverMutation(): void {
     this.isOverMutationEnabled.update((v) => !v);
@@ -133,7 +172,15 @@ export class MutationService {
   }
 
   public toggleMutation(id: MutationId): void {
-    this.activeMutationId.set(this.activeMutationId() === id ? null : id);
+    if (this.activeMutationId() === id) {
+      this.activeMutationId.set(null);
+      return;
+    }
+    // Blokada uruchomienia mutacji, jeśli warunki strukturalne drzewa nie są spełnione
+    if (!this.areUpgradeRequirementsMet(id)) {
+      return;
+    }
+    this.activeMutationId.set(id);
   }
 
   private completeMutation(id: MutationId): void {
@@ -146,7 +193,13 @@ export class MutationService {
     if (!active) return;
 
     const mutation = this.availableMutations.find((m) => m.id === active);
-    if (!mutation || this.isCompleted(active) || !mutation.costs || mutation.costs.length === 0) {
+    if (
+      !mutation ||
+      this.isCompleted(active) ||
+      !this.areUpgradeRequirementsMet(active) ||
+      !mutation.costs ||
+      mutation.costs.length === 0
+    ) {
       this.activeMutationId.set(null);
       return;
     }

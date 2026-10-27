@@ -74,6 +74,28 @@ export class UpgradeService {
   );
   public rootVigor = new UpgradeBase(UpgradeId.RootVigor, UPGRADES_CONFIG[UpgradeId.RootVigor]);
 
+  private readonly upgradeMap: Record<UpgradeId, UpgradeBase> = {
+    [UpgradeId.Branch]: this.branch,
+    [UpgradeId.Leaf]: this.leaf,
+    [UpgradeId.SunwardReach]: this.sunwardReach,
+    [UpgradeId.CanopySpread]: this.canopySpread,
+    [UpgradeId.BarkThickness]: this.barkThickness,
+    [UpgradeId.VascularTissues]: this.vascularTissues,
+    [UpgradeId.SapPressure]: this.sapPressure,
+    [UpgradeId.ResinSecretion]: this.resinSecretion,
+    [UpgradeId.RootWidth]: this.rootWidth,
+    [UpgradeId.RootDepth]: this.rootDepth,
+    [UpgradeId.RootHairs]: this.rootHairs,
+    [UpgradeId.MycorrhizalNetwork]: this.mycorrhizalNetwork,
+    [UpgradeId.RootVigor]: this.rootVigor,
+  };
+
+  constructor() {
+    this.mutationService.registerUpgradeLevelLookup((id: UpgradeId) => {
+      return this.upgradeMap[id]?.level() ?? 0;
+    });
+  }
+
   // ==========================================
   // 3. LIMITS & CONSTRAINTS (DYNAMIC CAPS)
   // ==========================================
@@ -158,18 +180,19 @@ export class UpgradeService {
   public isMaxed(upgrade: UpgradeBase, limit?: number): boolean {
     return limit !== undefined && upgrade.level() >= limit;
   }
+
   // ==========================================
   // 4. CAPACITY CALCULATION & BREAKDOWN (PER RESOURCE)
   // ==========================================
 
   private globalCapacityMultipliers = computed(() => {
-    const resinPercent = this.resinSecretion.level() * 5;
+    const resinPercent = this.resinSecretion.level() * 6;
     const resinMultiplier = 1 + resinPercent / 100;
     const ligninMultiplier = this.mutationService.isCompleted(MutationId.LigninSynthesis)
-      ? 1.2
+      ? 1.25
       : 1.0;
     const heartwoodMultiplier = this.mutationService.isCompleted(MutationId.HeartwoodFormation)
-      ? 1.35
+      ? 1.4
       : 1.0;
     const timberMultiplier = this.hasAncientTimberBonus() ? 1.25 : 1.0;
 
@@ -184,10 +207,10 @@ export class UpgradeService {
 
   public waterCapacityBreakdown = computed(() => {
     const base = this.hasFirstStem() ? 25 : 10;
-    const bark = this.barkThickness.level() * 15;
-    const rootWidthCap = this.rootWidth.level() * 10;
-    const vascularTissues = this.vascularTissues.level() * 35;
-    const canopySpread = this.canopySpread.level() * 25;
+    const bark = this.barkThickness.level() * 22;
+    const rootWidthCap = this.rootWidth.level() * 14;
+    const vascularTissues = this.vascularTissues.level() * 45;
+    const canopySpread = this.canopySpread.level() * 35;
 
     const flatTotal = base + bark + rootWidthCap + vascularTissues + canopySpread;
     const mults = this.globalCapacityMultipliers();
@@ -207,9 +230,9 @@ export class UpgradeService {
 
   public mineralsCapacityBreakdown = computed(() => {
     const base = this.hasFirstStem() ? 25 : 10;
-    const bark = this.barkThickness.level() * 15;
-    const rootDepthCap = this.rootDepth.level() * 10;
-    const resinSecretion = this.resinSecretion.level() * 50;
+    const bark = this.barkThickness.level() * 22;
+    const rootDepthCap = this.rootDepth.level() * 14;
+    const resinSecretion = this.resinSecretion.level() * 65;
 
     const flatTotal = base + bark + rootDepthCap + resinSecretion;
     const mults = this.globalCapacityMultipliers();
@@ -228,9 +251,9 @@ export class UpgradeService {
 
   public energyCapacityBreakdown = computed(() => {
     const base = this.hasFirstStem() ? 25 : 10;
-    const bark = this.barkThickness.level() * 15;
-    const canopySpread = this.canopySpread.level() * 60;
-    const resinSecretion = this.resinSecretion.level() * 50;
+    const bark = this.barkThickness.level() * 22;
+    const canopySpread = this.canopySpread.level() * 75;
+    const resinSecretion = this.resinSecretion.level() * 65;
 
     const flatTotal = base + bark + canopySpread + resinSecretion;
     const mults = this.globalCapacityMultipliers();
@@ -256,7 +279,7 @@ export class UpgradeService {
   // ==========================================
 
   public sapPressureRate = computed(() =>
-    this.mutationService.isCompleted(MutationId.XylemConduits) ? 0.001 : 0.0005,
+    this.mutationService.isCompleted(MutationId.XylemConduits) ? 0.0012 : 0.0006,
   );
 
   public waterSapPressure = computed(
@@ -268,6 +291,7 @@ export class UpgradeService {
   public energySapPressure = computed(
     () => this.sapPressure.level() * this.energyMaxCapacity() * this.sapPressureRate(),
   );
+
   public leafResourceUpkeep = computed(() => {
     let upkeep = 0.08;
     if (this.mutationService.isCompleted(MutationId.CuticleWaxing)) upkeep = 0.065;
@@ -280,20 +304,20 @@ export class UpgradeService {
 
   public leafEnergyMultiplier = computed(() => {
     let mult = 1.0;
-    if (this.mutationService.isCompleted(MutationId.ChloroplastRefinement)) mult *= 1.25;
-    if (this.mutationService.isCompleted(MutationId.PhotosyntheticCascade)) mult *= 1.25;
+    if (this.mutationService.isCompleted(MutationId.ChloroplastRefinement)) mult *= 1.3;
+    if (this.mutationService.isCompleted(MutationId.PhotosyntheticCascade)) mult *= 1.3;
     if (this.hasApexFloraBonus()) mult *= 1.5;
     return mult;
   });
 
   public singleLeafEnergy = computed(
-    () => (this.leafEnergyBase() + this.sunwardReach.level() * 0.03) * this.leafEnergyMultiplier(),
+    () => (this.leafEnergyBase() + this.sunwardReach.level() * 0.035) * this.leafEnergyMultiplier(),
   );
 
   public rootMultiplier = computed(() => {
-    let mult = 1 + this.rootVigor.level() * 0.1;
+    let mult = 1 + this.rootVigor.level() * 0.12;
     if (this.mutationService.isCompleted(MutationId.FibrousRootlets)) mult *= 1.15;
-    if (this.mutationService.isCompleted(MutationId.DeepTaproot)) mult *= 1.25;
+    if (this.mutationService.isCompleted(MutationId.DeepTaproot)) mult *= 1.3;
     if (this.hasDeepAnchorageBonus()) mult *= 1.25;
     return mult;
   });
@@ -301,10 +325,10 @@ export class UpgradeService {
   public waterGeneration = computed(() => {
     const base = this.hasFirstRoot() ? 1 : 0;
     const myceliumBonus = this.mutationService.isCompleted(MutationId.SymbioticMycelium)
-      ? this.mycorrhizalNetwork.level() * 1.5
+      ? this.mycorrhizalNetwork.level() * 2.0
       : 0;
     const fromRoots =
-      (this.rootWidth.level() * 1 + this.rootHairs.level() * 2.5 + myceliumBonus) *
+      (this.rootWidth.level() * 1.2 + this.rootHairs.level() * 2.8 + myceliumBonus) *
       this.rootMultiplier();
     const fromSapPressure = this.waterSapPressure();
     const leafUpkeep = this.leaf.level() * this.leafResourceUpkeep();
@@ -313,19 +337,19 @@ export class UpgradeService {
 
   public waterBreakdown = computed(() => {
     const myceliumBonus = this.mutationService.isCompleted(MutationId.SymbioticMycelium)
-      ? this.mycorrhizalNetwork.level() * 1.5
+      ? this.mycorrhizalNetwork.level() * 2.0
       : 0;
     return {
       base: this.hasFirstRoot() ? 1 : 0,
-      rootWidth: this.rootWidth.level() * 1,
-      rootHairs: this.rootHairs.level() * 2.5,
+      rootWidth: this.rootWidth.level() * 1.2,
+      rootHairs: this.rootHairs.level() * 2.8,
       myceliumWater: myceliumBonus,
-      rootVigorPercent: this.rootVigor.level() * 10,
+      rootVigorPercent: this.rootVigor.level() * 12,
       hasFibrousRootlets: this.mutationService.isCompleted(MutationId.FibrousRootlets),
       hasDeepTaproot: this.mutationService.isCompleted(MutationId.DeepTaproot),
       hasDeepAnchorage: this.hasDeepAnchorageBonus(),
       subtotalRoots:
-        (this.rootWidth.level() * 1 + this.rootHairs.level() * 2.5 + myceliumBonus) *
+        (this.rootWidth.level() * 1.2 + this.rootHairs.level() * 2.8 + myceliumBonus) *
         this.rootMultiplier(),
       sapPressure: this.waterSapPressure(),
       leaves: -(this.leaf.level() * this.leafResourceUpkeep()),
@@ -335,7 +359,8 @@ export class UpgradeService {
   public mineralsGeneration = computed(() => {
     const base = this.hasFirstRoot() ? 1 : 0;
     const fromRoots =
-      (this.rootDepth.level() * 1 + this.mycorrhizalNetwork.level() * 3.5) * this.rootMultiplier();
+      (this.rootDepth.level() * 1.2 + this.mycorrhizalNetwork.level() * 4.0) *
+      this.rootMultiplier();
     const fromSapPressure = this.mineralsSapPressure();
     const leafUpkeep = this.leaf.level() * this.leafResourceUpkeep();
     return base + fromRoots + fromSapPressure - leafUpkeep;
@@ -343,14 +368,15 @@ export class UpgradeService {
 
   public mineralsBreakdown = computed(() => ({
     base: this.hasFirstRoot() ? 1 : 0,
-    rootDepth: this.rootDepth.level() * 1,
-    mycorrhizalNetwork: this.mycorrhizalNetwork.level() * 3.5,
-    rootVigorPercent: this.rootVigor.level() * 10,
+    rootDepth: this.rootDepth.level() * 1.2,
+    mycorrhizalNetwork: this.mycorrhizalNetwork.level() * 4.0,
+    rootVigorPercent: this.rootVigor.level() * 12,
     hasFibrousRootlets: this.mutationService.isCompleted(MutationId.FibrousRootlets),
     hasDeepTaproot: this.mutationService.isCompleted(MutationId.DeepTaproot),
     hasDeepAnchorage: this.hasDeepAnchorageBonus(),
     subtotalRoots:
-      (this.rootDepth.level() * 1 + this.mycorrhizalNetwork.level() * 3.5) * this.rootMultiplier(),
+      (this.rootDepth.level() * 1.2 + this.mycorrhizalNetwork.level() * 4.0) *
+      this.rootMultiplier(),
     sapPressure: this.mineralsSapPressure(),
     leaves: -(this.leaf.level() * this.leafResourceUpkeep()),
   }));
@@ -359,11 +385,11 @@ export class UpgradeService {
     const apexMult = this.hasApexFloraBonus() ? 1.5 : 1.0;
     const base = (this.hasFirstStem() ? 1 : 0) * apexMult;
     const fromLeaves = this.leaf.level() * this.singleLeafEnergy();
-    const fromVascular = this.vascularTissues.level() * 1.0 * apexMult;
+    const fromVascular = this.vascularTissues.level() * 1.2 * apexMult;
     const fromSapPressure = this.energySapPressure() * apexMult;
     const fromMycelium =
       (this.mutationService.isCompleted(MutationId.SymbioticMycelium)
-        ? this.mycorrhizalNetwork.level() * 1.5
+        ? this.mycorrhizalNetwork.level() * 2.0
         : 0) * apexMult;
     return base + fromLeaves + fromVascular + fromSapPressure + fromMycelium;
   });
@@ -375,15 +401,15 @@ export class UpgradeService {
       base: (this.hasFirstStem() ? 1 : 0) * apexMult,
       leaves: leafCount * this.singleLeafEnergy(),
       leafBaseTotal: leafCount * this.leafEnergyBase(),
-      sunwardReachTotal: leafCount * (this.sunwardReach.level() * 0.03),
+      sunwardReachTotal: leafCount * (this.sunwardReach.level() * 0.035),
       hasChloroplast: this.mutationService.isCompleted(MutationId.ChloroplastRefinement),
       hasCascade: this.mutationService.isCompleted(MutationId.PhotosyntheticCascade),
       hasApexFlora: this.hasApexFloraBonus(),
-      vascularTissues: this.vascularTissues.level() * 1.0 * apexMult,
+      vascularTissues: this.vascularTissues.level() * 1.2 * apexMult,
       sapPressure: this.energySapPressure() * apexMult,
       symbioticMycelium:
         (this.mutationService.isCompleted(MutationId.SymbioticMycelium)
-          ? this.mycorrhizalNetwork.level() * 1.5
+          ? this.mycorrhizalNetwork.level() * 2.0
           : 0) * apexMult,
     };
   });
@@ -465,7 +491,7 @@ export class UpgradeService {
     upgrade: UpgradeBase,
     limit?: number,
   ): { amount: number; resourceName: string }[] {
-    const qty = this.getTargetQuantity(upgrade, this.shortcutService.multiplier(), limit);
+    const qty = this.getTargetQuantity(upgrade, this.shortcutService.getNumericMultiplier(), limit);
     return this.getCostsForQuantity(upgrade, qty)
       .sort((a, b) => a.resourceId - b.resourceId)
       .map((c) => ({
@@ -476,14 +502,14 @@ export class UpgradeService {
 
   public canAfford(upgrade: UpgradeBase, limit?: number): boolean {
     if (this.isMaxed(upgrade, limit)) return false;
-    const qty = this.getTargetQuantity(upgrade, this.shortcutService.multiplier(), limit);
+    const qty = this.getTargetQuantity(upgrade, this.shortcutService.getNumericMultiplier(), limit);
     const costs = this.getCostsForQuantity(upgrade, qty);
     return costs.every((c) => this.getResourceAmount(c.resourceId) >= c.amount);
   }
 
   public isReachable(upgrade: UpgradeBase, limit?: number): boolean {
     if (this.isMaxed(upgrade, limit)) return true;
-    const qty = this.getTargetQuantity(upgrade, this.shortcutService.multiplier(), limit);
+    const qty = this.getTargetQuantity(upgrade, this.shortcutService.getNumericMultiplier(), limit);
     const costs = this.getCostsForQuantity(upgrade, qty);
     return costs.every((c) => this.getResourceMaxAmount(c.resourceId) >= c.amount);
   }
@@ -511,7 +537,7 @@ export class UpgradeService {
 
   public buyUpgrade(upgrade: UpgradeBase, limit?: number): void {
     if (this.isMaxed(upgrade, limit)) return;
-    const qty = this.getTargetQuantity(upgrade, this.shortcutService.multiplier(), limit);
+    const qty = this.getTargetQuantity(upgrade, this.shortcutService.getNumericMultiplier(), limit);
     if (limit !== undefined && upgrade.level() + qty > limit) return;
 
     if (this.canAfford(upgrade, limit)) {

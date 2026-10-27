@@ -49,7 +49,7 @@ export class TreeTabComponent {
   public getTitle(upgrade: UpgradeBase, baseTitle: string, limit?: number): string {
     if (this.upgradeService.isMaxed(upgrade, limit)) return baseTitle;
 
-    const mult = this.shortcutService.multiplier();
+    const mult = this.shortcutService.getNumericMultiplier();
     if (mult <= 1) return baseTitle;
 
     const affordable = this.upgradeService.getAffordableQuantity(upgrade, mult, limit);
