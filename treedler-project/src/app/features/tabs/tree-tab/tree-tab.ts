@@ -61,7 +61,8 @@ export class TreeTabComponent {
     const leafLvl = this.upgradeService.leaf.level();
     const reachLvl = this.upgradeService.sunwardReach.level();
     const spreadLvl = this.upgradeService.canopySpread.level();
-    const capMult = this.upgradeService.capacityBreakdown().totalMultiplier;
+    const waterCapMult = this.upgradeService.waterCapacityBreakdown().totalMultiplier;
+    const energyCapMult = this.upgradeService.energyCapacityBreakdown().totalMultiplier;
 
     return [
       {
@@ -96,7 +97,7 @@ export class TreeTabComponent {
         ),
         description: 'Converts water and minerals into precious energy in small amounts.',
         effect: [
-          `-${this.upgradeService.leafResourceUpkeep()} Water & Minerals/s`,
+          `-${this.upgradeService.leafResourceUpkeep().toFixed(3)} Water & Minerals/s`,
           `+${this.upgradeService.singleLeafEnergy().toFixed(2)} Energy/s`,
         ],
         breakdown: [
@@ -165,21 +166,22 @@ export class TreeTabComponent {
         ),
         description:
           'Broaden the leafy canopy to capture more rain and dew, increasing global storage.',
-        effect: ['+75 Base Max Limits'],
+        effect: ['+60 Energy Capacity', '+25 Water Capacity'],
         breakdown: [
-          { label: 'Flat Capacity:', value: `+${spreadLvl * 75}` },
-          ...(capMult > 1
+          { label: 'Flat Energy Cap:', value: `+${spreadLvl * 60}` },
+          { label: 'Flat Water Cap:', value: `+${spreadLvl * 25}` },
+          ...(energyCapMult > 1
             ? [
                 {
                   label: 'Global Multipliers:',
-                  value: `x${capMult.toFixed(2)}`,
+                  value: `x${energyCapMult.toFixed(2)}`,
                   tone: 'bonus' as const,
                 },
               ]
             : []),
           {
-            label: 'Effective Storage Added:',
-            value: `+${Math.floor(spreadLvl * 75 * capMult)}`,
+            label: 'Effective Energy Storage:',
+            value: `+${Math.floor(spreadLvl * 60 * energyCapMult)}`,
             tone: 'total',
           },
         ],
@@ -194,32 +196,39 @@ export class TreeTabComponent {
     const vascLvl = this.upgradeService.vascularTissues.level();
     const sapLvl = this.upgradeService.sapPressure.level();
     const resinLvl = this.upgradeService.resinSecretion.level();
-    const capMult = this.upgradeService.capacityBreakdown().totalMultiplier;
+    const waterCapMult = this.upgradeService.waterCapacityBreakdown().totalMultiplier;
+    const mineralsCapMult = this.upgradeService.mineralsCapacityBreakdown().totalMultiplier;
     const apexMult = this.upgradeService.hasApexFloraBonus() ? 1.5 : 1.0;
+    const sapPctPerLvl = this.upgradeService.sapPressureRate() * 100;
 
     return [
       {
         model: this.upgradeService.barkThickness,
-        title: this.getTitle(this.upgradeService.barkThickness, `Thicken Bark (Lvl ${barkLvl})`),
+        title: this.getTitle(
+          this.upgradeService.barkThickness,
+          `Thicken Bark (Lvl ${barkLvl} / ${this.upgradeService.maxBarkThickness()})`,
+          this.upgradeService.maxBarkThickness(),
+        ),
         description: 'Increases structural integrity, allowing you to store more resources.',
-        effect: ['+25 Base Max Limits'],
+        effect: ['+15 All Resource Capacities'],
         breakdown: [
-          { label: 'Flat Capacity:', value: `+${barkLvl * 25}` },
-          ...(capMult > 1
+          { label: 'Flat Capacity (All):', value: `+${barkLvl * 15}` },
+          ...(waterCapMult > 1
             ? [
                 {
                   label: 'Global Multipliers:',
-                  value: `x${capMult.toFixed(2)}`,
+                  value: `x${waterCapMult.toFixed(2)}`,
                   tone: 'bonus' as const,
                 },
               ]
             : []),
           {
             label: 'Effective Storage Added:',
-            value: `+${Math.floor(barkLvl * 25 * capMult)}`,
+            value: `+${Math.floor(barkLvl * 15 * waterCapMult)}`,
             tone: 'total',
           },
         ],
+        limit: this.upgradeService.maxBarkThickness(),
       },
       {
         model: this.upgradeService.vascularTissues,
@@ -229,16 +238,15 @@ export class TreeTabComponent {
           this.upgradeService.maxVascularTissues(),
         ),
         description: 'Develop internal channels to better distribute and store resources.',
-        effect: ['+20 Base Max Limits', '+1.5 Energy/s'],
+        effect: ['+35 Water Capacity', '+1.0 Energy/s'],
         breakdown: [
           {
-            label: 'Effective Storage Added:',
-            value: `+${Math.floor(vascLvl * 20 * capMult)}`,
-            tone: 'bonus',
+            label: 'Effective Water Storage Added:',
+            value: `+${Math.floor(vascLvl * 35 * waterCapMult)}`,
           },
           {
             label: 'Total Energy Output:',
-            value: `+${(vascLvl * 1.5 * apexMult).toFixed(2)}/s`,
+            value: `+${(vascLvl * 1.0 * apexMult).toFixed(2)}/s`,
             tone: 'total',
           },
         ],
@@ -253,23 +261,27 @@ export class TreeTabComponent {
           this.upgradeService.maxSapPressure(),
         ),
         description:
-          'Pressurize internal sap channels, converting 0.05% of your Total Max Capacity per level into passive resource generation.',
-        effect: [
-          `+${this.upgradeService.sapPressurePerLevel().toFixed(2)} All Resources/s (0.05% Cap)`,
-        ],
+          'Pressurize internal sap channels, converting a percentage of each resource Max Capacity into passive generation.',
+        effect: [`+${sapPctPerLvl.toFixed(2)}% of each Resource Cap/s per level`],
         breakdown: [
           {
-            label: 'Current Max Capacity:',
-            value: `${this.upgradeService.totalMaxCapacity()}`,
-          },
-          {
             label: 'Conversion Rate:',
-            value: `${(sapLvl * 0.05).toFixed(2)}% of Cap`,
+            value: `${(sapLvl * sapPctPerLvl).toFixed(2)}% of Caps`,
             tone: 'bonus',
           },
           {
-            label: 'Total All Resources/s:',
-            value: `+${this.upgradeService.sapPressureProduction().toFixed(2)}/s`,
+            label: 'Total Water/s:',
+            value: `+${this.upgradeService.waterSapPressure().toFixed(2)}/s`,
+            tone: 'total',
+          },
+          {
+            label: 'Total Minerals/s:',
+            value: `+${this.upgradeService.mineralsSapPressure().toFixed(2)}/s`,
+            tone: 'total',
+          },
+          {
+            label: 'Total Energy/s:',
+            value: `+${this.upgradeService.energySapPressure().toFixed(2)}/s`,
             tone: 'total',
           },
         ],
@@ -284,18 +296,18 @@ export class TreeTabComponent {
           this.upgradeService.maxResinSecretion(),
         ),
         description:
-          'Seal the outer bark with hardened resin to vastly expand resource containment.',
-        effect: ['+100 Base Max Limits', '+10% Total Max Capacity (Global)'],
+          'Seal the outer bark with hardened resin to vastly expand mineral and energy storage.',
+        effect: ['+50 Minerals & Energy Capacity', '+5% Total Max Capacities (Global)'],
         breakdown: [
-          { label: 'Flat Storage Added:', value: `+${resinLvl * 100}` },
+          { label: 'Flat Storage Added:', value: `+${resinLvl * 50}` },
           {
             label: 'Global Storage Bonus:',
-            value: `+${resinLvl * 10}% to ALL Storage`,
+            value: `+${resinLvl * 5}% to ALL Storage`,
             tone: 'bonus',
           },
           {
-            label: 'Bonus Storage from %:',
-            value: `+${Math.floor(this.upgradeService.capacityBreakdown().flatTotal * (resinLvl * 0.1))}`,
+            label: 'Effective Minerals Storage:',
+            value: `+${Math.floor(this.upgradeService.mineralsCapacityBreakdown().total)}`,
             tone: 'total',
           },
         ],
@@ -318,10 +330,11 @@ export class TreeTabComponent {
       {
         model: this.upgradeService.rootWidth,
         title: this.getTitle(this.upgradeService.rootWidth, `Expand Roots (Lvl ${widthLvl})`),
-        description: 'Spread wide to catch passing moisture.',
-        effect: [`+${(1 * rootMult).toFixed(2)} Water/s`],
+        description: 'Spread wide to catch passing moisture and expand water storage.',
+        effect: [`+${(1 * rootMult).toFixed(2)} Water/s`, '+10 Water Capacity'],
         breakdown: [
           { label: 'Base Water:', value: `+${widthLvl.toFixed(1)}/s` },
+          { label: 'Water Capacity Added:', value: `+${widthLvl * 10}` },
           ...(rootMult > 1
             ? [
                 {
@@ -341,10 +354,11 @@ export class TreeTabComponent {
       {
         model: this.upgradeService.rootDepth,
         title: this.getTitle(this.upgradeService.rootDepth, `Deepen Roots (Lvl ${depthLvl})`),
-        description: 'Burrow deeper to extract rich minerals.',
-        effect: [`+${(1 * rootMult).toFixed(2)} Minerals/s`],
+        description: 'Burrow deeper to extract rich minerals and expand mineral storage.',
+        effect: [`+${(1 * rootMult).toFixed(2)} Minerals/s`, '+10 Minerals Capacity'],
         breakdown: [
           { label: 'Base Minerals:', value: `+${depthLvl.toFixed(1)}/s` },
+          { label: 'Minerals Capacity Added:', value: `+${depthLvl * 10}` },
           ...(rootMult > 1
             ? [
                 {
@@ -402,8 +416,8 @@ export class TreeTabComponent {
         effect: hasMycelium
           ? [
               `+${(3.5 * rootMult).toFixed(2)} Minerals/s`,
-              `+${(2 * rootMult).toFixed(2)} Water/s`,
-              '+2.00 Energy/s',
+              `+${(1.5 * rootMult).toFixed(2)} Water/s`,
+              '+1.50 Energy/s',
             ]
           : [`+${(3.5 * rootMult).toFixed(2)} Minerals/s`],
         breakdown: [
@@ -426,7 +440,7 @@ export class TreeTabComponent {
             ? [
                 {
                   label: 'Symbiotic Water & Energy:',
-                  value: `+${(mycoLvl * 2 * rootMult).toFixed(1)} W / +${mycoLvl * 2} E`,
+                  value: `+${(mycoLvl * 1.5 * rootMult).toFixed(1)} W / +${(mycoLvl * 1.5).toFixed(1)} E`,
                   tone: 'bonus' as const,
                 },
               ]
@@ -446,15 +460,19 @@ export class TreeTabComponent {
           'Strengthen the root system structure, boosting all water and mineral extraction by 10% per level.',
         effect: ['+10% Root Production'],
         breakdown: [
-          { label: 'Vigor Multiplier:', value: `+${vigorLvl * 10}%`, tone: 'bonus' },
+          {
+            label: 'Vigor Multiplier:',
+            value: `x${(1 + vigorLvl * 0.1).toFixed(2)}`,
+            tone: 'bonus',
+          },
+          ...(this.mutationService.isCompleted(MutationId.FibrousRootlets)
+            ? [{ label: 'Fibrous Rootlets:', value: 'x1.15', tone: 'bonus' as const }]
+            : []),
+          ...(this.mutationService.isCompleted(MutationId.DeepTaproot)
+            ? [{ label: 'Subterranean Taproot:', value: 'x1.25', tone: 'bonus' as const }]
+            : []),
           ...(this.upgradeService.hasDeepAnchorageBonus()
-            ? [
-                {
-                  label: 'Deep Anchorage Milestone:',
-                  value: 'x1.25',
-                  tone: 'bonus' as const,
-                },
-              ]
+            ? [{ label: 'Deep Anchorage:', value: 'x1.25', tone: 'bonus' as const }]
             : []),
           {
             label: 'Combined Root Multiplier:',

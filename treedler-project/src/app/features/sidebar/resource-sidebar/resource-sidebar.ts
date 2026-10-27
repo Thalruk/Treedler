@@ -76,6 +76,21 @@ export class SidebarComponent {
         isMultiplier: true,
       });
     }
+
+    if (breakdown.hasFibrousRootlets) {
+      rootSubs.push({
+        label: 'Fibrous Rootlets',
+        amountText: 'x1.15',
+        isMultiplier: true,
+      });
+    }
+    if (breakdown.hasDeepTaproot) {
+      rootSubs.push({
+        label: 'Taproot Mut.',
+        amountText: 'x1.25',
+        isMultiplier: true,
+      });
+    }
     if (breakdown.hasDeepAnchorage) {
       rootSubs.push({
         label: 'Deep Anchorage',
@@ -134,6 +149,22 @@ export class SidebarComponent {
           isMultiplier: true,
         });
       }
+
+      if (breakdown.hasChloroplast) {
+        leafSubs.push({
+          label: 'Chloroplast Mut.',
+          amountText: 'x1.25',
+          isMultiplier: true,
+        });
+      }
+      if (breakdown.hasCascade) {
+        leafSubs.push({
+          label: 'Photo. Cascade',
+          amountText: 'x1.25',
+          isMultiplier: true,
+        });
+      }
+
       if (breakdown.hasApexFlora) {
         leafSubs.push({
           label: 'Apex Flora',
@@ -189,6 +220,21 @@ export class SidebarComponent {
         isMultiplier: true,
       });
     }
+    if (breakdown.hasFibrousRootlets) {
+      mineralSubs.push({
+        label: 'Fibrous Rootlets',
+        amountText: 'x1.15',
+        isMultiplier: true,
+      });
+    }
+    if (breakdown.hasDeepTaproot) {
+      mineralSubs.push({
+        label: 'Taproot Mut.',
+        amountText: 'x1.25',
+        isMultiplier: true,
+      });
+    }
+
     if (breakdown.hasDeepAnchorage) {
       mineralSubs.push({
         label: 'Deep Anchorage',
@@ -220,44 +266,57 @@ export class SidebarComponent {
     return items;
   });
 
-  public globalCapacityBreakdown = computed(() => {
+  private buildMultiplierItems(breakdown: {
+    resinPercent: number;
+    hasLignin: boolean;
+    hasHeartwood: boolean;
+    hasAncientTimber: boolean;
+  }): ResourceBreakdownItem[] {
     const items: ResourceBreakdownItem[] = [];
-    const breakdown = this.upgradeService.capacityBreakdown();
-
-    // 1. Flat additions
-    if (breakdown.base > 0) items.push({ label: 'Base', amount: breakdown.base });
-    if (breakdown.bark > 0) items.push({ label: 'Bark', amount: breakdown.bark });
-    if (breakdown.vascularTissues > 0)
-      items.push({ label: 'Vascular Tissues', amount: breakdown.vascularTissues });
-    if (breakdown.canopySpread > 0)
-      items.push({ label: 'Canopy Spread', amount: breakdown.canopySpread });
-    if (breakdown.resinSecretion > 0)
-      items.push({ label: 'Resin Secretion', amount: breakdown.resinSecretion });
-
-    // 2. Global Multipliers (rendered below the separator line)
     if (breakdown.resinPercent > 0) {
       const mult = 1 + breakdown.resinPercent / 100;
-      items.push({
-        label: 'Resin Bonus',
-        amountText: `x${mult.toFixed(2)}`,
-        isMultiplier: true,
-      });
+      items.push({ label: 'Resin Bonus', amountText: `x${mult.toFixed(2)}`, isMultiplier: true });
+    }
+    if (breakdown.hasLignin) {
+      items.push({ label: 'Lignin Synthesis', amountText: 'x1.20', isMultiplier: true });
     }
     if (breakdown.hasHeartwood) {
-      items.push({
-        label: 'Heartwood',
-        amountText: 'x1.50',
-        isMultiplier: true,
-      });
+      items.push({ label: 'Heartwood', amountText: 'x1.35', isMultiplier: true });
     }
     if (breakdown.hasAncientTimber) {
-      items.push({
-        label: 'Ancient Timber',
-        amountText: 'x1.25',
-        isMultiplier: true,
-      });
+      items.push({ label: 'Ancient Timber', amountText: 'x1.25', isMultiplier: true });
     }
-
     return items;
+  }
+
+  public waterCapacityBreakdown = computed(() => {
+    const b = this.upgradeService.waterCapacityBreakdown();
+    const items: ResourceBreakdownItem[] = [];
+    if (b.base > 0) items.push({ label: 'Base', amount: b.base });
+    if (b.bark > 0) items.push({ label: 'Bark', amount: b.bark });
+    if (b.rootWidthCap > 0) items.push({ label: 'Expand Roots', amount: b.rootWidthCap });
+    if (b.vascularTissues > 0) items.push({ label: 'Vascular Tissues', amount: b.vascularTissues });
+    if (b.canopySpread > 0) items.push({ label: 'Canopy Spread', amount: b.canopySpread });
+    return [...items, ...this.buildMultiplierItems(b)];
+  });
+
+  public mineralsCapacityBreakdown = computed(() => {
+    const b = this.upgradeService.mineralsCapacityBreakdown();
+    const items: ResourceBreakdownItem[] = [];
+    if (b.base > 0) items.push({ label: 'Base', amount: b.base });
+    if (b.bark > 0) items.push({ label: 'Bark', amount: b.bark });
+    if (b.rootDepthCap > 0) items.push({ label: 'Deepen Roots', amount: b.rootDepthCap });
+    if (b.resinSecretion > 0) items.push({ label: 'Resin Secretion', amount: b.resinSecretion });
+    return [...items, ...this.buildMultiplierItems(b)];
+  });
+
+  public energyCapacityBreakdown = computed(() => {
+    const b = this.upgradeService.energyCapacityBreakdown();
+    const items: ResourceBreakdownItem[] = [];
+    if (b.base > 0) items.push({ label: 'Base', amount: b.base });
+    if (b.bark > 0) items.push({ label: 'Bark', amount: b.bark });
+    if (b.canopySpread > 0) items.push({ label: 'Canopy Spread', amount: b.canopySpread });
+    if (b.resinSecretion > 0) items.push({ label: 'Resin Secretion', amount: b.resinSecretion });
+    return [...items, ...this.buildMultiplierItems(b)];
   });
 }

@@ -1,5 +1,5 @@
-import { ResourceId } from '../enums/resource.enum';
 import { MutationId } from '../enums/mutation.enum';
+import { ResourceId } from '../enums/resource.enum';
 
 export interface MutationCost {
   resourceId: ResourceId;
@@ -11,6 +11,7 @@ export interface MutationDef {
   id: MutationId;
   title: string;
   description: string;
-  effect: string[];
   costs: MutationCost[];
+  effect: string[];
+  requiredMutations?: MutationId[];
 }

@@ -1,85 +1,202 @@
 import { MutationDef } from '../models/mutation.model';
-import { ResourceId } from '../enums/resource.enum';
 import { MutationId } from '../enums/mutation.enum';
+import { ResourceId } from '../enums/resource.enum';
 
 export const MUTATIONS_CONFIG: MutationDef[] = [
+  // ==========================================
+  // TIER 1: STARTER ADAPTATIONS
+  // ==========================================
+  {
+    id: MutationId.CuticleWaxing,
+    title: 'Waxy Cuticle',
+    description: 'Coat emerging leaves in a thin lipid film to curb excessive water evaporation.',
+    costs: [
+      { resourceId: ResourceId.Energy, totalRequired: 180, drainPerSecond: 3 },
+      { resourceId: ResourceId.Water, totalRequired: 120, drainPerSecond: 2 },
+    ],
+    effect: [
+      'Leaf Upkeep: 0.08 -> 0.065/s',
+      '+5 Max Bark Thickness Level',
+      '+2 Max Sunward Reach Level',
+    ],
+  },
+  {
+    id: MutationId.FibrousRootlets,
+    title: 'Fibrous Rootlets',
+    description:
+      'Split primary roots into dense mats of fine feeder threads that cling to soil particles.',
+    costs: [
+      { resourceId: ResourceId.Energy, totalRequired: 200, drainPerSecond: 3 },
+      { resourceId: ResourceId.Minerals, totalRequired: 160, drainPerSecond: 2.5 },
+    ],
+    effect: ['x1.15 Root Production', '+3 Max Root Hairs Level', '+2 Max Root Vigor Level'],
+  },
+
+  // ==========================================
+  // TIER 2: STRUCTURAL & VASCULAR EXPANSION
+  // ==========================================
   {
     id: MutationId.DenseBranching,
     title: 'Dense Branching',
-    description: 'Compact foliage structure allowing more leaves on a single branch.',
-    effect: ['+5 Leaves per Branch', '+5 Max Canopy Spread Level', '+5 Max Root Hairs Level'],
+    description: ' Alter nodal growth angles to pack more foliage onto every bough.',
+    requiredMutations: [MutationId.CuticleWaxing],
     costs: [
-      { resourceId: ResourceId.Energy, totalRequired: 600, drainPerSecond: 6 },
-      { resourceId: ResourceId.Water, totalRequired: 400, drainPerSecond: 4 },
-      { resourceId: ResourceId.Minerals, totalRequired: 200, drainPerSecond: 2 },
+      { resourceId: ResourceId.Energy, totalRequired: 350, drainPerSecond: 5 },
+      { resourceId: ResourceId.Water, totalRequired: 250, drainPerSecond: 3.5 },
+      { resourceId: ResourceId.Minerals, totalRequired: 250, drainPerSecond: 3.5 },
     ],
+    effect: ['+3 Leaves per Branch', '+3 Max Canopy Spread Level', '+3 Max Root Hairs Level'],
   },
   {
     id: MutationId.StomataOptimization,
     title: 'Stomata Optimization',
-    description: 'Refined microscopic pores reduce transpiration and mineral loss.',
-    effect: ['-35% Leaf Water & Mineral Upkeep', '+7 Max Vascular Tissues Level'],
+    description:
+      'Synchronize microscopic pore openings with ambient humidity to minimize transpiration loss.',
+    requiredMutations: [MutationId.CuticleWaxing],
     costs: [
-      { resourceId: ResourceId.Energy, totalRequired: 1200, drainPerSecond: 10 },
-      { resourceId: ResourceId.Water, totalRequired: 1000, drainPerSecond: 8 },
-      { resourceId: ResourceId.Minerals, totalRequired: 500, drainPerSecond: 4 },
+      { resourceId: ResourceId.Energy, totalRequired: 420, drainPerSecond: 6 },
+      { resourceId: ResourceId.Water, totalRequired: 320, drainPerSecond: 4.5 },
+    ],
+    effect: [
+      'Leaf Upkeep: 0.065 -> 0.05/s',
+      '+4 Max Vascular Tissues Level',
+      '+3 Max Sap Pressure Level',
     ],
   },
+  {
+    id: MutationId.LigninSynthesis,
+    title: 'Lignin Synthesis',
+    description:
+      'Reinforce cellular walls with complex polymers, significantly expanding internal storage.',
+    requiredMutations: [MutationId.FibrousRootlets],
+    costs: [
+      { resourceId: ResourceId.Energy, totalRequired: 450, drainPerSecond: 6 },
+      { resourceId: ResourceId.Minerals, totalRequired: 380, drainPerSecond: 5 },
+    ],
+    effect: [
+      'x1.20 Total Max Capacity',
+      '+5 Max Bark Thickness Level',
+      '+3 Max Resin Secretion Level',
+    ],
+  },
+
+  // ==========================================
+  // TIER 3: METABOLIC SPECIALIZATION
+  // ==========================================
   {
     id: MutationId.ChloroplastRefinement,
     title: 'Chloroplast Refinement',
-    description: 'Enhanced chlorophyll density drastically amplifies solar conversion.',
-    effect: ['x1.4 Total Leaf Energy Output', '+5 Max Sunward Reach Level'],
+    description: 'Pack thylakoid membranes tighter to capture a broader spectrum of sunlight.',
+    requiredMutations: [MutationId.DenseBranching],
     costs: [
-      { resourceId: ResourceId.Energy, totalRequired: 2500, drainPerSecond: 15 },
-      { resourceId: ResourceId.Water, totalRequired: 1500, drainPerSecond: 10 },
-      { resourceId: ResourceId.Minerals, totalRequired: 1000, drainPerSecond: 6 },
+      { resourceId: ResourceId.Energy, totalRequired: 750, drainPerSecond: 9 },
+      { resourceId: ResourceId.Water, totalRequired: 500, drainPerSecond: 6 },
+      { resourceId: ResourceId.Minerals, totalRequired: 500, drainPerSecond: 6 },
     ],
+    effect: ['x1.25 Leaf Energy Output', '+4 Max Sunward Reach Level'],
   },
   {
-    id: MutationId.HeartwoodFormation,
-    title: 'Heartwood Formation',
-    description: 'Compress the inner core into dense, hollow-resistant timber for vast storage.',
-    effect: [
-      'x1.5 Global Max Capacity',
-      '+5 Max Resin Secretion Level',
-      '+8 Max Vascular Tissues Level',
-    ],
+    id: MutationId.XylemConduits,
+    title: 'Wide Xylem Conduits',
+    description:
+      'Widen internal sap vessels, doubling the passive flow generated by hydrostatic pressure.',
+    requiredMutations: [MutationId.StomataOptimization],
     costs: [
-      { resourceId: ResourceId.Energy, totalRequired: 4000, drainPerSecond: 20 },
-      { resourceId: ResourceId.Water, totalRequired: 3000, drainPerSecond: 15 },
-      { resourceId: ResourceId.Minerals, totalRequired: 3000, drainPerSecond: 15 },
+      { resourceId: ResourceId.Energy, totalRequired: 850, drainPerSecond: 10 },
+      { resourceId: ResourceId.Water, totalRequired: 700, drainPerSecond: 8 },
+    ],
+    effect: [
+      'Doubles Sap Pressure Output (0.10% Cap/Lvl)',
+      '+5 Max Vascular Tissues Level',
+      '+4 Max Sap Pressure Level',
     ],
   },
   {
     id: MutationId.SymbioticMycelium,
     title: 'Symbiotic Mycelium',
     description:
-      'Fuse fungal threads directly into root cells for bi-directional nutrient synthesis.',
-    effect: [
-      'Mycorrhiza: +2 Water/s & +2 Energy/s per Lvl',
-      '+7 Max Mycorrhiza & Root Vigor Level',
-      '+10 Max Root Hairs Level',
-    ],
+      'Fuse fungal hyphae directly into root cortex cells for bidirectional nutrient exchange.',
+    requiredMutations: [MutationId.FibrousRootlets, MutationId.LigninSynthesis],
     costs: [
-      { resourceId: ResourceId.Energy, totalRequired: 8000, drainPerSecond: 30 },
-      { resourceId: ResourceId.Water, totalRequired: 6000, drainPerSecond: 22 },
-      { resourceId: ResourceId.Minerals, totalRequired: 6000, drainPerSecond: 22 },
+      { resourceId: ResourceId.Energy, totalRequired: 950, drainPerSecond: 11 },
+      { resourceId: ResourceId.Water, totalRequired: 650, drainPerSecond: 7.5 },
+      { resourceId: ResourceId.Minerals, totalRequired: 800, drainPerSecond: 9 },
+    ],
+    effect: [
+      'Mycorrhiza grants +1.5 Water & +1.5 Energy/s',
+      '+5 Max Mycorrhizal Network Level',
+      '+4 Max Root Hairs Level',
+    ],
+  },
+
+  // ==========================================
+  // TIER 4: ADVANCED EVOLUTION
+  // ==========================================
+  {
+    id: MutationId.DeepTaproot,
+    title: 'Subterranean Taproot',
+    description:
+      'Drive a massive central root through bedrock fractures into pressurized mineral seams.',
+    requiredMutations: [MutationId.SymbioticMycelium],
+    costs: [
+      { resourceId: ResourceId.Energy, totalRequired: 1400, drainPerSecond: 15 },
+      { resourceId: ResourceId.Minerals, totalRequired: 1400, drainPerSecond: 15 },
+    ],
+    effect: [
+      'x1.25 Root Production',
+      '+5 Max Root Vigor Level',
+      '+3 Max Mycorrhizal Network Level',
     ],
   },
   {
+    id: MutationId.HeartwoodFormation,
+    title: 'Heartwood Formation',
+    description:
+      'Compress the inner trunk into dense, resin-infused pillars capable of holding vast reserves.',
+    requiredMutations: [MutationId.LigninSynthesis, MutationId.XylemConduits],
+    costs: [
+      { resourceId: ResourceId.Energy, totalRequired: 1600, drainPerSecond: 16 },
+      { resourceId: ResourceId.Water, totalRequired: 1200, drainPerSecond: 12 },
+      { resourceId: ResourceId.Minerals, totalRequired: 1400, drainPerSecond: 14 },
+    ],
+    effect: [
+      'x1.35 Total Max Capacity',
+      '+10 Max Bark Thickness Level',
+      '+5 Max Resin Secretion Level',
+      '+5 Max Sap Pressure Level',
+    ],
+  },
+  {
+    id: MutationId.PhotosyntheticCascade,
+    title: 'Photosynthetic Cascade',
+    description:
+      'Establish secondary light-harvesting complexes that recycle photorespiratory byproducts.',
+    requiredMutations: [MutationId.ChloroplastRefinement, MutationId.XylemConduits],
+    costs: [
+      { resourceId: ResourceId.Energy, totalRequired: 1900, drainPerSecond: 19 },
+      { resourceId: ResourceId.Water, totalRequired: 1500, drainPerSecond: 15 },
+    ],
+    effect: [
+      'Leaf Upkeep: 0.05 -> 0.035/s',
+      'x1.25 Leaf Energy Output',
+      '+5 Max Sunward Reach Level',
+    ],
+  },
+
+  // ==========================================
+  // TIER 5: APEX CAPSTONE
+  // ==========================================
+  {
     id: MutationId.FractalCanopy,
     title: 'Fractal Canopy',
-    description: 'Self-repeating geometric sub-branches maximize exposure to the sky.',
-    effect: [
-      '+10 Leaves per Branch',
-      '+7 Max Sunward Reach & Resin Level',
-      '+10 Max Canopy Spread Level',
-    ],
+    description:
+      'Self-similar geometric branching eliminates self-shading across the entire crown.',
+    requiredMutations: [MutationId.HeartwoodFormation, MutationId.PhotosyntheticCascade],
     costs: [
-      { resourceId: ResourceId.Energy, totalRequired: 15000, drainPerSecond: 45 },
-      { resourceId: ResourceId.Water, totalRequired: 10000, drainPerSecond: 30 },
-      { resourceId: ResourceId.Minerals, totalRequired: 8000, drainPerSecond: 25 },
+      { resourceId: ResourceId.Energy, totalRequired: 2800, drainPerSecond: 25 },
+      { resourceId: ResourceId.Water, totalRequired: 2400, drainPerSecond: 22 },
+      { resourceId: ResourceId.Minerals, totalRequired: 2400, drainPerSecond: 22 },
     ],
+    effect: ['+6 Leaves per Branch', '+7 Max Canopy Spread Level', '+5 Max Resin Secretion Level'],
   },
 ];

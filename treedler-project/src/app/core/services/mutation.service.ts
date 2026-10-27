@@ -64,6 +64,19 @@ export class MutationService {
     return minExtraMultiples === Infinity ? 0 : Math.max(0, minExtraMultiples);
   });
 
+  public visibleMutations = computed(() => {
+    const completedMap = this.completed();
+    return this.availableMutations.filter((mut) => {
+      if (completedMap[mut.id]) return true;
+      if (!mut.requiredMutations || mut.requiredMutations.length === 0) return true;
+      return mut.requiredMutations.every((reqId) => !!completedMap[reqId]);
+    });
+  });
+
+  public completedCount = computed(
+    () => this.availableMutations.filter((m) => !!this.completed()[m.id]).length,
+  );
+
   public drainMultiplier = computed(() => 1 + this.overMutationMultiples());
 
   public overMutationSpeedMultiplier = computed(

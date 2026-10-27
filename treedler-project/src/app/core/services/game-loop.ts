@@ -63,7 +63,11 @@ export class GameLoopService {
         minerals: this.upgradeService.mineralsGeneration(),
         energy: this.upgradeService.energyGeneration(),
       },
-      this.upgradeService.totalMaxCapacity(),
+      {
+        water: this.upgradeService.waterMaxCapacity(),
+        minerals: this.upgradeService.mineralsMaxCapacity(),
+        energy: this.upgradeService.energyMaxCapacity(),
+      },
     );
   }
 

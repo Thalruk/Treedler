@@ -80,8 +80,8 @@ export class UpgradeService {
 
   public leavesPerBranch = computed(() => {
     let base = 10;
-    if (this.mutationService.isCompleted(MutationId.DenseBranching)) base += 5;
-    if (this.mutationService.isCompleted(MutationId.FractalCanopy)) base += 10;
+    if (this.mutationService.isCompleted(MutationId.DenseBranching)) base += 3;
+    if (this.mutationService.isCompleted(MutationId.FractalCanopy)) base += 6;
     return base;
   });
 
@@ -89,120 +89,199 @@ export class UpgradeService {
 
   public maxSunwardReach = computed(() => {
     let cap = 3;
-    if (this.mutationService.isCompleted(MutationId.ChloroplastRefinement)) cap += 5;
-    if (this.mutationService.isCompleted(MutationId.FractalCanopy)) cap += 7;
+    if (this.mutationService.isCompleted(MutationId.CuticleWaxing)) cap += 2;
+    if (this.mutationService.isCompleted(MutationId.ChloroplastRefinement)) cap += 4;
+    if (this.mutationService.isCompleted(MutationId.PhotosyntheticCascade)) cap += 5;
     return cap;
   });
 
   public maxCanopySpread = computed(() => {
-    let cap = 5;
-    if (this.mutationService.isCompleted(MutationId.DenseBranching)) cap += 5;
-    if (this.mutationService.isCompleted(MutationId.FractalCanopy)) cap += 10;
+    let cap = 4;
+    if (this.mutationService.isCompleted(MutationId.DenseBranching)) cap += 3;
+    if (this.mutationService.isCompleted(MutationId.FractalCanopy)) cap += 7;
+    return cap;
+  });
+
+  public maxBarkThickness = computed(() => {
+    let cap = 10;
+    if (this.mutationService.isCompleted(MutationId.CuticleWaxing)) cap += 5;
+    if (this.mutationService.isCompleted(MutationId.LigninSynthesis)) cap += 5;
+    if (this.mutationService.isCompleted(MutationId.HeartwoodFormation)) cap += 10;
     return cap;
   });
 
   public maxVascularTissues = computed(() => {
     let cap = 5;
-    if (this.mutationService.isCompleted(MutationId.StomataOptimization)) cap += 7;
-    if (this.mutationService.isCompleted(MutationId.HeartwoodFormation)) cap += 8;
+    if (this.mutationService.isCompleted(MutationId.StomataOptimization)) cap += 4;
+    if (this.mutationService.isCompleted(MutationId.XylemConduits)) cap += 5;
     return cap;
   });
 
   public maxSapPressure = computed(() => {
     let cap = 3;
-    if (this.mutationService.isCompleted(MutationId.StomataOptimization)) cap += 5;
-    if (this.mutationService.isCompleted(MutationId.HeartwoodFormation)) cap += 7;
+    if (this.mutationService.isCompleted(MutationId.StomataOptimization)) cap += 3;
+    if (this.mutationService.isCompleted(MutationId.XylemConduits)) cap += 4;
+    if (this.mutationService.isCompleted(MutationId.HeartwoodFormation)) cap += 5;
     return cap;
   });
 
   public maxResinSecretion = computed(() => {
     let cap = 3;
+    if (this.mutationService.isCompleted(MutationId.LigninSynthesis)) cap += 3;
     if (this.mutationService.isCompleted(MutationId.HeartwoodFormation)) cap += 5;
-    if (this.mutationService.isCompleted(MutationId.FractalCanopy)) cap += 7;
+    if (this.mutationService.isCompleted(MutationId.FractalCanopy)) cap += 5;
     return cap;
   });
 
   public maxRootHairs = computed(() => {
-    let cap = 5;
-    if (this.mutationService.isCompleted(MutationId.DenseBranching)) cap += 5;
-    if (this.mutationService.isCompleted(MutationId.SymbioticMycelium)) cap += 10;
+    let cap = 4;
+    if (this.mutationService.isCompleted(MutationId.FibrousRootlets)) cap += 3;
+    if (this.mutationService.isCompleted(MutationId.DenseBranching)) cap += 3;
+    if (this.mutationService.isCompleted(MutationId.SymbioticMycelium)) cap += 4;
     return cap;
   });
 
   public maxMycorrhizalNetwork = computed(() => {
     let cap = 3;
-    if (this.mutationService.isCompleted(MutationId.SymbioticMycelium)) cap += 7;
+    if (this.mutationService.isCompleted(MutationId.SymbioticMycelium)) cap += 5;
+    if (this.mutationService.isCompleted(MutationId.DeepTaproot)) cap += 3;
     return cap;
   });
 
   public maxRootVigor = computed(() => {
     let cap = 3;
-    if (this.mutationService.isCompleted(MutationId.SymbioticMycelium)) cap += 7;
+    if (this.mutationService.isCompleted(MutationId.FibrousRootlets)) cap += 2;
+    if (this.mutationService.isCompleted(MutationId.DeepTaproot)) cap += 5;
     return cap;
   });
 
   public isMaxed(upgrade: UpgradeBase, limit?: number): boolean {
     return limit !== undefined && upgrade.level() >= limit;
   }
-
   // ==========================================
-  // 4. CAPACITY CALCULATION & BREAKDOWN
+  // 4. CAPACITY CALCULATION & BREAKDOWN (PER RESOURCE)
   // ==========================================
 
-  public capacityBreakdown = computed(() => {
-    const base = this.hasFirstStem() ? 30 : 10;
-    const bark = this.barkThickness.level() * 25;
-    const vascularTissues = this.vascularTissues.level() * 20;
-    const canopySpread = this.canopySpread.level() * 75;
-    const resinSecretion = this.resinSecretion.level() * 100;
-
-    const flatTotal = base + bark + vascularTissues + canopySpread + resinSecretion;
-    const resinMultiplier = 1 + this.resinSecretion.level() * 0.1;
+  private globalCapacityMultipliers = computed(() => {
+    const resinPercent = this.resinSecretion.level() * 5;
+    const resinMultiplier = 1 + resinPercent / 100;
+    const ligninMultiplier = this.mutationService.isCompleted(MutationId.LigninSynthesis)
+      ? 1.2
+      : 1.0;
     const heartwoodMultiplier = this.mutationService.isCompleted(MutationId.HeartwoodFormation)
-      ? 1.5
+      ? 1.35
       : 1.0;
     const timberMultiplier = this.hasAncientTimberBonus() ? 1.25 : 1.0;
 
-    const total = Math.floor(flatTotal * resinMultiplier * heartwoodMultiplier * timberMultiplier);
+    return {
+      resinPercent,
+      hasLignin: this.mutationService.isCompleted(MutationId.LigninSynthesis),
+      hasHeartwood: this.mutationService.isCompleted(MutationId.HeartwoodFormation),
+      hasAncientTimber: this.hasAncientTimberBonus(),
+      totalMultiplier: resinMultiplier * ligninMultiplier * heartwoodMultiplier * timberMultiplier,
+    };
+  });
+
+  public waterCapacityBreakdown = computed(() => {
+    const base = this.hasFirstStem() ? 25 : 10;
+    const bark = this.barkThickness.level() * 15;
+    const rootWidthCap = this.rootWidth.level() * 10;
+    const vascularTissues = this.vascularTissues.level() * 35;
+    const canopySpread = this.canopySpread.level() * 25;
+
+    const flatTotal = base + bark + rootWidthCap + vascularTissues + canopySpread;
+    const mults = this.globalCapacityMultipliers();
+    const total = Math.floor(flatTotal * mults.totalMultiplier);
 
     return {
       base,
       bark,
+      rootWidthCap,
       vascularTissues,
       canopySpread,
-      resinSecretion,
       flatTotal,
-      resinPercent: this.resinSecretion.level() * 10,
-      totalMultiplier: resinMultiplier * heartwoodMultiplier * timberMultiplier,
-      hasHeartwood: this.mutationService.isCompleted(MutationId.HeartwoodFormation),
-      hasAncientTimber: this.hasAncientTimberBonus(),
+      ...mults,
       total,
     };
   });
 
-  public totalMaxCapacity = computed(() => this.capacityBreakdown().total);
+  public mineralsCapacityBreakdown = computed(() => {
+    const base = this.hasFirstStem() ? 25 : 10;
+    const bark = this.barkThickness.level() * 15;
+    const rootDepthCap = this.rootDepth.level() * 10;
+    const resinSecretion = this.resinSecretion.level() * 50;
+
+    const flatTotal = base + bark + rootDepthCap + resinSecretion;
+    const mults = this.globalCapacityMultipliers();
+    const total = Math.floor(flatTotal * mults.totalMultiplier);
+
+    return {
+      base,
+      bark,
+      rootDepthCap,
+      resinSecretion,
+      flatTotal,
+      ...mults,
+      total,
+    };
+  });
+
+  public energyCapacityBreakdown = computed(() => {
+    const base = this.hasFirstStem() ? 25 : 10;
+    const bark = this.barkThickness.level() * 15;
+    const canopySpread = this.canopySpread.level() * 60;
+    const resinSecretion = this.resinSecretion.level() * 50;
+
+    const flatTotal = base + bark + canopySpread + resinSecretion;
+    const mults = this.globalCapacityMultipliers();
+    const total = Math.floor(flatTotal * mults.totalMultiplier);
+
+    return {
+      base,
+      bark,
+      canopySpread,
+      resinSecretion,
+      flatTotal,
+      ...mults,
+      total,
+    };
+  });
+
+  public waterMaxCapacity = computed(() => this.waterCapacityBreakdown().total);
+  public mineralsMaxCapacity = computed(() => this.mineralsCapacityBreakdown().total);
+  public energyMaxCapacity = computed(() => this.energyCapacityBreakdown().total);
 
   // ==========================================
   // 5. RESOURCE GENERATION & BREAKDOWNS
   // ==========================================
 
-  /**
-   * Sap Pressure: Each level converts 0.05% (0.0005) of Total Max Capacity into All Resources/s
-   */
-  public sapPressurePerLevel = computed(() => this.totalMaxCapacity() * 0.0005);
-  public sapPressureProduction = computed(
-    () => this.sapPressure.level() * this.sapPressurePerLevel(),
+  public sapPressureRate = computed(() =>
+    this.mutationService.isCompleted(MutationId.XylemConduits) ? 0.001 : 0.0005,
   );
 
-  public leafResourceUpkeep = computed(() =>
-    this.mutationService.isCompleted(MutationId.StomataOptimization) ? 0.013 : 0.02,
+  public waterSapPressure = computed(
+    () => this.sapPressure.level() * this.waterMaxCapacity() * this.sapPressureRate(),
   );
+  public mineralsSapPressure = computed(
+    () => this.sapPressure.level() * this.mineralsMaxCapacity() * this.sapPressureRate(),
+  );
+  public energySapPressure = computed(
+    () => this.sapPressure.level() * this.energyMaxCapacity() * this.sapPressureRate(),
+  );
+  public leafResourceUpkeep = computed(() => {
+    let upkeep = 0.08;
+    if (this.mutationService.isCompleted(MutationId.CuticleWaxing)) upkeep = 0.065;
+    if (this.mutationService.isCompleted(MutationId.StomataOptimization)) upkeep = 0.05;
+    if (this.mutationService.isCompleted(MutationId.PhotosyntheticCascade)) upkeep = 0.035;
+    return upkeep;
+  });
 
-  public leafEnergyBase = computed(() => 0.1);
+  public leafEnergyBase = computed(() => 0.12);
 
   public leafEnergyMultiplier = computed(() => {
     let mult = 1.0;
-    if (this.mutationService.isCompleted(MutationId.ChloroplastRefinement)) mult *= 1.4;
+    if (this.mutationService.isCompleted(MutationId.ChloroplastRefinement)) mult *= 1.25;
+    if (this.mutationService.isCompleted(MutationId.PhotosyntheticCascade)) mult *= 1.25;
     if (this.hasApexFloraBonus()) mult *= 1.5;
     return mult;
   });
@@ -212,27 +291,29 @@ export class UpgradeService {
   );
 
   public rootMultiplier = computed(() => {
-    const vigorMult = 1 + this.rootVigor.level() * 0.1;
-    const anchorageMult = this.hasDeepAnchorageBonus() ? 1.25 : 1.0;
-    return vigorMult * anchorageMult;
+    let mult = 1 + this.rootVigor.level() * 0.1;
+    if (this.mutationService.isCompleted(MutationId.FibrousRootlets)) mult *= 1.15;
+    if (this.mutationService.isCompleted(MutationId.DeepTaproot)) mult *= 1.25;
+    if (this.hasDeepAnchorageBonus()) mult *= 1.25;
+    return mult;
   });
 
   public waterGeneration = computed(() => {
     const base = this.hasFirstRoot() ? 1 : 0;
     const myceliumBonus = this.mutationService.isCompleted(MutationId.SymbioticMycelium)
-      ? this.mycorrhizalNetwork.level() * 2
+      ? this.mycorrhizalNetwork.level() * 1.5
       : 0;
     const fromRoots =
       (this.rootWidth.level() * 1 + this.rootHairs.level() * 2.5 + myceliumBonus) *
       this.rootMultiplier();
-    const fromSapPressure = this.sapPressureProduction();
+    const fromSapPressure = this.waterSapPressure();
     const leafUpkeep = this.leaf.level() * this.leafResourceUpkeep();
     return base + fromRoots + fromSapPressure - leafUpkeep;
   });
 
   public waterBreakdown = computed(() => {
     const myceliumBonus = this.mutationService.isCompleted(MutationId.SymbioticMycelium)
-      ? this.mycorrhizalNetwork.level() * 2
+      ? this.mycorrhizalNetwork.level() * 1.5
       : 0;
     return {
       base: this.hasFirstRoot() ? 1 : 0,
@@ -240,11 +321,13 @@ export class UpgradeService {
       rootHairs: this.rootHairs.level() * 2.5,
       myceliumWater: myceliumBonus,
       rootVigorPercent: this.rootVigor.level() * 10,
+      hasFibrousRootlets: this.mutationService.isCompleted(MutationId.FibrousRootlets),
+      hasDeepTaproot: this.mutationService.isCompleted(MutationId.DeepTaproot),
       hasDeepAnchorage: this.hasDeepAnchorageBonus(),
       subtotalRoots:
         (this.rootWidth.level() * 1 + this.rootHairs.level() * 2.5 + myceliumBonus) *
         this.rootMultiplier(),
-      sapPressure: this.sapPressureProduction(),
+      sapPressure: this.waterSapPressure(),
       leaves: -(this.leaf.level() * this.leafResourceUpkeep()),
     };
   });
@@ -253,7 +336,7 @@ export class UpgradeService {
     const base = this.hasFirstRoot() ? 1 : 0;
     const fromRoots =
       (this.rootDepth.level() * 1 + this.mycorrhizalNetwork.level() * 3.5) * this.rootMultiplier();
-    const fromSapPressure = this.sapPressureProduction();
+    const fromSapPressure = this.mineralsSapPressure();
     const leafUpkeep = this.leaf.level() * this.leafResourceUpkeep();
     return base + fromRoots + fromSapPressure - leafUpkeep;
   });
@@ -263,21 +346,24 @@ export class UpgradeService {
     rootDepth: this.rootDepth.level() * 1,
     mycorrhizalNetwork: this.mycorrhizalNetwork.level() * 3.5,
     rootVigorPercent: this.rootVigor.level() * 10,
+    hasFibrousRootlets: this.mutationService.isCompleted(MutationId.FibrousRootlets),
+    hasDeepTaproot: this.mutationService.isCompleted(MutationId.DeepTaproot),
     hasDeepAnchorage: this.hasDeepAnchorageBonus(),
     subtotalRoots:
       (this.rootDepth.level() * 1 + this.mycorrhizalNetwork.level() * 3.5) * this.rootMultiplier(),
-    sapPressure: this.sapPressureProduction(),
+    sapPressure: this.mineralsSapPressure(),
     leaves: -(this.leaf.level() * this.leafResourceUpkeep()),
   }));
+
   public energyGeneration = computed(() => {
     const apexMult = this.hasApexFloraBonus() ? 1.5 : 1.0;
     const base = (this.hasFirstStem() ? 1 : 0) * apexMult;
     const fromLeaves = this.leaf.level() * this.singleLeafEnergy();
-    const fromVascular = this.vascularTissues.level() * 1.5 * apexMult;
-    const fromSapPressure = this.sapPressureProduction() * apexMult;
+    const fromVascular = this.vascularTissues.level() * 1.0 * apexMult;
+    const fromSapPressure = this.energySapPressure() * apexMult;
     const fromMycelium =
       (this.mutationService.isCompleted(MutationId.SymbioticMycelium)
-        ? this.mycorrhizalNetwork.level() * 2
+        ? this.mycorrhizalNetwork.level() * 1.5
         : 0) * apexMult;
     return base + fromLeaves + fromVascular + fromSapPressure + fromMycelium;
   });
@@ -291,12 +377,13 @@ export class UpgradeService {
       leafBaseTotal: leafCount * this.leafEnergyBase(),
       sunwardReachTotal: leafCount * (this.sunwardReach.level() * 0.03),
       hasChloroplast: this.mutationService.isCompleted(MutationId.ChloroplastRefinement),
+      hasCascade: this.mutationService.isCompleted(MutationId.PhotosyntheticCascade),
       hasApexFlora: this.hasApexFloraBonus(),
-      vascularTissues: this.vascularTissues.level() * 1.5 * apexMult,
-      sapPressure: this.sapPressureProduction() * apexMult,
+      vascularTissues: this.vascularTissues.level() * 1.0 * apexMult,
+      sapPressure: this.energySapPressure() * apexMult,
       symbioticMycelium:
         (this.mutationService.isCompleted(MutationId.SymbioticMycelium)
-          ? this.mycorrhizalNetwork.level() * 2
+          ? this.mycorrhizalNetwork.level() * 1.5
           : 0) * apexMult,
     };
   });

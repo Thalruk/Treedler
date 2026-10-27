@@ -62,11 +62,11 @@ export class ResourceService {
   public tick(
     deltaTime: number,
     generations: { water: number; minerals: number; energy: number },
-    maxCapacity: number,
+    maxCapacities: { water: number; minerals: number; energy: number },
   ): void {
-    this.updateResource(this.water, deltaTime, generations.water, maxCapacity);
-    this.updateResource(this.minerals, deltaTime, generations.minerals, maxCapacity);
-    this.updateResource(this.energy, deltaTime, generations.energy, maxCapacity);
+    this.updateResource(this.water, deltaTime, generations.water, maxCapacities.water);
+    this.updateResource(this.minerals, deltaTime, generations.minerals, maxCapacities.minerals);
+    this.updateResource(this.energy, deltaTime, generations.energy, maxCapacities.energy);
   }
 
   private updateResource(
