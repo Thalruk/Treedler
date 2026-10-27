@@ -12,7 +12,8 @@ import { MutationTabComponent } from './features/tabs/mutation-tab/mutation-tab'
 import { LogSidebarComponent } from './features/sidebar/log-sidebar/log-sidebar';
 import { StorylineTabComponent } from './features/tabs/storyline-tab/storyline-tab';
 import { BloomTabComponent } from './features/tabs/bloom-tab/bloom-tab';
-
+import { RoadmapModalComponent } from './shared/ui/roadmap-modal/roadmap-modal';
+import { RoadmapService } from './core/services/roadmap.service';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -25,6 +26,7 @@ import { BloomTabComponent } from './features/tabs/bloom-tab/bloom-tab';
     LogSidebarComponent,
     StorylineTabComponent,
     BloomTabComponent,
+    RoadmapModalComponent,
   ],
   templateUrl: './app.html',
 })
@@ -35,7 +37,7 @@ export class AppComponent implements OnInit {
   public storylineService = inject(StorylineService);
   public activeTab = signal<TabId>(TabId.Tree);
   public Tab = TabId;
-
+  public roadmapService = inject(RoadmapService);
   ngOnInit(): void {
     this.saveService.loadGame();
     this.gameLoop.start();
