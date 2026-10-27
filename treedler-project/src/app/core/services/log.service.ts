@@ -1,4 +1,4 @@
-import { Injectable, signal, WritableSignal, inject } from '@angular/core';
+import { Injectable, signal, WritableSignal, inject, OnDestroy } from '@angular/core';
 import { UpgradeService } from './upgrade.service';
 import { MutationService } from './mutation.service';
 import { BloomService } from './bloom.service';
@@ -16,7 +16,7 @@ export interface LogEntry {
 }
 
 @Injectable({ providedIn: 'root' })
-export class LogService {
+export class LogService implements OnDestroy {
   private upgradeService = inject(UpgradeService);
   private mutationService = inject(MutationService);
   private bloomService = inject(BloomService);
@@ -43,13 +43,93 @@ export class LogService {
   public loggedBloomStageIndex = signal<number>(0);
   public loggedBloomComplete = signal<boolean>(false);
 
+  // RANDOM EVENT TIMER & VISIBILITY API STATE
+  private readonly minRandomIntervalMs = 45_000; // 45 sekund
+  private readonly maxRandomIntervalMs = 120_000; // 120 sekund
+  private remainingTimeMs = 0;
+  private lastStartTimestamp = 0;
+  private randomTimerId: ReturnType<typeof setTimeout> | null = null;
+  private lastRandomEventIndex: number = -1;
+
+  private readonly visibilityHandler = () => this.handleVisibilityChange();
+
+  constructor() {
+    document.addEventListener('visibilitychange', this.visibilityHandler);
+    this.scheduleNextRandomEvent();
+  }
+
+  public ngOnDestroy(): void {
+    this.clearRandomTimer();
+    document.removeEventListener('visibilitychange', this.visibilityHandler);
+  }
+
+  // ----------------------------------------
+  // SMART RANDOM EVENT SCHEDULER (RNG + VISIBILITY)
+  // ----------------------------------------
+  private scheduleNextRandomEvent(): void {
+    this.remainingTimeMs = this.getRandomDuration(
+      this.minRandomIntervalMs,
+      this.maxRandomIntervalMs,
+    );
+
+    if (!document.hidden) {
+      this.startRandomTimer();
+    }
+  }
+
+  private startRandomTimer(): void {
+    this.clearRandomTimer();
+    this.lastStartTimestamp = performance.now();
+
+    this.randomTimerId = setTimeout(() => {
+      // Odpalamy losowy event tylko, gdy gracz zaczął już rosnąć (ma pierwszy pęd i korzeń)
+      if (this.upgradeService.hasFirstStem() && this.upgradeService.hasFirstRoot()) {
+        this.triggerRandomFlavorEvent();
+      }
+      this.scheduleNextRandomEvent();
+    }, this.remainingTimeMs);
+  }
+
+  private pauseRandomTimer(): void {
+    if (this.randomTimerId !== null) {
+      clearTimeout(this.randomTimerId);
+      this.randomTimerId = null;
+
+      const elapsed = performance.now() - this.lastStartTimestamp;
+      this.remainingTimeMs = Math.max(0, this.remainingTimeMs - elapsed);
+    }
+  }
+
+  private clearRandomTimer(): void {
+    if (this.randomTimerId !== null) {
+      clearTimeout(this.randomTimerId);
+      this.randomTimerId = null;
+    }
+  }
+
+  private handleVisibilityChange(): void {
+    if (document.hidden) {
+      this.pauseRandomTimer();
+    } else {
+      this.startRandomTimer();
+    }
+  }
+
+  private getRandomDuration(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  // ----------------------------------------
+  // CORE LOGGING METHODS
+  // ----------------------------------------
   public addLog(text: string, category: LogCategory = LogCategory.Random): void {
     this.logs.update((currentLogs) => [
       ...currentLogs,
       { id: Math.random().toString(36).substring(2, 9), text, category },
     ]);
-    if (category === LogCategory.Story || category === LogCategory.Research)
+    if (category === LogCategory.Story || category === LogCategory.Research) {
       this.audioService.playUnlock();
+    }
     this.hasUnreadLogs.set(true);
   }
 
@@ -66,8 +146,6 @@ export class LogService {
       this.hasUnreadLogs.set(false);
     }
   }
-
-  private lastRandomEventIndex: number = -1;
 
   public triggerRandomFlavorEvent(): void {
     const events = RANDOM_FLAVOR_EVENTS;

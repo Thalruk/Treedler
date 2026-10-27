@@ -80,11 +80,5 @@ export class GameLoopService {
     if (this.secondsCounter % 30 === 0) {
       this.saveService.saveGame();
     }
-
-    if (this.secondsCounter % 60 === 0) {
-      if (Math.random() < 0.25) {
-        this.logService.triggerRandomFlavorEvent();
-      }
-    }
   }
 }

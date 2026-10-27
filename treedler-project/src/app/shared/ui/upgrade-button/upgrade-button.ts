@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AudioService } from '../../../core/services/audio.service';
+import { HoldToBuyDirective } from '../../../shared/directives/hold-to-buy.directive';
 
 export interface UpgradeCost {
   amount: number;
@@ -16,7 +17,7 @@ export interface UpgradeBreakdownRow {
 @Component({
   selector: 'app-upgrade-button',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, HoldToBuyDirective],
   templateUrl: './upgrade-button.html',
   host: {
     class: 'block h-full',

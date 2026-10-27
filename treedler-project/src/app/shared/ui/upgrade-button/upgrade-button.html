@@ -4,8 +4,9 @@
   (mouseleave)="onMouseLeave()"
 >
   <button
-    (click)="onButtonClick()"
-    class="w-full h-full text-left px-3 py-4 rounded transition-all duration-100 border"
+    appHoldToBuy
+    (buyTrigger)="onButtonClick()"
+    class="w-full h-full text-left px-3 py-4 rounded transition-all duration-100 border select-none touch-manipulation"
     [ngClass]="{
       'bg-gray-600 hover:bg-gray-500 border-gray-500 cursor-pointer active:scale-95':
         canAfford && !isMaxed,
