@@ -12,21 +12,22 @@ export class AudioService {
   public sfxVolume = signal<number>(0.4);
 
   public isMusicMuted = signal<boolean>(false);
-  public musicVolume = signal<number>(0.25);
+  public musicVolume = signal<number>(0.2);
 
   public isWindMuted = signal<boolean>(false);
-  public windVolume = signal<number>(0.3);
+  public windVolume = signal<number>(0.25);
 
   // ==========================================
   // 2. AUDIO NODES
   // ==========================================
-  private isMusicPlaying = false;
-  private musicMasterGain: GainNode | null = null;
+  private isAmbientPlaying = false;
+  private ambientMasterGain: GainNode | null = null;
   private windMasterGain: GainNode | null = null;
-  private ambientOscillators: OscillatorNode[] = [];
+  private ambientNodes: AudioNode[] = [];
+  private forestSoundTimers: ReturnType<typeof setTimeout>[] = [];
 
   // ==========================================
-  // 3. CORE INITIALIZATION & NOISE GENERATOR
+  // 3. CORE INITIALIZATION
   // ==========================================
   private initContext(): AudioContext | null {
     try {
@@ -42,10 +43,10 @@ export class AudioService {
         this.ctx.resume().catch(() => {});
       }
       if (this.ctx && !this.noiseBuffer) {
-        this.noiseBuffer = this.createPinkNoiseBuffer(this.ctx, 5);
+        this.noiseBuffer = this.createNoiseBuffer(this.ctx, 4);
       }
-      if (this.ctx && !this.isMusicPlaying && (!this.isMusicMuted() || !this.isWindMuted())) {
-        this.startAmbientMusic();
+      if (this.ctx && !this.isAmbientPlaying && (!this.isMusicMuted() || !this.isWindMuted())) {
+        this.startAmbient();
       }
       return this.ctx;
     } catch (e) {
@@ -54,30 +55,13 @@ export class AudioService {
     }
   }
 
-  private createPinkNoiseBuffer(ctx: AudioContext, durationSeconds: number): AudioBuffer {
+  private createNoiseBuffer(ctx: AudioContext, durationSeconds: number): AudioBuffer {
     const bufferSize = ctx.sampleRate * durationSeconds;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const output = buffer.getChannelData(0);
 
-    let b0 = 0,
-      b1 = 0,
-      b2 = 0,
-      b3 = 0,
-      b4 = 0,
-      b5 = 0,
-      b6 = 0;
-
     for (let i = 0; i < bufferSize; i++) {
-      const white = Math.random() * 2 - 1;
-      b0 = 0.99886 * b0 + white * 0.0555179;
-      b1 = 0.99332 * b1 + white * 0.0750759;
-      b2 = 0.969 * b2 + white * 0.153852;
-      b3 = 0.8665 * b3 + white * 0.3104856;
-      b4 = 0.55 * b4 + white * 0.5329522;
-      b5 = -0.7616 * b5 - white * 0.016898;
-      output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-      output[i] *= 0.04;
-      b6 = white * 0.115926;
+      output[i] = Math.random() * 2 - 1;
     }
 
     return buffer;
@@ -97,24 +81,24 @@ export class AudioService {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
 
-      const pitchVariation = 0.96 + Math.random() * 0.08;
-      const startFreq = 190 * pitchVariation;
-      const endFreq = 65 * pitchVariation;
+      const pitchVariation = 0.97 + Math.random() * 0.06;
+      const startFreq = 400 * pitchVariation;
+      const endFreq = 700 * pitchVariation;
 
       osc.type = 'sine';
       osc.frequency.setValueAtTime(startFreq, now);
-      osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.075);
+      osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.06);
 
-      const vol = Math.max(0.001, this.sfxVolume() * 0.5);
+      const vol = Math.max(0.001, this.sfxVolume() * 0.3);
       gain.gain.setValueAtTime(0.001, now);
-      gain.gain.linearRampToValueAtTime(vol, now + 0.005);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.075);
+      gain.gain.linearRampToValueAtTime(vol, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
 
       osc.start(now);
-      osc.stop(now + 0.08);
+      osc.stop(now + 0.1);
     } catch {}
   }
 
@@ -128,25 +112,23 @@ export class AudioService {
       const noise = ctx.createBufferSource();
       noise.buffer = this.noiseBuffer;
 
-      const randomOffset = Math.random() * 4.5;
-
       const filter = ctx.createBiquadFilter();
       filter.type = 'bandpass';
-      filter.Q.setValueAtTime(2.5, now);
-      filter.frequency.setValueAtTime(900, now);
-      filter.frequency.exponentialRampToValueAtTime(1600, now + 0.09);
+      filter.Q.setValueAtTime(1, now);
+      filter.frequency.setValueAtTime(1500, now);
+      filter.frequency.exponentialRampToValueAtTime(3000, now + 0.08);
 
       const gain = ctx.createGain();
-      const vol = Math.max(0.001, this.sfxVolume() * 0.45);
+      const vol = Math.max(0.001, this.sfxVolume() * 0.25);
       gain.gain.setValueAtTime(0.001, now);
-      gain.gain.linearRampToValueAtTime(vol, now + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+      gain.gain.linearRampToValueAtTime(vol, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
 
       noise.connect(filter);
       filter.connect(gain);
       gain.connect(ctx.destination);
 
-      noise.start(now, randomOffset, 0.12);
+      noise.start(now, Math.random() * 3, 0.12);
     } catch {}
   }
 
@@ -156,156 +138,173 @@ export class AudioService {
       const ctx = this.initContext();
       if (!ctx) return;
 
-      const notes = [523.25, 659.25, 783.99];
+      const now = ctx.currentTime;
+      // Ascending major arpeggio: C5 E5 G5 C6
+      const notes = [523.25, 659.25, 783.99, 1046.5];
+
       notes.forEach((freq, idx) => {
-        const now = ctx.currentTime + idx * 0.09;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
 
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.setValueAtTime(freq, now + idx * 0.07);
 
-        const vol = Math.max(0.001, this.sfxVolume() * 0.25);
-        gain.gain.setValueAtTime(0.001, now);
-        gain.gain.linearRampToValueAtTime(vol, now + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
+        const vol = Math.max(0.001, this.sfxVolume() * 0.15);
+        gain.gain.setValueAtTime(0.001, now + idx * 0.07);
+        gain.gain.linearRampToValueAtTime(vol, now + idx * 0.07 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.07 + 0.5);
 
         osc.connect(gain);
         gain.connect(ctx.destination);
 
-        osc.start(now);
-        osc.stop(now + 0.95);
+        osc.start(now + idx * 0.07);
+        osc.stop(now + idx * 0.07 + 0.55);
       });
     } catch {}
   }
 
   // ==========================================
-  // 5. AMBIENT MUSIC & WIND LAYERS
+  // 5. AMBIENT FOREST SOUNDSCAPE
   // ==========================================
 
-  public startAmbientMusic(): void {
+  public startAmbient(): void {
     try {
-      if (!this.ctx || this.isMusicPlaying) return;
+      if (!this.ctx || this.isAmbientPlaying) return;
 
-      this.isMusicPlaying = true;
+      this.isAmbientPlaying = true;
       const ctx = this.ctx;
       const now = ctx.currentTime;
 
-      // --- MASTER GAIN: MUSIC ---
-      this.musicMasterGain = ctx.createGain();
-      const targetMusicGain = this.isMusicMuted()
+      // --- MASTER GAIN ---
+      this.ambientMasterGain = ctx.createGain();
+      const targetAmbientGain = this.isMusicMuted()
         ? 0.0001
-        : Math.max(0.0001, this.musicVolume() * 0.18);
-      this.musicMasterGain.gain.setValueAtTime(0.0001, now);
-      this.musicMasterGain.gain.linearRampToValueAtTime(targetMusicGain, now + 3.0);
-      this.musicMasterGain.connect(ctx.destination);
+        : Math.max(0.0001, this.musicVolume() * 0.15);
+      this.ambientMasterGain.gain.setValueAtTime(0.0001, now);
+      this.ambientMasterGain.gain.linearRampToValueAtTime(targetAmbientGain, now + 2.0);
+      this.ambientMasterGain.connect(ctx.destination);
 
-      // --- MASTER GAIN: WIND ---
+      // --- WIND MASTER GAIN ---
       this.windMasterGain = ctx.createGain();
       const targetWindGain = this.isWindMuted()
         ? 0.0001
-        : Math.max(0.0001, this.windVolume() * 0.35);
+        : Math.max(0.0001, this.windVolume() * 0.25);
       this.windMasterGain.gain.setValueAtTime(0.0001, now);
-      this.windMasterGain.gain.linearRampToValueAtTime(targetWindGain, now + 3.0);
+      this.windMasterGain.gain.linearRampToValueAtTime(targetWindGain, now + 2.0);
       this.windMasterGain.connect(ctx.destination);
 
-      // --- LAYER A: ZEN HARMONIC DRONE ---
-      const filter = ctx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(380, now);
+      // --- LAYER A: SOFT HARMONIC DRONE (consonant fifths) ---
+      const droneFilter = ctx.createBiquadFilter();
+      droneFilter.type = 'lowpass';
+      droneFilter.frequency.setValueAtTime(450, now);
+      droneFilter.connect(this.ambientMasterGain);
 
-      const filterLfo = ctx.createOscillator();
-      const filterLfoGain = ctx.createGain();
-      filterLfo.type = 'sine';
-      filterLfo.frequency.setValueAtTime(0.08, now);
-      filterLfoGain.gain.setValueAtTime(140, now);
-      filterLfo.connect(filterLfoGain);
-      filterLfoGain.connect(filter.frequency);
-      filterLfo.start(now);
-
-      filter.connect(this.musicMasterGain);
-
-      const padFrequencies = [65.41, 98.0, 164.81, 196.0, 246.94, 293.66];
-      this.ambientOscillators = [filterLfo];
-
-      padFrequencies.forEach((freq, index) => {
+      const droneFreqs = [130.81, 196.0, 261.63]; // C3, G3, C4 - consonant intervals
+      droneFreqs.forEach((freq) => {
         const osc = ctx.createOscillator();
         const voiceGain = ctx.createGain();
 
-        osc.type = index < 2 ? 'triangle' : 'sine';
+        osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, now);
-        osc.detune.setValueAtTime((index % 2 === 0 ? 1 : -1) * (2 + index * 1.2), now);
+        osc.detune.setValueAtTime(-5, now); // slight detune for warmth
 
-        const baseVoiceVol = index < 2 ? 0.22 : 0.1;
-        voiceGain.gain.setValueAtTime(baseVoiceVol, now);
-
-        const ampLfo = ctx.createOscillator();
-        const ampLfoGain = ctx.createGain();
-        ampLfo.type = 'sine';
-        ampLfo.frequency.setValueAtTime(0.05 + index * 0.017, now);
-        ampLfoGain.gain.setValueAtTime(baseVoiceVol * 0.45, now);
-
-        ampLfo.connect(ampLfoGain);
-        ampLfoGain.connect(voiceGain.gain);
-
+        voiceGain.gain.setValueAtTime(0.05, now);
         osc.connect(voiceGain);
-        voiceGain.connect(filter);
+        voiceGain.connect(droneFilter);
 
         osc.start(now);
-        ampLfo.start(now);
-
-        this.ambientOscillators.push(osc, ampLfo);
+        this.ambientNodes.push(osc, voiceGain);
       });
 
-      // --- LAYER B: WIND & RUSTLING CANOPY ---
-      this.setupWindAndLeavesLayer(ctx, now);
+      // --- LAYER B: WIND THROUGH LEAVES (filtered noise) ---
+      if (!this.isWindMuted()) {
+        const windSource = ctx.createBufferSource();
+        windSource.buffer = this.noiseBuffer;
+        windSource.loop = true;
+
+        const windFilter = ctx.createBiquadFilter();
+        windFilter.type = 'bandpass';
+        windFilter.Q.setValueAtTime(1.5, now);
+        windFilter.frequency.setValueAtTime(4000, now);
+
+        const windGain = ctx.createGain();
+        windGain.gain.setValueAtTime(0.12, now);
+
+        // Slow amplitude modulation for gustiness
+        const windAmpLfo = ctx.createOscillator();
+        const windAmpLfoGain = ctx.createGain();
+        windAmpLfo.type = 'sine';
+        windAmpLfo.frequency.setValueAtTime(0.05, now);
+        windAmpLfoGain.gain.setValueAtTime(0.08, now);
+
+        windAmpLfo.connect(windAmpLfoGain);
+        windAmpLfoGain.connect(windGain.gain);
+
+        windSource.connect(windFilter);
+        windFilter.connect(windGain);
+        windGain.connect(this.windMasterGain);
+
+        windSource.start(now);
+        windAmpLfo.start(now);
+        this.ambientNodes.push(windSource, windFilter, windGain, windAmpLfo, windAmpLfoGain);
+      }
+
+      // --- SCHEDULED FOREST SOUNDS ---
+      this.scheduleBirdChirp(ctx, now);
     } catch (e) {
-      console.warn('Ambient synth init failed:', e);
-      this.isMusicPlaying = false;
+      console.warn('Ambient init failed:', e);
+      this.isAmbientPlaying = false;
     }
   }
 
-  private setupWindAndLeavesLayer(ctx: AudioContext, now: number): void {
-    if (!this.noiseBuffer || !this.windMasterGain) return;
+  private scheduleBirdChirp(ctx: AudioContext, now: number): void {
+    if (!this.ctx || this.isMusicMuted()) return;
 
-    const windSource = ctx.createBufferSource();
-    windSource.buffer = this.noiseBuffer;
-    windSource.loop = true;
-
-    const windFilter = ctx.createBiquadFilter();
-    windFilter.type = 'bandpass';
-    windFilter.Q.setValueAtTime(1.8, now);
-    windFilter.frequency.setValueAtTime(550, now);
-
-    const windPitchLfo = ctx.createOscillator();
-    const windPitchLfoGain = ctx.createGain();
-    windPitchLfo.type = 'sine';
-    windPitchLfo.frequency.setValueAtTime(0.09, now);
-    windPitchLfoGain.gain.setValueAtTime(260, now);
-    windPitchLfo.connect(windPitchLfoGain);
-    windPitchLfoGain.connect(windFilter.frequency);
-
-    const windGain = ctx.createGain();
-    windGain.gain.setValueAtTime(0.28, now);
-
-    const windAmpLfo = ctx.createOscillator();
-    const windAmpLfoGain = ctx.createGain();
-    windAmpLfo.type = 'sine';
-    windAmpLfo.frequency.setValueAtTime(0.065, now);
-    windAmpLfoGain.gain.setValueAtTime(0.18, now);
-    windAmpLfo.connect(windAmpLfoGain);
-    windAmpLfoGain.connect(windGain.gain);
-
-    windSource.connect(windFilter);
-    windFilter.connect(windGain);
-    windGain.connect(this.windMasterGain);
-
-    windSource.start(now);
-    windPitchLfo.start(now);
-    windAmpLfo.start(now);
-
-    this.ambientOscillators.push(windPitchLfo, windAmpLfo);
+    const nextChirp = now + 10 + Math.random() * 15; // 10-25 seconds
+    const timer = setTimeout(
+      () => {
+        if (!this.ctx || this.isMusicMuted()) return;
+        this.playBirdChirp();
+        this.scheduleBirdChirp(this.ctx!, this.ctx.currentTime);
+      },
+      (nextChirp - now) * 1000,
+    );
+    this.forestSoundTimers.push(timer);
   }
+
+  private playBirdChirp(): void {
+    if (!this.ctx) return;
+    try {
+      const now = this.ctx.currentTime;
+
+      // Two-note chirp, slightly randomized
+      const baseFreq = 3000 + Math.random() * 1000;
+      const secondFreq = baseFreq * (1.3 + Math.random() * 0.3);
+
+      [baseFreq, secondFreq].forEach((freq, idx) => {
+        const osc = this.ctx!.createOscillator();
+        const gain = this.ctx!.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.7, now + idx * 0.08 + 0.2);
+
+        gain.gain.setValueAtTime(0.001, now + idx * 0.08);
+        gain.gain.linearRampToValueAtTime(0.12, now + idx * 0.08 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.08 + 0.3);
+
+        osc.connect(gain);
+        gain.connect(this.ctx!.destination);
+
+        osc.start(now + idx * 0.08);
+        osc.stop(now + idx * 0.08 + 0.35);
+      });
+    } catch {}
+  }
+
+  // ==========================================
+  // 6. GAIN UPDATES & CONTROLS
+  // ==========================================
 
   public updateGains(): void {
     try {
@@ -313,24 +312,49 @@ export class AudioService {
         if (!this.isMusicMuted() || !this.isWindMuted()) this.initContext();
         return;
       }
-      if (!this.isMusicPlaying && (!this.isMusicMuted() || !this.isWindMuted())) {
-        this.startAmbientMusic();
+      if (!this.isAmbientPlaying && (!this.isMusicMuted() || !this.isWindMuted())) {
+        this.startAmbient();
         return;
       }
+
       const now = this.ctx.currentTime;
 
-      if (this.musicMasterGain) {
+      if (this.ambientMasterGain) {
         const targetMusic = this.isMusicMuted()
           ? 0.0001
-          : Math.max(0.0001, this.musicVolume() * 0.18);
-        this.musicMasterGain.gain.setTargetAtTime(targetMusic, now, 0.15);
+          : Math.max(0.0001, this.musicVolume() * 0.15);
+        this.ambientMasterGain.gain.setTargetAtTime(targetMusic, now, 0.2);
       }
 
       if (this.windMasterGain) {
-        const targetWind = this.isWindMuted() ? 0.0001 : Math.max(0.0001, this.windVolume() * 0.35);
-        this.windMasterGain.gain.setTargetAtTime(targetWind, now, 0.15);
+        const targetWind = this.isWindMuted() ? 0.0001 : Math.max(0.0001, this.windVolume() * 0.25);
+        this.windMasterGain.gain.setTargetAtTime(targetWind, now, 0.2);
       }
     } catch {}
+  }
+
+  public stopAmbient(): void {
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+
+    // Clear scheduled forest sounds
+    this.forestSoundTimers.forEach((timer) => clearTimeout(timer));
+    this.forestSoundTimers = [];
+
+    this.ambientNodes.forEach((node) => {
+      try {
+        if (node instanceof OscillatorNode || node instanceof AudioBufferSourceNode) {
+          node.stop(now + 0.5);
+        }
+        if (node instanceof GainNode) {
+          node.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+        }
+      } catch {}
+    });
+    this.ambientNodes = [];
+    this.isAmbientPlaying = false;
+    this.ambientMasterGain = null;
+    this.windMasterGain = null;
   }
 
   public toggleSfxMute(): void {
