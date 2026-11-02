@@ -2,6 +2,8 @@ import { Injectable, signal, computed } from '@angular/core';
 
 export type BuyMultiplierOption = 1 | 5 | 10 | 'MAX';
 
+export const BUY_MULTIPLIER_OPTIONS: BuyMultiplierOption[] = [1, 5, 10, 'MAX'];
+
 @Injectable({ providedIn: 'root' })
 export class ShortcutService {
   public baseMultiplier = signal<BuyMultiplierOption>(1);
@@ -13,25 +15,23 @@ export class ShortcutService {
   public multiplier = computed<number | 'MAX'>(() => {
     if (this.isAltPressed()) return 'MAX';
 
-    let mult = 1;
-    if (this.isShiftPressed()) mult *= 5;
-    if (this.isCtrlPressed()) mult *= 10;
+    let modifierMultiplier = 1;
+    if (this.isShiftPressed()) modifierMultiplier *= 5;
+    if (this.isCtrlPressed()) modifierMultiplier *= 10;
 
-    // Jeśli wciśnięto modyfikatory (wynik 5, 10 lub 50), nadpisują one bazę
-    if (mult > 1) return mult;
+    if (modifierMultiplier > 1) return modifierMultiplier;
 
     return this.baseMultiplier();
   });
 
-  // Metoda pomocnicza dla UpgradeService - tłumaczy 'MAX' na bezpieczny limit dla pętli
   public getNumericMultiplier(): number {
-    const val = this.multiplier();
-    return val === 'MAX' ? 1000 : val;
+    const value = this.multiplier();
+    return value === 'MAX' ? 1000 : value;
   }
 
   constructor() {
-    window.addEventListener('keydown', (e) => this.updateModifierKeys(e));
-    window.addEventListener('keyup', (e) => this.updateModifierKeys(e));
+    window.addEventListener('keydown', (event) => this.updateModifierKeys(event));
+    window.addEventListener('keyup', (event) => this.updateModifierKeys(event));
     window.addEventListener('blur', () => this.resetModifiers());
   }
 

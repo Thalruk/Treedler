@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GameLoopService } from './core/services/game-loop';
+import { GameLoopService } from './core/services/game-loop.service';
 import { SaveService } from './core/services/save.service';
 import { StorylineService } from './core/services/storyline.service';
 import { AudioService } from './core/services/audio.service';

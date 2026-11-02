@@ -7,13 +7,18 @@ import { LogService } from './log.service';
 import { BloomService } from './bloom.service';
 import { AudioService } from './audio.service';
 import { SettingsService } from './settings.service';
+import { SaveState } from '../models/save-state.model';
+
+interface WritableSignalLike {
+  set: (value: unknown) => void;
+}
+
+interface UpgradeLevelHost {
+  level?: WritableSignalLike;
+}
 
 @Injectable({ providedIn: 'root' })
 export class SaveService {
-  // ==========================================
-  // 1. INJECTIONS & CONSTANTS
-  // ==========================================
-
   private resourceService = inject(ResourceService);
   private upgradeService = inject(UpgradeService);
   private storylineService = inject(StorylineService);
@@ -25,12 +30,8 @@ export class SaveService {
 
   private readonly SAVE_KEY = 'treedler_save';
 
-  // ==========================================
-  // 2. ACTIONS
-  // ==========================================
-
   public saveGame(): void {
-    const saveState = {
+    const saveState: SaveState = {
       resources: {
         water: this.resourceService.water(),
         minerals: this.resourceService.minerals(),
@@ -115,42 +116,43 @@ export class SaveService {
     if (!savedData) return;
 
     try {
-      const parsed = JSON.parse(savedData);
+      const parsed = JSON.parse(savedData) as SaveState;
 
-      if (parsed.resources) {
-        if (parsed.resources.water) this.resourceService.water.set(parsed.resources.water);
-        if (parsed.resources.minerals) this.resourceService.minerals.set(parsed.resources.minerals);
-        if (parsed.resources.energy) this.resourceService.energy.set(parsed.resources.energy);
-      }
+      if (parsed.resources?.water) this.resourceService.water.set(parsed.resources.water);
+      if (parsed.resources?.minerals) this.resourceService.minerals.set(parsed.resources.minerals);
+      if (parsed.resources?.energy) this.resourceService.energy.set(parsed.resources.energy);
 
       if (parsed.upgrades) this.loadSignals(parsed.upgrades, this.upgradeService);
       if (parsed.storyline) this.loadSignals(parsed.storyline, this.storylineService);
       if (parsed.logsData) this.loadSignals(parsed.logsData, this.logService);
 
-      if (parsed.mutations) {
-        if (parsed.mutations.progresses) {
-          this.mutationService.progresses.set(parsed.mutations.progresses);
-        }
-        if (parsed.mutations.completed) {
-          this.mutationService.completed.set(parsed.mutations.completed);
-        }
-        if (parsed.mutations.isOverMutationEnabled !== undefined) {
-          this.mutationService.isOverMutationEnabled.set(parsed.mutations.isOverMutationEnabled);
-        }
+      if (parsed.mutations?.progresses) {
+        this.mutationService.progresses.set(parsed.mutations.progresses);
       }
-      if (parsed.bloom) {
-        if (parsed.bloom.currentStageIndex !== undefined)
-          this.bloomService.currentStageIndex.set(parsed.bloom.currentStageIndex);
-        if (parsed.bloom.isActive !== undefined)
-          this.bloomService.isActive.set(parsed.bloom.isActive);
-        if (parsed.bloom.invested) this.bloomService.invested.set(parsed.bloom.invested);
-        if (parsed.bloom.isFullyComplete !== undefined)
-          this.bloomService.isFullyComplete.set(parsed.bloom.isFullyComplete);
+      if (parsed.mutations?.completed) {
+        this.mutationService.completed.set(parsed.mutations.completed);
       }
+      if (parsed.mutations?.isOverMutationEnabled !== undefined) {
+        this.mutationService.isOverMutationEnabled.set(parsed.mutations.isOverMutationEnabled);
+      }
+
+      if (parsed.bloom?.currentStageIndex !== undefined) {
+        this.bloomService.currentStageIndex.set(parsed.bloom.currentStageIndex);
+      }
+      if (parsed.bloom?.isActive !== undefined) {
+        this.bloomService.isActive.set(parsed.bloom.isActive);
+      }
+      if (parsed.bloom?.invested) {
+        this.bloomService.invested.set(parsed.bloom.invested);
+      }
+      if (parsed.bloom?.isFullyComplete !== undefined) {
+        this.bloomService.isFullyComplete.set(parsed.bloom.isFullyComplete);
+      }
+
       if (parsed.audio) this.loadSignals(parsed.audio, this.audioService);
       if (parsed.settings) this.loadSignals(parsed.settings, this.settingsService);
-    } catch (e) {
-      console.error('Save load error:', e);
+    } catch (error) {
+      console.error('Save load error:', error);
     }
   }
 
@@ -159,23 +161,24 @@ export class SaveService {
     window.location.reload();
   }
 
-  // ==========================================
-  // 3. HELPER METHODS
-  // ==========================================
-  private loadSignals(savedSection: any, targetService: any): void {
-    for (const key of Object.keys(savedSection)) {
-      if (savedSection[key] !== undefined) {
-        if (key.endsWith('Level')) {
-          const upgradeKey = key.replace('Level', '');
-          if (
-            targetService[upgradeKey] &&
-            typeof targetService[upgradeKey].level?.set === 'function'
-          ) {
-            targetService[upgradeKey].level.set(savedSection[key]);
-          }
-        } else if (targetService[key] && typeof targetService[key].set === 'function') {
-          targetService[key].set(savedSection[key]);
+  private loadSignals(savedSection: Record<string, unknown>, targetService: object): void {
+    const target = targetService as Record<string, unknown>;
+
+    for (const [key, value] of Object.entries(savedSection)) {
+      if (value === undefined) continue;
+
+      if (key.endsWith('Level')) {
+        const upgradeKey = key.slice(0, -'Level'.length);
+        const upgrade = target[upgradeKey] as UpgradeLevelHost | undefined;
+        if (typeof upgrade?.level?.set === 'function') {
+          upgrade.level.set(value);
         }
+        continue;
+      }
+
+      const maybeSignal = target[key] as WritableSignalLike | undefined;
+      if (typeof maybeSignal?.set === 'function') {
+        maybeSignal.set(value);
       }
     }
   }
