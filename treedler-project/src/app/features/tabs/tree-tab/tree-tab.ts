@@ -11,16 +11,7 @@ import {
 } from '../../../shared/ui/upgrade-button/upgrade-button';
 import { UpgradeBase } from '../../../core/classes/upgrade-base';
 import { MutationId } from '../../../core/enums/mutation.enum';
-
-export interface UpgradeView {
-  model: UpgradeBase;
-  title: string;
-  description: string;
-  effect: string[];
-  breakdown: UpgradeBreakdownRow[];
-  limit?: number;
-  isVisible?: () => boolean;
-}
+import { UpgradeView } from '../../../core/models/upgrade-view.model';
 
 @Component({
   selector: 'app-tree-tab',

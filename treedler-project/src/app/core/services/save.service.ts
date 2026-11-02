@@ -9,12 +9,12 @@ import { AudioService } from './audio.service';
 import { SettingsService } from './settings.service';
 import { SaveState } from '../models/save-state.model';
 
-interface WritableSignalLike {
+interface SignalLike {
   set: (value: unknown) => void;
 }
 
-interface UpgradeLevelHost {
-  level?: WritableSignalLike;
+interface UpgradeSignalHost {
+  level?: SignalLike;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -163,22 +163,21 @@ export class SaveService {
 
   private loadSignals(savedSection: Record<string, unknown>, targetService: object): void {
     const target = targetService as Record<string, unknown>;
-
     for (const [key, value] of Object.entries(savedSection)) {
       if (value === undefined) continue;
 
       if (key.endsWith('Level')) {
         const upgradeKey = key.slice(0, -'Level'.length);
-        const upgrade = target[upgradeKey] as UpgradeLevelHost | undefined;
+        const upgrade = target[upgradeKey] as UpgradeSignalHost | undefined;
         if (typeof upgrade?.level?.set === 'function') {
           upgrade.level.set(value);
         }
         continue;
       }
 
-      const maybeSignal = target[key] as WritableSignalLike | undefined;
-      if (typeof maybeSignal?.set === 'function') {
-        maybeSignal.set(value);
+      const signal = target[key] as SignalLike | undefined;
+      if (typeof signal?.set === 'function') {
+        signal.set(value);
       }
     }
   }
